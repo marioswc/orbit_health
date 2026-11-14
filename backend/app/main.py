@@ -24,6 +24,10 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="ORBIT Health", version="0.1.0", lifespan=lifespan)
 app.include_router(router)
+if config.DEMO_API:
+    from .api import demo
+
+    app.include_router(demo.router)
 
 
 def _montar_frontend() -> None:

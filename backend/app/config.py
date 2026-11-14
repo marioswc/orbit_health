@@ -13,5 +13,7 @@ from .dominio.umbrales import UMBRALES  # noqa: E402
 # Los valores por defecto salen de datos/umbrales.json; la variable de entorno tiene prioridad.
 VENTANA_NEWS2_MIN = int(os.getenv("ORBIT_VENTANA_NEWS2_MIN") or UMBRALES["ventana_news2_min"])
 DIAS_LINEA_BASE = int(os.getenv("ORBIT_DIAS_LINEA_BASE") or UMBRALES["linea_base"]["dias"])
+# Endpoints de escenarios de demostración (escriben datos): desactivar fuera de la demo.
+DEMO_API = os.getenv("ORBIT_DEMO_API", "1") == "1"
 SEED_DEMO = os.getenv("ORBIT_SEED_DEMO", "1") == "1"
 FRONTEND_DIST = os.getenv("ORBIT_FRONTEND_DIST", "")
