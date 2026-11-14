@@ -50,6 +50,7 @@
 - Un apagón largo acumula muchos eventos de rutina (147 en el apagón simulado). Resumirlos antes de enviar sigue pendiente.
 
 ## No verificado (hay que comprobarlo a mano)
+- **Banda Aolon (u otra de consumo):** falta saber si trae el servicio estándar de frecuencia cardíaca. Se comprueba en un minuto con `puente_ble.py --escanear` y `--inspeccionar` (ver `docs/BANDA_BLE.md`). Si habla un protocolo propio, queda fuera de lo que se puede prometer.
 - **Una banda real:** el puente BLE y el flujo continuo están probados con paquetes simulados, no con hardware. Ver `docs/BANDA_BLE.md`.
 - Cómo se ve y se siente la interfaz en el navegador, y el flujo completo con una persona usándola.
 - El video, las diapositivas y el formulario de envío.

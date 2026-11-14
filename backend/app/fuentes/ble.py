@@ -51,3 +51,24 @@ def muestra_valida(medicion: dict) -> float | None:
     if medicion["contacto"] is False:
         return None
     return float(medicion["fc"]) if validar("frecuencia_cardiaca", medicion["fc"]) is None else None
+
+
+def describir_gatt(servicios) -> dict:
+    """Resume la tabla GATT de un dispositivo: qué servicios trae y si ofrece el estándar de frecuencia cardíaca.
+
+    `servicios` es cualquier iterable de objetos con `uuid` y `characteristics` (cada una con `uuid` y `properties`),
+    como el que entrega la librería BLE al conectar. Así se puede probar sin un dispositivo.
+    """
+    lineas, tiene_fc, notificables = [], False, []
+    for sv in servicios:
+        uuid = str(sv.uuid).lower()
+        es_fc = uuid == SERVICIO_FC
+        tiene_fc = tiene_fc or es_fc
+        lineas.append(f"Servicio {uuid}" + ("   <- frecuencia cardíaca ESTÁNDAR" if es_fc else ""))
+        for ch in sv.characteristics:
+            props = ",".join(sorted(ch.properties))
+            lineas.append(f"    {str(ch.uuid).lower()}  [{props}]")
+            if {"notify", "indicate"} & set(ch.properties):
+                notificables.append(str(ch.uuid).lower())
+    return {"lineas": lineas, "tiene_frecuencia_estandar": tiene_fc, "notificables": notificables,
+            "servicios": sum(1 for _ in lineas if _.startswith("Servicio"))}
