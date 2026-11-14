@@ -14,6 +14,7 @@ import BotonCaptura from "./BotonCaptura";
 
 // Vistas secundarias: se descargan solo al abrirlas
 const BienestarPage = lazy(() => import("../features/bienestar").then((m) => ({ default: m.BienestarPage })));
+const HistorialPage = lazy(() => import("../features/historial").then((m) => ({ default: m.HistorialPage })));
 const RiesgosPage = lazy(() => import("../features/peligros").then((m) => ({ default: m.RiesgosPage })));
 const EnlacePage = lazy(() => import("../features/enlace").then((m) => ({ default: m.EnlacePage })));
 
@@ -23,7 +24,7 @@ interface EstadoUmbrales { version: string; estado: string }
 function desdeUrl() {
   const q = new URLSearchParams(window.location.search);
   const v = q.get("vista");
-  return { vista: (v === "bienestar" || v === "enlace" || v === "riesgos" ? v : "monitor") as Vista, captura: q.get("captura") === "1" };
+  return { vista: (v === "bienestar" || v === "enlace" || v === "riesgos" || v === "historial" ? v : "monitor") as Vista, captura: q.get("captura") === "1" };
 }
 
 export default function App() {
@@ -44,7 +45,7 @@ export default function App() {
     estado?.indicadores.find((i) => i.indicador === "dosis_pct") ?? null,
   );
   // Direccion del cambio de vista: el contenido entra desde el lado hacia el que se movio la pestana
-  const orden = ["monitor", "bienestar", "riesgos", "enlace"];
+  const orden = ["monitor", "historial", "bienestar", "riesgos", "enlace"];
   const previa = useRef(orden.indexOf(ini.vista));
   const dx = orden.indexOf(vista) >= previa.current ? 32 : -32;
   useEffect(() => { previa.current = orden.indexOf(vista); });
@@ -90,7 +91,6 @@ export default function App() {
         <div className="vista" key={vista} style={{ display: vista === "monitor" ? "contents" : undefined, "--dx": `${dx}px` } as CSSProperties}>
           {tid && vista === "monitor" && (
             <MonitorPage
-              tripulanteId={tid}
               estado={estado}
               ambiente={ambiente.nivel}
               cabina={<MonitorCabina ambiente={ambiente} alerta={colectivas?.alertas[0] ?? null} />}
@@ -98,6 +98,7 @@ export default function App() {
           )}
           <Suspense fallback={<span className="esqueleto" style={{ height: 120 }} aria-busy="true" />}>
             {tid && vista === "bienestar" && <BienestarPage tripulanteId={tid} />}
+            {tid && vista === "historial" && <HistorialPage tripulanteId={tid} estado={estado} />}
             {vista === "riesgos" && <RiesgosPage />}
             {vista === "enlace" && <EnlacePage />}
           </Suspense>

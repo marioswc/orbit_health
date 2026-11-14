@@ -58,9 +58,18 @@
 .grafica-cab { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--spacing-12); }
 .grafica-cab h2 { margin: 0 0 var(--spacing-4); }
 .grafica-cab p { margin: 0; }
-.serie-svg { width: 100%; height: auto; max-height: 150px; display: block; background: var(--color-eggshell); border: 1px solid var(--color-stone); border-radius: var(--radius-input); }
-.serie-eje { stroke: var(--color-stone); stroke-width: 1; }
-.serie-linea { stroke: var(--hud); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.serie-caja { position: relative; }
+.serie-svg { width: 100%; height: auto; display: block; border-radius: 16px; background: color-mix(in srgb, var(--color-eggshell) 70%, transparent); border: 1px solid var(--color-stone); touch-action: pan-y; cursor: crosshair; }
+.serie-linea { stroke: var(--hud); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; animation: trazo-serie .9s var(--ease-out) both; }
+@keyframes trazo-serie { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.serie-rejilla { stroke: var(--color-stone); stroke-width: 1; }
+.serie-txt { fill: var(--color-smoke); font: 11px var(--font-geist-mono); }
+.serie-media { stroke: var(--color-smoke); stroke-width: 1; stroke-dasharray: 4 5; }
+.serie-guia { stroke: var(--color-ash); stroke-width: 1; }
+.serie-punto.ultimo { stroke: var(--hud); stroke-width: 2; }
+.serie-punto.sel { stroke: var(--color-ink); stroke-width: 2; }
+.serie-tip { position: absolute; transform: translate(-50%, calc(-100% - 12px)); display: grid; gap: 2px; justify-items: start; padding: var(--spacing-8) var(--spacing-12); border-radius: 14px; font-size: var(--text-caption); color: var(--color-graphite); background: var(--color-eggshell); border: 1px solid var(--color-stone); box-shadow: 0 6px 20px rgba(0, 0, 0, .25); pointer-events: none; white-space: nowrap; z-index: 2; }
+.serie-tip strong { color: var(--color-ink); font-size: var(--text-body-sm); }
 .serie-punto { fill: var(--estado-verde); stroke: var(--color-eggshell); stroke-width: 1.2; }
 .serie-punto.amarillo { fill: var(--estado-amarillo); }
 .serie-punto.rojo { fill: var(--estado-rojo); }
