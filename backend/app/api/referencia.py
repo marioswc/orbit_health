@@ -18,6 +18,8 @@ RUTAS_PUBLICAS = {
     ("GET", "/api/explicaciones"),               # contenido educativo, sin datos de salud
     ("GET", "/api/explicaciones/{clave}"),
     ("GET", "/api/peligros"),                    # marco de peligros y riesgos del HRP, sin datos de salud
+    ("GET", "/api/entornos"),                    # gravedad y aplicabilidad de cifras por entorno, sin datos de salud
+    ("GET", "/api/entornos/{clave}"),
 }
 
 ENCABEZADO = """# Referencia de la API

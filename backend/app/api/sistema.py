@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 
 from ..dominio.catalogos import INDICADORES
 from ..dominio import peligros as dominio_peligros
+from ..dominio.entornos import DATOS as ENTORNOS
 from ..dominio.explicaciones import DATOS as EXPLICACIONES
 from ..dominio.umbrales import UMBRALES
 from ..repositorios import tripulantes
@@ -49,6 +50,21 @@ def explicacion(clave: str) -> dict:
         raise HTTPException(404, "No hay explicación para ese indicador")
     return {"clave": clave, "estado": EXPLICACIONES["estado"], "aviso": EXPLICACIONES["aviso"],
             **EXPLICACIONES["explicaciones"][clave]}
+
+
+@router.get("/entornos")
+def entornos() -> dict:
+    """Entornos de la misión con su gravedad y si la estimación de pérdida ósea aplica en cada uno"""
+    return ENTORNOS
+
+
+@router.get("/entornos/{clave}")
+def entorno(clave: str) -> dict:
+    """Un entorno de la misión: gravedad y aplicabilidad de la estimación ósea"""
+    if clave not in ENTORNOS["entornos"]:
+        raise HTTPException(404, "Entorno desconocido")
+    return {"clave": clave, "nota_general": ENTORNOS["nota_general"], "fuente_gravedad": ENTORNOS["fuente_gravedad"],
+            **ENTORNOS["entornos"][clave]}
 
 
 @router.get("/peligros")

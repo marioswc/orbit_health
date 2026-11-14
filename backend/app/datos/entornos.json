@@ -1,0 +1,42 @@
+{
+  "estado": "valores de referencia; la gravedad de Marte viene de la NASA y la de la Luna es un valor físico de referencia",
+  "fuente_gravedad": "https://www.nasa.gov/hrp/hazard-gravity-fields/",
+  "nota_general": "El cuerpo debe adaptarse a distintos niveles de gravedad: la nave, la Luna o Marte, y de nuevo la Tierra al volver.",
+  "entornos": {
+    "nave_en_transito": {
+      "nombre": "Nave en tránsito",
+      "gravedad_g": 0.0,
+      "microgravedad": true,
+      "perfil_enlace_tipico": ["marte_cercano", "marte_medio", "marte", "luna"],
+      "estimacion_osea": {"estado": "aplica", "nota": "La NASA da una pérdida de 1 a 1.5 % de densidad ósea por mes en misiones en microgravedad de 4 a 6 meses; en más tiempo no está bien caracterizada."}
+    },
+    "estacion_orbital": {
+      "nombre": "Estación en órbita",
+      "gravedad_g": 0.0,
+      "microgravedad": true,
+      "perfil_enlace_tipico": [],
+      "estimacion_osea": {"estado": "aplica", "nota": "La NASA da una pérdida de 1 a 1.5 % de densidad ósea por mes en misiones en microgravedad de 4 a 6 meses; en más tiempo no está bien caracterizada."}
+    },
+    "base_lunar": {
+      "nombre": "Base en la Luna",
+      "gravedad_g": 0.165,
+      "microgravedad": false,
+      "perfil_enlace_tipico": ["luna"],
+      "estimacion_osea": {"estado": "no_caracterizada", "nota": "La cifra de pérdida ósea es de microgravedad. Para gravedad parcial la NASA no da cifras en las páginas consultadas, así que no se calcula."}
+    },
+    "base_marciana": {
+      "nombre": "Base en Marte",
+      "gravedad_g": 0.375,
+      "microgravedad": false,
+      "perfil_enlace_tipico": ["marte_cercano", "marte_medio", "marte"],
+      "estimacion_osea": {"estado": "no_caracterizada", "nota": "La NASA indica que en Marte la tripulación viviría hasta dos años a tres octavos de la gravedad terrestre, pero no da una cifra de pérdida ósea para esa gravedad, así que no se calcula."}
+    },
+    "rover_en_superficie": {
+      "nombre": "Rover en la superficie",
+      "gravedad_g": null,
+      "microgravedad": false,
+      "perfil_enlace_tipico": ["luna", "marte_cercano", "marte_medio", "marte"],
+      "estimacion_osea": {"estado": "no_caracterizada", "nota": "Depende del cuerpo donde opere (Luna o Marte) y para gravedad parcial no hay cifras de pérdida ósea."}
+    }
+  }
+}
