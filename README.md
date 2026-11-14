@@ -30,6 +30,19 @@ scripts/cargar_calibracion.sh     # sin red: carga series BIDMC como historial d
 Los registros son de pacientes críticos hospitalizados (ver `data/physionet/ATRIBUCION.md`): sirven para dar
 variabilidad realista a la demo, no como línea base clínica.
 
+## Simular la latencia del enlace
+
+| Modo | Configuración | Retardo de ida (Marte, peor caso) |
+|---|---|---|
+| Demo acelerada (por defecto) | `ORBIT_FACTOR_ACELERACION=30` | 40 s |
+| Tiempo real | `ORBIT_FACTOR_ACELERACION=1` | 1200 s (20 min) |
+| Con variación | `ORBIT_JITTER_PCT=15` y, para repetirlo, `ORBIT_JITTER_SEMILLA=42` | ±15 % |
+
+- Perfiles en `backend/app/datos/enlace.json`: `luna`, `marte_cercano`, `marte_medio` y `marte`. Cambian con `POST /api/enlace`.
+- Cada evento pasa por `retenido` → `en_transito` → `recibido` (llegó a Tierra) y queda `confirmado` cuando vuelve la confirmación (ida y vuelta).
+- `GET /api/enlace/latencia` devuelve el perfil vigente, los tiempos reales y simulados y los eventos en tránsito.
+- Los retardos son supuestos de diseño y deben verificarse contra fuentes publicadas antes de citarlos.
+
 ## Escenarios de demo
 
 ```bash
