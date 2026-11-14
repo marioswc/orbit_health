@@ -13,6 +13,13 @@ set -a; . ../.env; set +a
 uvicorn app.main:app --port 3000      # sirve API y frontend en http://localhost:3000
 ```
 
+## Arranque y verificación rápidos
+
+```bash
+./run.sh                      # preparado una vez con red; luego funciona sin internet (solo 127.0.0.1)
+scripts/verificar_e2e.sh      # E2E automático contra una base temporal
+```
+
 ## Desarrollo
 
 ```bash
