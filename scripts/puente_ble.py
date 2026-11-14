@@ -8,7 +8,8 @@ Lee la frecuencia cardíaca del servicio estándar (GATT 0x180D) y la envía cad
 Uso:
     puente_ble.py --escanear                          # ¿qué dispositivos cercanos anuncian frecuencia cardíaca?
     puente_ble.py --nombre Polar --tripulante T1      # conecta y envía (sesión: variable ORBIT_TOKEN si hay autenticación)
-    puente_ble.py --inspeccionar --nombre Aolon       # ¿qué servicios ofrece mi banda? ¿trae el estándar de frecuencia cardíaca?
+    puente_ble.py --escanear --filtrar Aolon          # solo los dispositivos con ese nombre (no lista los ajenos)
+    puente_ble.py --inspeccionar --nombre Aolon --mas-cercana   # ¿qué servicios ofrece mi banda? (con varias iguales, la más cercana)
     puente_ble.py --inspeccionar --nombre Aolon --escuchar 20   # además, muestra en crudo lo que emite durante 20 s
 
 NO está probado con una banda real: confirma primero con --escanear que la tuya anuncia el servicio estándar.
@@ -35,9 +36,16 @@ def _bleak():
         sys.exit("Falta la librería BLE. Instálala con: backend/.venv/bin/pip install -r backend/requirements-ble.txt")
 
 
-async def escanear(segundos: float, mostrar: bool) -> int:
+async def escanear(segundos: float, mostrar: bool, filtrar: str | None = None) -> int:
     bleak = _bleak()
     vistos = await bleak.BleakScanner.discover(timeout=segundos, return_adv=True)
+    if filtrar:                                   # solo lo que coincide con ese nombre: no se listan dispositivos ajenos
+        coinc = [(d, a) for d, a in vistos.values() if filtrar.lower() in (d.name or a.local_name or "").lower()]
+        print(f"Dispositivos BLE visibles: {len(vistos)} (no se muestran). Coinciden con '{filtrar}': {len(coinc)}")
+        for d, a in sorted(coinc, key=lambda x: x[1].rssi or -999, reverse=True):
+            fc = any(u.lower() == ble.SERVICIO_FC for u in (a.service_uuids or []))
+            print(f"  {d.name or a.local_name!r}  señal {a.rssi} dBm  …{d.address[-5:]}  frecuencia estándar anunciada: {'SÍ' if fc else 'no'}")
+        return 0 if coinc else 1
     con_fc = [(d, a) for d, a in vistos.values() if ble.SERVICIO_FC in [u.lower() for u in (a.service_uuids or [])]]
     print(f"Dispositivos BLE visibles: {len(vistos)}")
     print(f"Los que anuncian el servicio estándar de frecuencia cardíaca: {len(con_fc)}")
@@ -68,11 +76,22 @@ async def _buscar(bleak, args):
     if args.direccion:
         dispositivo = await bleak.BleakScanner.find_device_by_address(args.direccion, timeout=10)
     else:
-        dispositivo = await bleak.BleakScanner.find_device_by_filter(
-            lambda d, a: bool(args.nombre) and args.nombre.lower() in (d.name or "").lower(), timeout=10)
+        vistos = await bleak.BleakScanner.discover(timeout=10, return_adv=True)
+        coinc = [(d.name or a.local_name or "", a.rssi, d.address, d) for d, a in vistos.values()
+                 if args.nombre and args.nombre.lower() in (d.name or a.local_name or "").lower()]
+        estado, elegido = ble.elegir_coincidencia(coinc, args.mas_cercana)
+        if estado == "ambigua":
+            print(f"Hay {len(elegido)} dispositivos que coinciden con '{args.nombre}'. No elijo yo, por si alguno es de otra persona:")
+            for nombre, rssi, direccion, _ in elegido:
+                print(f"  {nombre!r}  señal {rssi} dBm  …{direccion[-5:]}")
+            print("Repite con --mas-cercana (suele ser la que llevas puesta) o con --direccion <dirección completa>.")
+            return None
+        if estado == "unica" and len(coinc) > 1:
+            print(f"Elegida la de señal más fuerte ({elegido[1]} dBm).")
+        dispositivo = elegido[3] if estado == "unica" else None
     if dispositivo is None:
         print("No se encontró. Revisa que esté encendido y cerca, que NO esté conectado a la app del teléfono "
-              "(muchas bandas solo aceptan una conexión) y usa --escanear.")
+              "(muchas bandas solo aceptan una conexión) y usa --escanear --filtrar <nombre>.")
     return dispositivo
 
 
@@ -143,6 +162,8 @@ def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--escanear", action="store_true", help="solo busca dispositivos con frecuencia cardíaca")
     p.add_argument("--mostrar", action="store_true", help="con --escanear, muestra nombres y direcciones")
+    p.add_argument("--filtrar", help="con --escanear, muestra solo los dispositivos cuyo nombre contenga este texto")
+    p.add_argument("--mas-cercana", dest="mas_cercana", action="store_true", help="si hay varias coincidencias, usa la de señal más fuerte")
     p.add_argument("--inspeccionar", action="store_true", help="conecta a tu dispositivo y lista sus servicios")
     p.add_argument("--escuchar", type=float, default=0, help="con --inspeccionar, segundos de datos en crudo")
     p.add_argument("--segundos", type=float, default=8, help="duración del escaneo")
@@ -153,7 +174,7 @@ def main() -> int:
     p.add_argument("--cada", type=float, default=5, help="segundos entre envíos")
     args = p.parse_args()
     if args.escanear:
-        return asyncio.run(escanear(args.segundos, args.mostrar))
+        return asyncio.run(escanear(args.segundos, args.mostrar, args.filtrar))
     if not (args.nombre or args.direccion):
         p.error("indica --nombre o --direccion (o usa --escanear)")
     try:
