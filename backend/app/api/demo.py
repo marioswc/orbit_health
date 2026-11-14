@@ -3,7 +3,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from .. import config
 from ..dominio import acciones, comparativa, reglas
 from ..dominio import enlace as modelo_enlace
-from ..fuentes import escenarios
+from ..fuentes import dispositivo_simulado, escenarios
+from ..servicios import estado as servicio_estado
+from ..servicios import lecturas as servicio_lecturas
+from .dependencias import requerir_tripulante
 from .dependencias import conexion, requiere
 
 router = APIRouter(prefix="/api/demo", tags=["demo"])
@@ -39,3 +42,27 @@ def comparativa_con_y_sin_orbit(entorno: str = "marte", respuesta_tierra_min: fl
     out = comparativa.linea_de_tiempo(retardo, respuesta_tierra_min * 60, r.nivel, pasos, config.FACTOR_ACELERACION)
     return {"entorno": entorno, "retardo_unidireccional_s": retardo, "respuesta_tierra_min": respuesta_tierra_min,
             "evento": "SpO₂ 88 %", **out}
+
+
+@router.post("/sensor/{tid}")
+def dispositivo_simulado_en_marcha(tid: str, perfil: str = "deterioro_respiratorio", ticks: int = 12, semilla: int | None = 7,
+                                   conn=Depends(conexion), _: dict = Depends(requiere("demo:ejecutar"))) -> dict:
+    """Un dispositivo portátil simulado envía `ticks` rondas de constantes vitales (origen 'sensor'). Escribe datos de demo."""
+    requerir_tripulante(conn, tid)
+    try:
+        serie = dispositivo_simulado.generar(perfil, ticks, semilla)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    rondas, primero = [], {"amarillo": None, "rojo": None}
+    for i, tick in enumerate(serie, start=1):
+        for indicador, valor in tick.items():
+            servicio_lecturas.registrar_lectura(conn, tid, indicador, valor, origen="sensor")
+        # El nivel de una ronda es el estado global del tripulante al terminarla, no el de la última lectura.
+        e = servicio_estado.estado_tripulante(conn, tid)
+        nivel = e["nivel_fisiologico"]
+        rondas.append({"ronda": i, "valores": tick, "nivel": nivel, "puntos_news2": e["news2"]["puntos"]})
+        for objetivo in ("amarillo", "rojo"):
+            if primero[objetivo] is None and nivel == objetivo:
+                primero[objetivo] = i
+    return {"perfil": perfil, "semilla": semilla, "rondas": rondas,
+            "primera_ronda_amarillo": primero["amarillo"], "primera_ronda_rojo": primero["rojo"]}

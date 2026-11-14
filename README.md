@@ -3,6 +3,8 @@
 Apoyo a la decisión clínica para tripulaciones con comunicación degradada. Funciona 100 % local.
 **English:** [README.en.md](README.en.md). English summary for judges: [docs/PROJECT_SUMMARY_EN.md](docs/PROJECT_SUMMARY_EN.md). Use of SI tools (required by the challenge): [docs/SI_DISCLOSURE.md](docs/SI_DISCLOSURE.md).
 
+Estado y pendientes del equipo: [docs/PENDIENTES.md](docs/PENDIENTES.md).
+
 Plan completo: [PLAN_DE_DESARROLLO.md](backend/docs/PLAN_DE_DESARROLLO.md).
 
 ## Producción local (un solo servidor, sin internet)
@@ -66,6 +68,9 @@ variabilidad realista a la demo, no como línea base clínica.
 | `GET/PUT /api/preferencias/{id}` | Tono, detalle y recordatorios del asistente (solo su dueño) |
 | `POST /api/animo`, `GET /api/animo/{id}` | Ánimo diario, privado |
 | `GET /api/demo/comparativa?entorno=&respuesta_tierra_min=` | Línea de tiempo con y sin ORBIT |
+| `GET /api/recordatorios` y `/{id}` | Quién tiene la medición vencida, según su nivel y su frecuencia elegida |
+| `POST /api/sensores/lectura` y `/lote` | Entrada de dispositivos (origen `sensor`); el lote es todo o nada |
+| `POST /api/demo/sensor/{id}?perfil=` | Un dispositivo portátil simulado (estable o deterioro respiratorio) |
 | `GET /api/tierra/mensajes` | Vista del centro de control: solo lo que ya llegó, lo urgente primero. Solo lectura, no consume mensajes |
 | `GET /api/informe` y `/api/informe/{id}` | Informe exportable (JSON o CSV) con huella de integridad |
 
