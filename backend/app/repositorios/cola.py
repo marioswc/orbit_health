@@ -23,10 +23,12 @@ def retenidos_ordenados(conn: sqlite3.Connection) -> list[dict]:
            WHERE estado='retenido' ORDER BY prioridad ASC, id ASC""")]
 
 
-def marcar_en_transito(conn: sqlite3.Connection, evento_id: int, transmitido: str, llegada: str) -> None:
+def marcar_en_transito(conn: sqlite3.Connection, evento_id: int, transmitido: str, llegada: str,
+                       ack: str | None = None) -> None:
     conn.execute(
-        "UPDATE cola_salida SET estado='en_transito', transmitido_ts=?, llegada_estimada_ts=? WHERE id=?",
-        (transmitido, llegada, evento_id))
+        """UPDATE cola_salida SET estado='en_transito', transmitido_ts=?, llegada_estimada_ts=?,
+           ack_estimado_ts=? WHERE id=?""",
+        (transmitido, llegada, ack, evento_id))
 
 
 def marcar_recibidos(conn: sqlite3.Connection, ahora_iso: str) -> int:
@@ -42,5 +44,5 @@ def todos_en_orden(conn: sqlite3.Connection):
 def recientes(conn: sqlite3.Connection, limite: int = 200) -> list[dict]:
     return [dict(f) for f in conn.execute(
         """SELECT id, tripulante_id, tipo_evento, prioridad, estado, hash, ts_guardado,
-                  transmitido_ts, llegada_estimada_ts
+                  transmitido_ts, llegada_estimada_ts, ack_estimado_ts
            FROM cola_salida ORDER BY id DESC LIMIT ?""", (limite,))]
