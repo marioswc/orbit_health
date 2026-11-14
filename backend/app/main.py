@@ -1,3 +1,5 @@
+import asyncio
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -8,10 +10,25 @@ from . import config
 from .api import router
 from .fuentes.semilla import sembrar
 from .repositorios.conexion import get_conn, init_db
+from .servicios import recuperacion
+
+log = logging.getLogger("orbit")
+
+
+async def _respaldos_periodicos() -> None:
+    while True:
+        await asyncio.sleep(config.RESPALDO_CADA_MIN * 60)
+        try:
+            await asyncio.to_thread(recuperacion.hacer_respaldo)
+        except Exception:                                  # un fallo de respaldo no debe tumbar el servicio
+            log.exception("Falló el respaldo automático")
 
 
 @asynccontextmanager
-async def lifespan(_: FastAPI):
+async def lifespan(app: FastAPI):
+    app.state.arranque = recuperacion.arranque_seguro()
+    if app.state.arranque["estado"] != "sana" and app.state.arranque["estado"] != "nueva":
+        log.warning("Autorrecuperación: %s", app.state.arranque["detalle"])
     init_db()
     if config.SEED_DEMO:
         conn = get_conn()
@@ -19,7 +36,16 @@ async def lifespan(_: FastAPI):
             sembrar(conn)
         finally:
             conn.close()
+    tarea = None
+    if config.RESPALDO_CADA_MIN > 0:
+        try:
+            recuperacion.hacer_respaldo()                  # un respaldo bueno desde el primer minuto
+        except Exception:
+            log.exception("Falló el respaldo inicial")
+        tarea = asyncio.create_task(_respaldos_periodicos())
     yield
+    if tarea:
+        tarea.cancel()
 
 
 app = FastAPI(title="ORBIT Health", version="0.1.0", lifespan=lifespan)

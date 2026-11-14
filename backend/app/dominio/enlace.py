@@ -43,9 +43,15 @@ def retardo_base_s(entorno: str) -> float:
         raise KeyError(f"entorno desconocido: {entorno}") from e
 
 
+def factor_valido(factor: float) -> float:
+    """Garantiza un factor de aceleración > 0 (si es <= 0, opera en tiempo real 1x)."""
+    return float(factor) if factor and factor > 0 else 1.0
+
+
 def con_jitter(base_s: float, jitter_pct: float, rng: random.Random | None = None) -> float:
-    """Varía `base_s` en ±jitter_pct %. Con jitter 0 devuelve exactamente la base."""
+    """Varía `base_s` en ±jitter_pct % (acotado a 95 %). Con jitter <= 0 devuelve exactamente la base."""
     if jitter_pct <= 0:
         return base_s
-    u = (rng or random).uniform(-jitter_pct, jitter_pct) / 100.0
+    pct = min(float(jitter_pct), 95.0)
+    u = (rng or random).uniform(-pct, pct) / 100.0
     return base_s * (1.0 + u)

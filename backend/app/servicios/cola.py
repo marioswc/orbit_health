@@ -13,6 +13,7 @@ from ..repositorios import cola as repo
 from ..repositorios import enlace as repo_enlace
 
 _RNG = random.Random(int(config.JITTER_SEMILLA)) if config.JITTER_SEMILLA else random.Random()
+PASO_DESPACHO_S = 1.0  # desfase de serialización entre eventos al drenar cola por prioridad
 
 
 def _ahora() -> datetime:
@@ -43,7 +44,21 @@ def encolar(conn: sqlite3.Connection, tid: str, tipo_evento: str, prioridad: int
 def latencia_s(entorno: str) -> float:
     """Retardo unidireccional simulado (con jitter opcional) en segundos de reloj de pared."""
     real = modelo_enlace.con_jitter(modelo_enlace.retardo_base_s(entorno), config.JITTER_PCT, _RNG)
-    return real / config.FACTOR_ACELERACION
+    return real / modelo_enlace.factor_valido(config.FACTOR_ACELERACION)
+
+
+def _calcular_tramo(entorno: str, tx: datetime,
+                    llegada_prev: datetime | None, ack_prev: datetime | None) -> tuple[datetime, datetime]:
+    """Calcula llegada y confirmación garantizando que respeten el orden de prioridad del lote."""
+    retardo_ida = latencia_s(entorno)
+    retardo_vuelta = latencia_s(entorno) if config.JITTER_PCT > 0 else retardo_ida
+    llegada = tx + timedelta(seconds=retardo_ida)
+    if llegada_prev is not None and llegada <= llegada_prev:
+        llegada = llegada_prev + timedelta(milliseconds=1)
+    ack = llegada + timedelta(seconds=retardo_vuelta)
+    if ack_prev is not None and ack <= ack_prev:
+        ack = ack_prev + timedelta(milliseconds=1)
+    return llegada, ack
 
 
 def despachar_sin_commit(conn: sqlite3.Connection, enlace_activo: bool, entorno: str = "marte",
@@ -52,13 +67,29 @@ def despachar_sin_commit(conn: sqlite3.Connection, enlace_activo: bool, entorno:
     if not enlace_activo:
         return []
     ahora = ahora or _ahora()
-    retardo = latencia_s(entorno)
-    llegada = ahora + timedelta(seconds=retardo)
-    ack = ahora + timedelta(seconds=2 * retardo)  # la confirmación vuelve por el mismo enlace
     salida = repo.retenidos_ordenados(conn)
-    for f in salida:
-        repo.marcar_en_transito(conn, f["id"], ahora.isoformat(), llegada.isoformat(), ack.isoformat())
+    llegada_prev: datetime | None = None
+    ack_prev: datetime | None = None
+    for idx, f in enumerate(salida):
+        tx = ahora + timedelta(seconds=idx * PASO_DESPACHO_S)
+        llegada, ack = _calcular_tramo(entorno, tx, llegada_prev, ack_prev)
+        repo.marcar_en_transito(conn, f["id"], tx.isoformat(), llegada.isoformat(), ack.isoformat())
+        llegada_prev, ack_prev = llegada, ack
     return salida
+
+
+def _recalcular_en_transito(conn: sqlite3.Connection, entorno: str, ahora: datetime) -> None:
+    """Ajusta los tiempos estimados de eventos en tránsito al cambiar de perfil de enlace."""
+    en_vuelo = repo.en_transito_ordenados(conn)
+    llegada_prev: datetime | None = None
+    ack_prev: datetime | None = None
+    for idx, f in enumerate(en_vuelo):
+        tx_base = datetime.fromisoformat(f["transmitido_ts"]) if f.get("transmitido_ts") else ahora
+        tx = tx_base + timedelta(seconds=idx * PASO_DESPACHO_S) if idx > 0 and tx_base == ahora else tx_base
+        llegada, ack = _calcular_tramo(entorno, tx, llegada_prev, ack_prev)
+        repo.marcar_en_transito(conn, f["id"], tx.isoformat(), llegada.isoformat(), ack.isoformat())
+        llegada_prev, ack_prev = llegada, ack
+    repo.marcar_recibidos(conn, ahora.isoformat())
 
 
 def despachar_si_activo(conn: sqlite3.Connection, ahora: datetime | None = None) -> list[dict]:
@@ -90,34 +121,52 @@ def listar(conn: sqlite3.Connection, ahora: datetime | None = None) -> list[dict
     ahora_iso = (ahora or _ahora()).isoformat()
     items = repo.recientes(conn)
     for i in items:
-        i["confirmado"] = bool(i.get("ack_estimado_ts") and i["ack_estimado_ts"] <= ahora_iso)
+        i["confirmado"] = bool(
+            i["estado"] == "recibido" and i.get("ack_estimado_ts") and i["ack_estimado_ts"] <= ahora_iso
+        )
     return items
 
 
-def estado_cola(conn: sqlite3.Connection) -> dict:
-    actualizar_recibidos(conn)
-    items = listar(conn)
+def estado_cola(conn: sqlite3.Connection, ahora: datetime | None = None) -> dict:
+    ahora = ahora or _ahora()
+    actualizar_recibidos(conn, ahora)
+    items = listar(conn, ahora)
     resumen: dict = {}
-    for i in items:
-        resumen.setdefault(i["estado"], {1: 0, 2: 0, 3: 0})[i["prioridad"]] += 1
+    for f in repo.conteo_por_estado_y_prioridad(conn):
+        resumen.setdefault(f["estado"], {1: 0, 2: 0, 3: 0})[f["prioridad"]] = f["total"]
     return {"enlace": repo_enlace.leer(conn), "resumen": resumen, "items": items}
 
 
-def cambiar_enlace(conn: sqlite3.Connection, activo: bool, entorno: str) -> dict:
+def cambiar_enlace(conn: sqlite3.Connection, activo: bool, entorno: str,
+                   ahora: datetime | None = None) -> dict:
     entorno = entorno.lower()
     if entorno not in modelo_enlace.entornos():
         raise ValueError(f"entorno debe ser uno de: {', '.join(modelo_enlace.entornos())}")
-    repo_enlace.guardar(conn, activo, entorno)
-    conn.commit()
-    return {"activo": activo, "entorno": entorno, "despachados": despachar(conn, activo, entorno)}
+    ahora = ahora or _ahora()
+    if not conn.in_transaction:
+        conn.execute("BEGIN IMMEDIATE")
+    try:
+        previo = repo_enlace.leer(conn)
+        repo.marcar_recibidos(conn, ahora.isoformat())
+        repo_enlace.guardar(conn, activo, entorno)
+        if activo and previo["entorno"] != entorno:
+            _recalcular_en_transito(conn, entorno, ahora)
+        despachados = despachar_sin_commit(conn, activo, entorno, ahora)
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    return {"activo": activo, "entorno": entorno, "despachados": despachados}
 
 
-def info_latencia(conn: sqlite3.Connection) -> dict:
+def info_latencia(conn: sqlite3.Connection, ahora: datetime | None = None) -> dict:
     """Parámetros vigentes del modelo de enlace, para mostrarlos en la consola."""
+    ahora = ahora or _ahora()
+    actualizar_recibidos(conn, ahora)
     actual = repo_enlace.leer(conn)
     base = modelo_enlace.retardo_base_s(actual["entorno"])
-    factor = config.FACTOR_ACELERACION
-    en_transito = [i for i in listar(conn) if i["estado"] == "en_transito"]
+    factor = modelo_enlace.factor_valido(config.FACTOR_ACELERACION)
+    en_transito = repo.en_transito_ordenados(conn)
     llegadas = sorted(i["llegada_estimada_ts"] for i in en_transito if i["llegada_estimada_ts"])
     return {
         "enlace": actual,

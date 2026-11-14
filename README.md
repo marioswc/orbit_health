@@ -1,6 +1,8 @@
 # ORBIT Health
 
 Apoyo a la decisión clínica para tripulaciones con comunicación degradada. Funciona 100 % local.
+English summary for judges: [docs/PROJECT_SUMMARY_EN.md](docs/PROJECT_SUMMARY_EN.md).
+
 Plan completo: [PLAN_DE_DESARROLLO.md](backend/docs/PLAN_DE_DESARROLLO.md).
 
 ## Producción local (un solo servidor, sin internet)
@@ -37,7 +39,7 @@ variabilidad realista a la demo, no como línea base clínica.
 | Necesidad | Qué hay hoy | Qué falta |
 |---|---|---|
 | Arranque automático y reinicio si falla | `deploy/orbit-health.service` (systemd) | Probarlo en el equipo de destino |
-| Atender otros dispositivos de la cabina | `ORBIT_HOST=0.0.0.0` bloqueado salvo `ORBIT_PERMITIR_RED=1` | **Autenticación por tripulante** antes de usarlo de verdad |
+| Atender otros dispositivos de la cabina | `ORBIT_HOST=0.0.0.0` exige `ORBIT_AUTH=1` (autenticación por tripulante con PIN, roles y auditoría; ver [docs/SEGURIDAD_A_BORDO.md](docs/SEGURIDAD_A_BORDO.md)) | TLS y cifrado de la base |
 | Respaldo de datos | `scripts/respaldar_db.sh` (consistente, con rotación) | Programarlo (cron o systemd timer) y definir dónde se guarda |
 | Sin Node ni internet en el destino | El build del frontend es estático y lo sirve el backend | Paquete de instalación con las dependencias de Python precargadas |
 

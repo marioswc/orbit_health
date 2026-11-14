@@ -6,13 +6,15 @@ cd "$(dirname "$0")"
 PUERTO="${ORBIT_PUERTO:-3000}"
 HOST="${ORBIT_HOST:-127.0.0.1}"
 
-# Sin autenticación por tripulante, exponer el servicio en la red de la cabina deja los datos de salud
-# visibles para cualquier dispositivo conectado. Solo se permite con confirmación explícita.
+# Exponer el servicio en la red de la cabina requiere autenticación por tripulante (ORBIT_AUTH=1).
+# Sin ella solo se permite con confirmación explícita, porque los datos de salud quedarían visibles
+# para cualquier dispositivo conectado.
 case "$HOST" in
   127.0.0.1|localhost|::1) ;;
-  *) [ "${ORBIT_PERMITIR_RED:-0}" = "1" ] || {
-       echo "ORBIT_HOST=$HOST expone los datos en la red y aún no hay autenticación por tripulante."
-       echo "Si es una red aislada y confiable, confirma con ORBIT_PERMITIR_RED=1."; exit 1; } ;;
+  *) [ "${ORBIT_AUTH:-0}" = "1" ] || [ "${ORBIT_PERMITIR_RED:-0}" = "1" ] || {
+       echo "ORBIT_HOST=$HOST expone los datos en la red."
+       echo "Activa la autenticación con ORBIT_AUTH=1 (y da de alta a la tripulación con scripts/inscribir_tripulante.sh)."
+       exit 1; } ;;
 esac
 
 [ -d frontend/dist ] || { echo "Falta frontend/dist: ejecuta (con red) 'cd frontend && npm install && npm run build'"; exit 1; }

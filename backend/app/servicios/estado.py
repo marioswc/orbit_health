@@ -3,7 +3,8 @@ import sqlite3
 from datetime import datetime, timedelta, timezone
 
 from .. import config
-from ..dominio import combinadas, reglas
+from ..dominio import acciones, combinadas, reglas
+from ..dominio.catalogos import INDICADORES
 from ..repositorios import lecturas as repo
 from .lecturas import signos_recientes
 
@@ -32,4 +33,7 @@ def estado_tripulante(conn: sqlite3.Connection, tid: str) -> dict:
     return {"indicadores": ultimos,
             "news2": {"puntos": news2.puntos, "nivel": news2.nivel, "faltantes": news2.faltantes},
             "reglas_combinadas": activas, "nivel_general": peor, "nivel_fisiologico": fisiologico, "ventana_min": config.VENTANA_NEWS2_MIN,
-            "proxima_captura_min": reglas.captura_recomendada_min(peor)}
+            "proxima_captura_min": reglas.captura_recomendada_min(peor),
+            "acciones_sugeridas": acciones.acciones_sugeridas(
+                peor, reglas.captura_recomendada_min(peor), faltantes=news2.faltantes, reglas=activas,
+                etiquetas={k: v[0] for k, v in INDICADORES.items()})}

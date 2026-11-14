@@ -104,3 +104,36 @@ def test_cambiar_a_perfil_nuevo_y_rechazar_desconocido(cliente):
     assert cliente.post("/api/enlace", json={"activo": True, "entorno": "marte_cercano"}).status_code == 200
     assert cliente.get("/api/enlace/latencia").json()["retardo_real_s"] == 180
     assert cliente.post("/api/enlace", json={"activo": True, "entorno": "jupiter"}).status_code == 422
+
+
+def test_despacho_escalonado_hace_llegar_primero_prioridad_1(conn, monkeypatch):
+    monkeypatch.setattr(config, "FACTOR_ACELERACION", 1.0)
+    monkeypatch.setattr(config, "JITTER_PCT", 0.0)
+    qm.encolar(conn, "T1", "RUTINA", 3, {})
+    qm.encolar(conn, "T1", "EMERGENCIA", 1, {})
+    t0 = qm._ahora()
+    qm.despachar(conn, True, "marte_cercano", ahora=t0)  # 180 s base, P1 sale en t0, P3 sale en t0 + 1 s
+    t_llega_p1 = t0 + timedelta(seconds=180.2)
+    qm.actualizar_recibidos(conn, ahora=t_llega_p1)
+    estados = {f["prioridad"]: f["estado"] for f in qm.listar(conn, ahora=t_llega_p1)}
+    assert estados[1] == "recibido" and estados[3] == "en_transito"
+
+
+def test_cambio_entorno_recalcula_eventos_en_transito(conn, monkeypatch):
+    monkeypatch.setattr(config, "FACTOR_ACELERACION", 1.0)
+    monkeypatch.setattr(config, "JITTER_PCT", 0.0)
+    t0 = qm._ahora()
+    qm.encolar(conn, "T1", "LECTURA", 1, {})
+    qm.cambiar_enlace(conn, True, "marte", ahora=t0)  # 1200 s
+    assert qm.listar(conn, ahora=t0 + timedelta(seconds=5))[0]["estado"] == "en_transito"
+    # Al cambiar a Luna (1.3 s) tras 5 s de vuelo, ya superó el retardo lunar y pasa a recibido
+    qm.cambiar_enlace(conn, True, "luna", ahora=t0 + timedelta(seconds=5))
+    assert qm.listar(conn, ahora=t0 + timedelta(seconds=5))[0]["estado"] == "recibido"
+
+
+def test_factor_aceleracion_cero_o_negativo_no_falla(monkeypatch):
+    monkeypatch.setattr(config, "FACTOR_ACELERACION", 0.0)
+    monkeypatch.setattr(config, "JITTER_PCT", 0.0)
+    assert qm.latencia_s("marte") == pytest.approx(1200.0)
+    monkeypatch.setattr(config, "FACTOR_ACELERACION", -5.0)
+    assert qm.latencia_s("marte") == pytest.approx(1200.0)
