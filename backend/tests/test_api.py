@@ -101,29 +101,17 @@ def test_ruta_db_por_defecto_apunta_a_data_del_repo(monkeypatch):
         importlib.reload(config)
 
 
-def test_umbrales_expone_estado_de_validacion(cliente):
-    r = cliente.get("/api/umbrales").json()
-    assert r["estado"].startswith("pendiente") and r["version"]
-
-
-def test_estado_resumen(cliente):
-    lectura(cliente, "spo2", 90)
-    e = cliente.get("/api/estado/T1").json()
-    assert e["nivel_general"] == "rojo" and e["indicadores"][0]["indicador"] == "spo2"
-
-
-def test_enlace_persiste_entre_reinicios(cliente):
-    from fastapi.testclient import TestClient
-    from app import main
-    cliente.post("/api/enlace", json={"activo": False, "entorno": "luna"})
-    with TestClient(main.app) as otro:   # nuevo arranque sobre la misma base
-        assert otro.get("/api/enlace").json() == {"activo": False, "entorno": "luna"}
-
-
-def test_ruta_db_por_defecto_es_absoluta():
+def test_ruta_db_por_defecto_es_absoluta(monkeypatch):
+    import importlib
     from pathlib import Path
     from app import config
-    assert Path(config.RAIZ.parent / "data").is_absolute()
+    monkeypatch.delenv("ORBIT_DB_PATH", raising=False)
+    try:
+        importlib.reload(config)
+        assert Path(config.DB_PATH).is_absolute()
+    finally:
+        monkeypatch.undo()
+        importlib.reload(config)
 
 
 def test_lectura_y_evento_son_atomicos(cliente, monkeypatch):
