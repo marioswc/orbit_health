@@ -60,40 +60,26 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
     try:
         c = _clasificar(conn, tid, indicador, valor, ventana)
         linea = reglas.desviacion_linea_base(valor, repo.historial(conn, tid, indicador, desde_base))
-<<<<<<< HEAD
-        nivel = "amarillo" if linea["aviso"] and c["nivel"] == "verde" else c["nivel"]
-        valores = repo.valores_recientes(conn, tid, combinadas.INDICADORES_USADOS, ventana)
-        valores[indicador] = valor
-        activas = combinadas.evaluar_individuales(valores)
-        nivel = combinadas.peor_nivel([nivel, *[a["nivel"] for a in activas]])
-=======
         nivel_lectura = "amarillo" if linea["aviso"] and c["nivel"] == "verde" else c["nivel"]
         nivel_evento = (max(nivel_lectura, c["nivel_global"], key=_ORDEN.__getitem__)
                         if c["puntos_ind"] > 0 else nivel_lectura)
->>>>>>> 45012a4 (feat: implementar despachar_si_activo función y mejorar manejo de  lectura en tests)
+        valores = repo.valores_recientes(conn, tid, combinadas.INDICADORES_USADOS, ventana)
+        valores[indicador] = valor
+        activas = combinadas.evaluar_individuales(valores)
+        nivel_evento = combinadas.peor_nivel([nivel_evento, *[a["nivel"] for a in activas]])
         lectura_id = repo.insertar(conn, tid, indicador, valor, INDICADORES[indicador][1],
                                    nivel_lectura, c["puntos"], ahora.isoformat())
         evento_id = cola.encolar_sin_commit(
             conn, tid, f"LECTURA_{indicador.upper()}", PRIORIDAD[nivel_evento],
             {"lectura_id": lectura_id, "indicador": indicador, "valor": valor,
-<<<<<<< HEAD
-             "nivel": nivel, "news2": c["puntos"], "reglas": [a["id"] for a in activas]})
-=======
-             "nivel": nivel_evento, "news2": c["puntos"]})
+             "nivel": nivel_evento, "news2": c["puntos"], "reglas": [a["id"] for a in activas]})
         cola.despachar_si_activo(conn, ahora)
->>>>>>> 45012a4 (feat: implementar despachar_si_activo función y mejorar manejo de  lectura en tests)
         conn.commit()
     except Exception:
         conn.rollback()
         raise
     return {"lectura_id": lectura_id, "nivel": nivel_evento, "puntos_news2": c["puntos"],
             "observacion": c["observacion"], "aviso_linea_base": linea["aviso"],
-<<<<<<< HEAD
             "faltantes_news2": c["faltantes"], "reglas_combinadas": activas, "cola_evento_id": evento_id,
-            "prioridad": PRIORIDAD[nivel],
-            "proxima_captura_min": reglas.captura_recomendada_min(nivel)}
-=======
-            "faltantes_news2": c["faltantes"], "cola_evento_id": evento_id,
             "prioridad": PRIORIDAD[nivel_evento],
             "proxima_captura_min": reglas.captura_recomendada_min(nivel_evento)}
->>>>>>> 45012a4 (feat: implementar despachar_si_activo función y mejorar manejo de  lectura en tests)
