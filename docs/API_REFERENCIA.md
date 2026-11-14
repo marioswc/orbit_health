@@ -11,6 +11,8 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 
 | Método | Ruta | Sesión | Qué hace |
 |---|---|---|---|
+| GET | `/api/entornos` | pública | Entornos de la misión con su gravedad y si la estimación de pérdida ósea aplica en cada uno |
+| GET | `/api/entornos/{clave}` | pública | Un entorno de la misión: gravedad y aplicabilidad de la estimación ósea |
 | GET | `/api/explicaciones` | pública | Qué es cada medición, por qué se mide, cómo medirla y qué cambia en el espacio |
 | GET | `/api/explicaciones/{clave}` | pública | Explicación de un indicador: qué es, por qué se mide y cómo medirlo |
 | GET | `/api/health` | pública | Comprobación de que el servidor responde |
@@ -41,6 +43,7 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 | GET | `/api/estado/{tid}` | requerida | Estado clínico vigente de un tripulante: niveles, NEWS2, reglas y acciones sugeridas |
 | GET | `/api/historial/{tid}` | requerida | Serie temporal de un indicador (para gráficas). El ánimo diario es privado y no sale por aquí |
 | POST | `/api/lecturas` | requerida | Cualquier tripulante autenticado puede registrar signos de un compañero (p. ej. si este queda incapacitado) |
+| GET | `/api/racha/{tid}` | requerida | Racha de días con los 5 signos vitales registrados y logros ligeros, sin presión |
 | GET | `/api/recordatorios` | requerida | Quién tiene la medición vencida, según su nivel actual y su frecuencia de recordatorios elegida |
 | GET | `/api/recordatorios/{tid}` | requerida | Indica si la medición de un tripulante está vencida o al día |
 
@@ -102,4 +105,4 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 | GET | `/api/demo/simulacion/estado` | requerida | Progreso de la misión simulada: minuto, línea de tiempo narrada y hitos (primer rojo, alerta colectiva, retenidos) |
 | POST | `/api/demo/simulacion/iniciar` | requerida | Pone en marcha una misión simulada en vivo: las bandas envían solas, el enlace se corta y vuelve. Escribe datos de demo |
 
-Total: 55 operaciones, 11 públicas.
+Total: 58 operaciones, 13 públicas.

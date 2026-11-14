@@ -73,6 +73,9 @@ La lista completa y siempre actual está en [docs/API_REFERENCIA.md](docs/API_RE
 | `GET /api/recordatorios` y `/{id}` | Quién tiene la medición vencida, según su nivel y su frecuencia elegida |
 | `POST /api/sensores/lectura` y `/lote` | Entrada de dispositivos (origen `sensor`); el lote es todo o nada |
 | `POST /api/demo/sensor/{id}?perfil=` | Un dispositivo portátil simulado (estable o deterioro respiratorio) |
+| `GET /api/entornos` y `/{clave}` | Entornos con su gravedad y si la estimación de pérdida ósea aplica (solo en microgravedad) |
+| `GET /api/racha/{id}` | Racha de días con los 5 signos vitales, sin presión |
+| `GET /api/explicaciones/{clave}` | Ahora trae `medidas_nasa` y `senales_a_vigilar` con cita textual y enlace |
 | `GET /api/tierra/mensajes` | Vista del centro de control: solo lo que ya llegó, lo urgente primero. Solo lectura, no consume mensajes |
 | `GET /api/informe` y `/api/informe/{id}` | Informe exportable (JSON o CSV) con huella de integridad |
 | `GET /api/crisis/protocolo`, `POST /api/crisis/aviso-medico` | Protocolo de crisis psicológica / riesgo de autolesión con evaluación de calidad de oxígeno en cabina (`o2_cabina`) y aviso al médico solo con consentimiento explícito |
