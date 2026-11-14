@@ -58,6 +58,9 @@ NARRACION = [(0.0, "Inicio: tripulación estable y bandas conectadas"),
              (32.0, "Tripulación recuperada")]
 # Una sola vez al empezar: resumen diario que entrega la banda (sueño) y, al final, el ejercicio.
 SUENO_INICIAL = {"T1": 7.2, "T2": 6.6, "T3": 5.8, "T4": 7.8}
+# Calidad del sueño que reporta un reloj de actigrafía (como en el estudio ARCHeR de NASA): valores inventados.
+SUENO_EFICIENCIA_INICIAL = {"T1": 91, "T2": 89, "T3": 84, "T4": 93}
+SUENO_DESPERTARES_INICIAL = {"T1": 25, "T2": 32, "T3": 50, "T4": 20}
 EJERCICIO_FINAL = {"T1": 45, "T2": 60, "T3": 30, "T4": 50}
 
 
