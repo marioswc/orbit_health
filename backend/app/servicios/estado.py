@@ -17,4 +17,5 @@ def estado_tripulante(conn: sqlite3.Connection, tid: str) -> dict:
     peor = max((v["nivel"] for v in ultimos), key=_ORDEN.__getitem__, default="verde")
     return {"indicadores": ultimos,
             "news2": {"puntos": news2.puntos, "nivel": news2.nivel, "faltantes": news2.faltantes},
-            "nivel_general": peor, "ventana_min": config.VENTANA_NEWS2_MIN}
+            "nivel_general": peor, "ventana_min": config.VENTANA_NEWS2_MIN,
+            "proxima_captura_min": reglas.captura_recomendada_min(peor)}

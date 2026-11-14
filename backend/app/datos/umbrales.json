@@ -3,6 +3,7 @@
   "estado": "pendiente de validación clínica",
   "nota": "Todos los valores son supuestos de diseño. Ver docs/VALIDACION_MEDICA.md. Cada banda se evalúa en orden: la primera cuyo 'hasta' (inclusive) contiene el valor aplica; la última no lleva 'hasta'.",
   "ventana_news2_min": 60,
+  "captura_recomendada_min": {"verde": 60, "amarillo": 15, "rojo": 5},
   "news2": {
     "modo_parametro_extremo": "conservador",
     "bandas": {

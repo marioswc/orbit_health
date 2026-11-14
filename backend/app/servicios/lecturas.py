@@ -66,4 +66,5 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
     return {"lectura_id": lectura_id, "nivel": nivel, "puntos_news2": c["puntos"],
             "observacion": c["observacion"], "aviso_linea_base": linea["aviso"],
             "faltantes_news2": c["faltantes"], "cola_evento_id": evento_id,
-            "prioridad": PRIORIDAD[nivel]}
+            "prioridad": PRIORIDAD[nivel],
+            "proxima_captura_min": reglas.captura_recomendada_min(nivel)}

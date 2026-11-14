@@ -82,6 +82,11 @@ def evaluar_news2(signos: Mapping[str, float | str]) -> ResultadoNews2:
     return ResultadoNews2(puntos, nivel, desglose, extremos, faltantes)
 
 
+def captura_recomendada_min(nivel: str) -> float:
+    """Minutos recomendados hasta la próxima captura, según el nivel actual."""
+    return UMBRALES["captura_recomendada_min"][nivel]
+
+
 def evaluar_ambiente(co2_mmhg: float | None = None, dosis_pct: float | None = None) -> str:
     """Peor nivel entre CO2 y dosis acumulada (% del límite de misión)."""
     niveles = ["verde"]

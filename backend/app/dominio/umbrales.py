@@ -42,6 +42,11 @@ def validar(datos: dict) -> dict:
         if variable not in bandas:
             raise UmbralesInvalidos(f"Faltan bandas NEWS2 para '{variable}'")
         _validar_bandas(variable, bandas[variable])
+    cap = datos.get("captura_recomendada_min", {})
+    if set(cap) != {"verde", "amarillo", "rojo"} or any(not isinstance(v, (int, float)) or v <= 0 for v in cap.values()):
+        raise UmbralesInvalidos("captura_recomendada_min necesita verde, amarillo y rojo con minutos > 0")
+    if not (cap["rojo"] <= cap["amarillo"] <= cap["verde"]):
+        raise UmbralesInvalidos("captura_recomendada_min debe acortarse al subir la gravedad")
     if datos["news2"].get("modo_parametro_extremo") not in ("conservador", "rcp"):
         raise UmbralesInvalidos("modo_parametro_extremo debe ser 'conservador' o 'rcp'")
     for clave, d in datos["indicadores"].items():
