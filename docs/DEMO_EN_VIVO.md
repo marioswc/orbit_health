@@ -34,6 +34,8 @@ Para empezar de cero, arranca con una base nueva: `ORBIT_DB_PATH=/tmp/demo.db ./
 | 22 | Vuelve el enlace | Sale **primero lo urgente** |
 | 26 a 32 | Se corrige el CO₂ y todos se recuperan | Vuelve al verde |
 
+Al arrancar, cada banda simulada entrega también su resumen de sueño: horas, **eficiencia** y **tiempo despierto**, las métricas que NASA estudia con relojes de actigrafía en el estudio [ARCHeR](https://www.nasa.gov/reference/archer) (los valores son inventados, `origen = simulado`; eficiencia y tiempo despierto solo avisan frente a la base personal, sin umbral absoluto: supuesto pendiente de validación clínica).
+
 T3 y T4 se mantienen sanos todo el tiempo, para que se vea que el sistema no da falsas alarmas.
 
 ## Qué devuelve `/api/demo/simulacion/estado`

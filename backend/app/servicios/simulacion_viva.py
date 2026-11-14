@@ -102,6 +102,8 @@ class SimulacionViva:
                 cola.cambiar_enlace(conn, True, guion.ENTORNO_INICIAL)
                 for tid, horas in guion.SUENO_INICIAL.items():           # el resumen de sueño que entrega la banda
                     lecturas.registrar_lectura(conn, tid, "sueno_horas", horas, origen="simulado")
+                    lecturas.registrar_lectura(conn, tid, "sueno_eficiencia_pct", guion.SUENO_EFICIENCIA_INICIAL[tid], origen="simulado")
+                    lecturas.registrar_lectura(conn, tid, "sueno_despertares_min", guion.SUENO_DESPERTARES_INICIAL[tid], origen="simulado")
             for _, activo, _ in guion.eventos_enlace_entre(previo, minuto):
                 if tick > 0 or not activo:
                     cola.cambiar_enlace(conn, activo, guion.ENTORNO_INICIAL)

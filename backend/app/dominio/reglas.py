@@ -144,7 +144,7 @@ def piso_de(indicador: str) -> float:
     return float(_LB.get("piso_desviacion", {}).get(indicador, 0.0))
 
 
-def desviacion_linea_base(valor: float, historial: Sequence[float], solo_baja: bool = False, piso: float = 0.0) -> dict:
+def desviacion_linea_base(valor: float, historial: Sequence[float], solo_baja: bool = False, piso: float = 0.0, solo_alta: bool = False) -> dict:
     """Compara `valor` con media y DE muestral del historial.
 
     Con `solo_baja` solo avisa cuando el valor queda POR DEBAJO de lo habitual (sueño, ejercicio, ánimo).
@@ -163,5 +163,7 @@ def desviacion_linea_base(valor: float, historial: Sequence[float], solo_baja: b
         z = (valor - mu) / efectiva
         aviso = abs(z) > K_DESVIACIONES
     if solo_baja and valor >= mu:
+        aviso = False
+    if solo_alta and valor <= mu:               # menos tiempo despierto que lo habitual no es un problema
         aviso = False
     return {"aplica": True, "n": n, "media": mu, "desviacion": sigma, "desviacion_efectiva": efectiva, "z": z, "aviso": aviso}
