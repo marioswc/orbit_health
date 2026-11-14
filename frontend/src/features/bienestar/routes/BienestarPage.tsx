@@ -1,4 +1,5 @@
 import EncabezadoPagina from "../../../shared/components/EncabezadoPagina";
+import AnimoDiario from "../components/AnimoDiario";
 import DiarioTripulante from "../components/DiarioTripulante";
 import Tamizaje from "../components/Tamizaje";
 
@@ -14,6 +15,7 @@ export default function BienestarPage({ tripulanteId }: { tripulanteId: string }
       <div className="rejilla-2">
         <DiarioTripulante tripulanteId={tripulanteId} />
         <Tamizaje tripulanteId={tripulanteId} />
+        <AnimoDiario tripulanteId={tripulanteId} />
       </div>
     </div>
   );

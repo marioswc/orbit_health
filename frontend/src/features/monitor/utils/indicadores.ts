@@ -9,6 +9,7 @@ const NOMBRES: Record<string, string> = {
   presion_sistolica: "Presión sistólica",
   presion_diastolica: "Presión diastólica",
   temperatura: "Temperatura",
+  sueno_horas: "Horas de sueño",
 };
 
 /** Nombre legible de un indicador; si no esta en la lista, lo humaniza a partir de la clave. */

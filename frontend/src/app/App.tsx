@@ -8,6 +8,7 @@ import { SelectorTripulante, useTripulantes } from "../features/tripulantes";
 import { MonitorPage, useEstadoTripulante } from "../features/monitor";
 import { PanelMedicion } from "../features/mediciones";
 import { MonitorCabina, resolverAmbiente, useAlertasColectivas } from "../features/cabina";
+import { AccesoTripulante, useAuth } from "../features/seguridad";
 import BarraSuperior, { type Vista } from "./BarraSuperior";
 import BotonCaptura from "./BotonCaptura";
 
@@ -25,8 +26,9 @@ function desdeUrl() {
 }
 
 export default function App() {
+  const auth = useAuth();
   const { tripulantes, tid, setTid, error: errorTripulantes } = useTripulantes();
-  const { estado, error: errorEstado, refrescar } = useEstadoTripulante(tid);
+  const { estado, error: errorEstado, refrescar } = useEstadoTripulante(auth.requiereAcceso ? "" : tid);
   const { tema, alternar } = useTema();
   const [ini] = useState(desdeUrl);
   const [vista, setVista] = useState<Vista>(ini.vista);
@@ -52,7 +54,18 @@ export default function App() {
       <BarraSuperior
         vista={vista} alCambiarVista={setVista}
         tema={tema} alAlternarTema={alternar}
-        selector={<SelectorTripulante tripulantes={tripulantes} valor={tid} alCambiar={setTid} />}
+        selector={
+          auth.requiereAcceso ? null : (
+            <>
+              <SelectorTripulante tripulantes={tripulantes} valor={tid} alCambiar={setTid} />
+              {auth.actor && (
+                <button type="button" className="ghost" onClick={auth.logout} aria-label={`Cerrar sesión (${auth.actor.rol})`}>
+                  Salir
+                </button>
+              )}
+            </>
+          )
+        }
       />
       <main className="pantalla">
         <div className="avisos">
@@ -61,9 +74,17 @@ export default function App() {
           )}
           {error && <Alerta tono="error" titulo="Algo salió mal">{error}</Alerta>}
         </div>
+        {auth.requiereAcceso ? (
+          <AccesoTripulante
+            tripulantes={tripulantes.map((t) => ({ valor: t.id, etiqueta: `${t.nombre} · ${t.rol}` }))}
+            alEntrar={auth.login}
+            alRecuperar={auth.recuperar}
+          />
+        ) : (
         <div className="vista" key={vista} style={{ display: vista === "monitor" ? "contents" : undefined }}>
           {tid && vista === "monitor" && (
             <MonitorPage
+              tripulanteId={tid}
               estado={estado}
               alAbrirCaptura={abrirCaptura}
               ambiente={ambiente.nivel}
@@ -75,11 +96,12 @@ export default function App() {
             {vista === "enlace" && <EnlacePage />}
           </Suspense>
         </div>
+        )}
       </main>
       </div>
 
-      {!captura && <BotonCaptura alAbrir={abrirCaptura} disponible={!!tid} />}
-      <Drawer abierto={captura && !!tid} alCerrar={cerrarCaptura} titulo="Captura manual">
+      {!auth.requiereAcceso && !captura && <BotonCaptura alAbrir={abrirCaptura} disponible={!!tid} />}
+      <Drawer abierto={!auth.requiereAcceso && captura && !!tid} alCerrar={cerrarCaptura} titulo="Captura manual">
         <PanelMedicion tripulanteId={tid} alGuardar={refrescar} />
       </Drawer>
     </>

@@ -7,17 +7,20 @@ interface Props {
   lectura: LecturaEstado;
   /** Destella al cambiar el valor (se usa tras la primera carga). */
   destello?: boolean;
+  /** Si se pasa, permite abrir la grafica de historial al hacer clic. */
+  activa?: boolean;
+  alSeleccionar?: (indicador: string) => void;
 }
 
 /** Signo vital con su valor actual y la comparacion contra la linea base personal. */
-function TarjetaSignoVital({ lectura: l, destello = false }: Props) {
+function TarjetaSignoVital({ lectura: l, destello = false, activa = false, alSeleccionar }: Props) {
   const c = compararConBase(l);
   const nombre = nombreIndicador(l.indicador);
   const fueraDeRango = l.nivel !== "verde";
   const normal = !fueraDeRango && !c.desvio;
 
   return (
-    <article className={`signo ${l.nivel}${destello ? " destello" : ""}`} aria-label={`${nombre}: ${l.valor} ${l.unidad}, ${l.nivel}`}>
+    <article className={`signo ${l.nivel}${destello ? " destello" : ""}${activa ? " activa" : ""}`} aria-label={`${nombre}: ${l.valor} ${l.unidad}, ${l.nivel}`}>
       <header className="signo-cab">
         <span className="signo-nombre">{nombre}</span>
         <span className={`badge ${l.nivel}`}>{l.nivel}</span>
@@ -33,6 +36,11 @@ function TarjetaSignoVital({ lectura: l, destello = false }: Props) {
         {normal && <span className="etiqueta-estado">Normal</span>}
         {fueraDeRango && <span className="etiqueta-estado alerta">Fuera de rango</span>}
         {c.desvio && <span className="etiqueta-estado desvio">Desvío &gt; 2σ</span>}
+        {alSeleccionar && (
+          <button type="button" className="ghost signo-hist" onClick={() => alSeleccionar(l.indicador)} aria-pressed={activa}>
+            {activa ? "Ocultar historial" : "Historial"}
+          </button>
+        )}
       </p>
     </article>
   );

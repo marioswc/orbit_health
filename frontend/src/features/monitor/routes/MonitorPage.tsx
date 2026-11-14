@@ -2,14 +2,18 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import Contador from "../../../shared/components/Contador";
 import Titular from "../../../shared/components/Titular";
 import TiraIndicadores from "../components/TiraIndicadores";
+import AccionesClinicas from "../components/AccionesClinicas";
 import DetalleZona from "../components/DetalleZona";
 import FiguraHumana from "../components/FiguraHumana";
+import GraficaSerie from "../components/GraficaSerie";
 import TarjetaSignoVital from "../components/TarjetaSignoVital";
+import { useHistorialIndicador } from "../hooks/useHistorialIndicador";
 import { useZonaSeleccionada } from "../hooks/useZonaSeleccionada";
 import type { Estado, LecturaEstado } from "../types/estado";
 import { CAPAS, ZONAS, nivelZona, type NivelZona } from "../zonas";
 
 interface Props {
+  tripulanteId?: string;
   estado: Estado | null;
   /** Abre la captura manual (la compone app/ para no acoplar features). */
   alAbrirCaptura?: () => void;
@@ -23,11 +27,14 @@ const SIN_LECTURAS: LecturaEstado[] = []; // referencia estable: evita recalcula
 const TITULAR = { verde: "Sin alertas activas", amarillo: "Requiere vigilancia", rojo: "Atención inmediata", sin_datos: "Sin lecturas recientes" } as const;
 const LEYENDA: [string, string][] = [["verde", "Verde"], ["amarillo", "Amarillo"], ["rojo", "Rojo"], ["sin_datos", "Sin datos"]];
 
-export default function MonitorPage({ estado, alAbrirCaptura, cabina, ambiente = null }: Props) {
+export default function MonitorPage({ tripulanteId = "", estado, alAbrirCaptura, cabina, ambiente = null }: Props) {
   const { zona, acercado, capa, setCapa, elegir, alejar } = useZonaSeleccionada();
   const [meses, setMeses] = useState(0);
+  const [indicadorHist, setIndicadorHist] = useState<string | null>(null);
+  const hist = useHistorialIndicador(tripulanteId, indicadorHist);
   const nivel = estado?.nivel_general ?? "sin_datos";
   const lecturas = estado?.indicadores ?? SIN_LECTURAS;
+  const toggleHist = (ind: string) => setIndicadorHist((actual) => (actual === ind ? null : ind));
 
   // Tras la primera carga, las filas cuyo valor cambia destellan (la clave incluye valor y hora)
   const cargado = useRef(false);
@@ -97,13 +104,34 @@ export default function MonitorPage({ estado, alAbrirCaptura, cabina, ambiente =
         </aside>
       </section>
 
+      {estado && (
+        <AccionesClinicas
+          nivel={nivel}
+          proximaCapturaMin={estado.proxima_captura_min}
+          reglas={estado.reglas_combinadas}
+          acciones={estado.acciones_sugeridas}
+        />
+      )}
+
       {lecturas.length > 0 && (
         <section className="tarjeta" aria-label="Comparación con línea base">
           <h2>Línea base personal</h2>
           <div className="signos">
-            {lecturas.map((i) => <TarjetaSignoVital key={`${i.indicador}-${i.valor}-${i.ts}`} lectura={i} destello={destellar} />)}
+            {lecturas.map((i) => (
+              <TarjetaSignoVital
+                key={`${i.indicador}-${i.valor}-${i.ts}`}
+                lectura={i}
+                destello={destellar}
+                activa={indicadorHist === i.indicador}
+                alSeleccionar={tripulanteId ? toggleHist : undefined}
+              />
+            ))}
           </div>
         </section>
+      )}
+
+      {indicadorHist && (
+        <GraficaSerie serie={hist.serie} cargando={hist.cargando} error={hist.error} alCerrar={() => setIndicadorHist(null)} />
       )}
     </div>
   );

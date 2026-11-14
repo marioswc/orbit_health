@@ -1,13 +1,37 @@
+const CLAVE_TOKEN = "orbit-token";
+let listener401: (() => void) | null = null;
+
+export function getToken(): string | null {
+  try { return sessionStorage.getItem(CLAVE_TOKEN); } catch { return null; }
+}
+
+export function setToken(token: string | null) {
+  try {
+    if (token) sessionStorage.setItem(CLAVE_TOKEN, token);
+    else sessionStorage.removeItem(CLAVE_TOKEN);
+  } catch { /* almacenamiento no disponible */ }
+}
+
+export function onNoAutorizado(fn: (() => void) | null) {
+  listener401 = fn;
+}
+
 export async function api<T>(ruta: string, init?: RequestInit): Promise<T> {
+  const token = getToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
+
   const r = await fetch(`/api${ruta}`, {
-    headers: { "Content-Type": "application/json" },
+    headers,
     ...init,
   });
   if (!r.ok) {
+    if (r.status === 401 && listener401) listener401();
     let detalle = `${r.status} ${r.statusText}`;
     try {
       const j = await r.json();
       if (typeof j.detail === "string") detalle = j.detail;
+      else if (j.detail && typeof j.detail.mensaje === "string") detalle = j.detail.mensaje;
     } catch { /* sin cuerpo JSON */ }
     throw new Error(detalle);
   }
