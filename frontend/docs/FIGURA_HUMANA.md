@@ -1,46 +1,41 @@
-# Figura humana interactiva (SVG)
+# Astronauta interactivo
 
-Elemento visual central del producto: reemplaza al "cerebro de partículas" de la referencia Dala. Es un SVG de cuerpo humano con **zonas clicables** que se colorean según el estado clínico.
+Pantalla principal del Monitor: un astronauta de frente al centro, zonas a la izquierda y detalle a la derecha. Elegir una zona acerca la cámara, revela una capa anatómica con la región a color y muestra una línea de llamada hacia el panel.
 
-Ubicación objetivo: `features/monitor/components/FiguraHumana.tsx` (hoy en `src/components/`).
+Ubicación: `features/monitor/` — `components/FiguraHumana.tsx`, `components/ArteAstronauta.tsx`, `components/DetalleZona.tsx`, `zonas.ts`, `zonasPaths.ts`, `assets/`.
 
-## Estado actual
+## Capas (todas SVG, alineadas en las mismas coordenadas)
 
-Implementación inicial con formas geométricas simples (círculo, rectángulos), 5 zonas, `React.memo`, color por clase CSS. **Aún no es clicable** y no es una silueta humana.
+| Capa | Archivo | Origen |
+|---|---|---|
+| Traje | `astronauta.svg` | Vectorización con curvas de la ilustración de referencia del equipo. **Licencia por confirmar** (parece de banco de imágenes) |
+| Músculo | `musculos.svg` | Diseño propio en estilo vectorial plano (músculos coral, huesos crema, cráneo y caja torácica expuestos en una mitad). Se genera con `scripts/gen_musculos.py` si se conserva el generador |
+| Hueso | `esqueleto.svg` | Wikimedia Commons, dominio público (LadyofHats) |
+| Órganos | `organos.svg` | Wikimedia Commons, dominio público (LadyofHats) |
 
-## Zonas e indicadores (mapeo actual en el frontend)
+Detalle y atribuciones en `assets/ATRIBUCION.md`. Las capas se alinean por el centro de la cabeza (casco) y por los pies (botas). En cada capa activa, la región de la zona elegida se ve a todo color y el resto apagado (`REGIONES` en `ArteAstronauta.tsx`).
 
-| Zona | Indicadores (backend) |
-|---|---|
-| Cabeza / SNC | `avpu` |
-| Cardiovascular | `presion_sistolica`, `presion_diastolica`, `frecuencia_cardiaca` |
-| Respiratorio | `spo2`, `frecuencia_respiratoria` |
-| Tronco / Metabólico | `glucosa`, `temperatura` |
-| Extremidades | ninguno en el prototipo |
+## Zonas
 
-Nivel de una zona = el peor de sus indicadores (`rojo > amarillo > verde`); sin lecturas = `sin_datos`.
+| Zona | Indicadores (backend) | Capa inicial |
+|---|---|---|
+| Cabeza / SNC | `avpu` | Órganos |
+| Respiratorio | `spo2`, `frecuencia_respiratoria` | Órganos |
+| Cardiovascular | `presion_sistolica`, `presion_diastolica`, `frecuencia_cardiaca` | Órganos |
+| Tronco / Metabólico | `glucosa`, `temperatura` | Órganos |
+| Brazos | ninguno en el prototipo | Músculo |
+| Piernas | ninguno en el prototipo | Músculo |
 
-## Requisitos de la nueva figura
+Nivel de zona = el peor de sus indicadores; sin lecturas = `sin_datos`. Los textos de efectos salen de los videos de NASA HRP (*Hazards of Human Spaceflight*) y se presentan como efectos generales de la misión, no como diagnóstico. En la capa Hueso de brazos y piernas hay una línea de tiempo (0–6 meses) que estima la **pérdida** de densidad ósea con una tasa constante de ≈1–1.5 % mensual (NASA HRP); es un cálculo simple del equipo, ilustrativo. La microgravedad disminuye la densidad ósea; no la aumenta.
 
-1. **Silueta humana en SVG** con regiones separadas: cabeza, tórax (corazón/pulmones), abdomen, brazos, piernas.
-2. **Click en una zona** → abre el detalle de esa zona (indicadores, niveles, guía). Estado `zonaSeleccionada` en `useZonaSeleccionada`.
-3. Color por estado con transición CSS en `fill`; alerta con `@keyframes` sobre `opacity`. Sin filtros SVG pesados (`blur`, `drop-shadow`).
-4. Accesibilidad: cada zona con `role="button"`, `tabIndex={0}`, `aria-label` y `<title>`; activable con Enter/Espacio. El estado nunca depende solo del color (badge con texto).
-5. `React.memo` para evitar renders por refrescos de fondo.
+## Interacción
 
-## Decisión pendiente
+- Cada zona es clicable en el dibujo (contorno del traje) y desde la lista; se puede usar el teclado.
+- `?zona=brazos&capa=musculo` abre la vista directamente (útil para la demo).
+- Inclinación suave con el cursor, barrido de escaneo, onda y brillo al elegir; todo respeta `prefers-reduced-motion`.
 
-El backend no tiene indicadores de brazos o piernas. Opciones:
+## Limitaciones
 
-| Opción | Trade-off |
-|---|---|
-| A. Brazos/piernas clicables que muestran "sin indicador en el prototipo" | Cumple la demo visual; honesto sobre el alcance |
-| B. Asociar a brazos un indicador existente (p. ej. presión arterial) | Más "vivo", pero es un mapeo arbitrario (**Supuesto**) |
-| C. Añadir indicadores nuevos en el backend (ejercicio, masa ósea) | Más completo; requiere trabajo y validación de umbrales en backend |
-
-Recomendación: A para la entrega; C si sobra tiempo. Confirmar con el equipo.
-
-## Pendientes
-
-- Obtener o dibujar el SVG de la silueta (verificar licencia si se toma de terceros).
-- Definir si las zonas se dibujan como `<path>` por región (recomendado) o con formas simples.
+- Una sola postura de frente: no se consiguió otra imagen utilizable.
+- Las capas de anatomía no coinciden exactamente con la postura del traje (brazos).
+- Pendiente: confirmar la redacción de los efectos y la licencia del traje.

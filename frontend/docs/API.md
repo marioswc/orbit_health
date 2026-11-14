@@ -14,6 +14,7 @@ Base: `/api` (proxy de Vite a `http://localhost:8000`). Fuente: `backend/app/mai
 | POST | `/api/tamizajes` | bienestar | PHQ-2; devuelve total, positivo y cápsulas |
 | GET/POST | `/api/enlace` | enlace | Estado/cambio de enlace y entorno (modo Eclipse) |
 | GET | `/api/cola` | enlace | Cola hacia la Tierra con resumen por prioridad |
+| GET | `/api/alertas/colectivas` | (pendiente) | Alerta colectiva de CO₂ (llegó en `main`, el frontend aún no la usa) |
 | GET | `/api/cola/verificar` | enlace | Verificación de la cadena de hashes |
 
 ## Notas

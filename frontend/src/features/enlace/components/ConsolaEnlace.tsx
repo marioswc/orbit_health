@@ -20,18 +20,18 @@ function ConsolaEnlace() {
     setVerif(r.valida ? `Cadena íntegra (${r.total} eventos)` : `Cadena rota en evento ${r.primer_invalido}`);
   }
 
-  if (!cola) return <section className="panel"><h2>Enlace con Tierra</h2><p className="error">{error || "Cargando…"}</p></section>;
+  if (!cola) return <section className="tarjeta"><h2>Cola y estado del canal</h2><p className="error">{error || "Cargando…"}</p></section>;
   const { activo, entorno } = cola.enlace;
   return (
-    <section className="panel">
-      <h2>Enlace con Tierra</h2>
+    <section className="tarjeta">
+      <h2>Cola y estado del canal</h2>
       <div className="fila">
         <button className={entorno === "luna" ? "activo" : ""} onClick={() => enlace(activo, "luna")}>Luna (1.3 s)</button>
         <button className={entorno === "marte" ? "activo" : ""} onClick={() => enlace(activo, "marte")}>Marte (1200 s)</button>
         <button className={activo ? "activo" : ""} onClick={() => enlace(true, entorno)}>Enlace normal</button>
         <button className={!activo ? "activo" : ""} onClick={() => enlace(false, entorno)}>Modo Eclipse</button>
       </div>
-      <p>{activo ? <span className="ok">Enlace activo</span> : <span className="error">Eclipse: nada sale de la nave</span>}</p>
+      <p>{activo ? <span className="ok"><span className="latido" />Enlace activo</span> : <span className="error"><span className="latido fijo" />Eclipse: nada sale de la nave</span>}</p>
       <div className="cols">
         {([1, 2, 3] as const).map((p) => (
           <div key={p} className="col-prio">
@@ -42,7 +42,7 @@ function ConsolaEnlace() {
           </div>
         ))}
       </div>
-      <div className="fila" style={{ marginTop: 8 }}>
+      <div className="fila" style={{ marginTop: 24 }}>
         <button onClick={verificar}>Verificar cadena de hash</button><span className="suave">{verif}</span>
       </div>
     </section>

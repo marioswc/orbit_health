@@ -1,0 +1,54 @@
+/* Capa de animaciones. Todas usan transform/opacity (y algo de blur), salida exponencial y respetan reduced-motion. */
+
+/* ---- Entrada de vistas y tarjetas (escalonada) ---- */
+.vista { display: grid; gap: var(--spacing-24); }
+.vista > * { animation: subir .55s var(--ease-out) both; }
+.vista > :nth-child(1) { animation-delay: 0ms; }
+.vista > :nth-child(2) { animation-delay: 90ms; }
+.vista > :nth-child(3) { animation-delay: 180ms; }
+.vista > :nth-child(4) { animation-delay: 270ms; }
+.vista > :nth-child(n+5) { animation-delay: 340ms; }
+@keyframes subir { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+/* Titular: revela con desenfoque al cambiar de estado */
+h1 { animation: revelar .7s var(--ease-out) both; }
+@keyframes revelar { from { opacity: 0; transform: translateY(14px); filter: blur(8px); } to { opacity: 1; transform: none; filter: blur(0); } }
+.num-contador { display: inline-block; min-width: 1ch; font-feature-settings: "tnum" on; color: var(--color-ink); }
+
+/* Tarjetas: elevan un poco al pasar el cursor */
+.tarjeta { transition: transform .3s var(--ease-out), box-shadow .3s ease; }
+@media (hover: hover) { .tarjeta:hover { transform: translateY(-3px); box-shadow: var(--shadow-subtle); } }
+
+/* Etiquetas de estado: rojo late */
+.badge.rojo::before { animation: latir 1.3s ease-in-out infinite; }
+.badge.amarillo::before { animation: latir 2.4s ease-in-out infinite; }
+@keyframes latir { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: .55; } }
+
+/* Filas: aparecen escalonadas; la que cambia de valor destella */
+.item { animation: entrar .4s var(--ease-out) both; }
+.item:nth-child(2) { animation-delay: 40ms; } .item:nth-child(3) { animation-delay: 80ms; }
+.item:nth-child(4) { animation-delay: 120ms; } .item:nth-child(n+5) { animation-delay: 160ms; }
+.item.destello { animation: entrar .4s var(--ease-out) both, destello 1.4s ease-out both; border-radius: 8px; }
+@keyframes destello { 0% { background: color-mix(in srgb, var(--color-ember-orange) 22%, transparent); } 100% { background: transparent; } }
+
+/* Mensajes de resultado */
+.ok, .error { animation: entrar .3s var(--ease-out) both; }
+
+/* ---- Estado de carga (esqueleto) ---- */
+.esqueleto { display: block; border-radius: 12px; background: linear-gradient(90deg, var(--color-warm-taupe) 0%, var(--color-stone) 50%, var(--color-warm-taupe) 100%); background-size: 220% 100%; animation: brillar 1.4s linear infinite; }
+@keyframes brillar { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+
+/* ---- Enlace: indicador de canal activo ---- */
+.latido { display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: currentColor; animation: ping 1.8s var(--ease-out) infinite; }
+.latido.fijo { animation: none; }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); } 80%, 100% { box-shadow: 0 0 0 9px transparent; } }
+
+/* ---- Tema: transicion suave de colores al cambiar ---- */
+html.cambiando-tema, html.cambiando-tema *, html.cambiando-tema *::before, html.cambiando-tema *::after { transition: background-color .4s ease, color .4s ease, border-color .4s ease, fill .4s ease, stroke .4s ease !important; }
+.icono svg { animation: girar .55s var(--ease-out) both; }
+@keyframes girar { from { transform: rotate(-90deg) scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---- Reducir movimiento ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
