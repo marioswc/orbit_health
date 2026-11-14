@@ -30,6 +30,9 @@ Los valores numéricos viven en `backend/app/datos/umbrales.json`. Para aplicar 
 | 11 | Rangos de captura | Sección `indicadores` de `datos/umbrales.json` | `datos/umbrales.json` | ¿Rechazan valores plausibles o aceptan imposibles? | Criterio clínico |
 | 12 | Conciencia (AVPU) | Autocaptura | Frontend | Una persona con conciencia alterada no puede registrarla. ¿Debe capturarla un compañero? | Criterio clínico |
 | 13 | Prioridad de cola | Rojo 1, amarillo 2, verde 3 | `servicios/lecturas.py` | ¿El orden de transmisión es el correcto? | Criterio clínico |
+| 14 | Regla combinada: pulso >90 con presión sistólica ≤110 | Nivel amarillo | `datos/umbrales.json` (`reglas_combinadas`) | ¿Es útil como aviso? ¿Debe ser rojo? | Criterio clínico |
+| 15 | Regla combinada: temperatura ≥38.1 con pulso >90 | Nivel amarillo | `datos/umbrales.json` (`reglas_combinadas`) | ¿Sensibilidad adecuada o genera ruido? | Criterio clínico |
+| 16 | Alerta colectiva de CO₂ | CO₂ >3.0 mmHg y ≥2 tripulantes en amarillo o peor, resultado rojo | `datos/umbrales.json` (`colectiva_co2`) | ¿Mínimo de tripulantes y nivel correctos? | Criterio clínico y normas de cabina |
 
 ## 3. Salud mental: puntos que requieren decisión humana
 

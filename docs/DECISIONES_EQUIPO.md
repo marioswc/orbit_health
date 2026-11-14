@@ -14,7 +14,7 @@
 
 | Afirmación | Realidad | Qué hacer |
 |---|---|---|
-| "Cruzamos las alertas de CO₂ y SpO₂" | **No está implementado.** Hoy se evalúan por separado | No decirlo en la demo, o implementar la correlación primero |
+| "Cruzamos las alertas de CO₂ y SpO₂" | **Implementado** con `GET /api/alertas/colectivas`: CO₂ sobre 3.0 mmHg y al menos 2 tripulantes con nivel fisiológico amarillo o peor. Las lecturas ambientales no cuentan como afectado | Condiciones y niveles son supuestos; validar con el clínico |
 | "Supuestos calibrados con literatura oficial" | Los umbrales son supuestos de diseño que no se han verificado contra fuentes publicadas | Decir "supuestos de diseño basados en NEWS2, pendientes de validación médica" y citar solo fuentes realmente consultadas |
 | "Frecuencia dinámica de captura" | Solo recomienda el intervalo; no hay recordatorios ni bloqueo | Presentarlo como recomendación |
 
@@ -23,5 +23,4 @@
 | Opción | Pro | Contra |
 |---|---|---|
 | Vigencia de lecturas por nivel (60/15/15) | Evita arrastrar puntajes viejos | Más reglas que validar |
-| Correlación CO₂ con síntomas de la tripulación | Cumple lo prometido en la demo | Requiere definir qué es "correlación" con un clínico |
 | Marcar los primeros N días como adaptación y no emitir avisos de línea base | Menos falsas alarmas al inicio | Puede ocultar un deterioro real; N lo define el clínico |
