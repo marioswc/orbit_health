@@ -52,7 +52,7 @@ React + TS (build estático)  ──HTTP local──▶  FastAPI
 | Backend | Python, FastAPI | API REST y motor clínico |
 | Datos | SQLite con `foreign_keys=ON` y WAL | Persistencia local |
 
-Estructura propuesta del repo: `backend/` (app, tests), `frontend/`, `docs/`, `data/` (series de calibración).
+Estructura del repo: ver README. Backend por capas (`api`, `servicios`, `repositorios`, `dominio`, `fuentes`); umbrales clínicos en `backend/app/datos/umbrales.json`.
 
 ## 5. Modelo de datos
 
