@@ -6,6 +6,7 @@ from ..servicios import estado as servicio_estado
 from ..servicios import lecturas as servicio
 from ..servicios import auditoria
 from ..servicios import preferencias as servicio_preferencias
+from ..servicios import recordatorios as servicio_recordatorios
 from ..servicios import historial as servicio_historial
 from .dependencias import conexion, requerir_tripulante, requiere
 
@@ -56,3 +57,15 @@ def historial(tid: str, indicador: str, dias: float = 14, limite: int = 500, con
         return servicio_historial.serie_indicador(conn, tid, indicador, dias, limite)
     except ValueError as e:
         raise HTTPException(422, str(e))
+
+
+@router.get("/recordatorios")
+def recordatorios(conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) -> dict:
+    """Quién tiene la medición vencida, según su nivel actual y su frecuencia de recordatorios elegida."""
+    return servicio_recordatorios.recordatorios_tripulacion(conn)
+
+
+@router.get("/recordatorios/{tid}")
+def recordatorio(tid: str, conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) -> dict:
+    requerir_tripulante(conn, tid)
+    return servicio_recordatorios.recordatorio_tripulante(conn, tid)
