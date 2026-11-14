@@ -1,6 +1,6 @@
 import { FormEvent, memo, useCallback, useEffect, useState } from "react";
-import { api, post } from "../api/client";
-import type { NotaDiario } from "../api/tipos";
+import { api, post } from "../../../shared/api/client";
+import type { NotaDiario } from "../types/bienestar";
 
 function DiarioTripulante({ tripulanteId }: { tripulanteId: string }) {
   const [titulo, setTitulo] = useState("");

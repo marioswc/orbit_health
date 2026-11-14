@@ -1,5 +1,6 @@
 import { memo } from "react";
-import type { LecturaEstado, Nivel } from "../api/tipos";
+import type { Nivel } from "../../../shared/types/nivel";
+import type { LecturaEstado } from "../types/estado";
 
 type NivelZona = Nivel | "sin_datos";
 

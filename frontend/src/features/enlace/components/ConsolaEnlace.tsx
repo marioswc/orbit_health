@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useState } from "react";
-import { api, post } from "../api/client";
-import type { Cola } from "../api/tipos";
+import { api, post } from "../../../shared/api/client";
+import type { Cola } from "../types/cola";
 
 const NOMBRE = { 1: "Prioridad 1 · rojo", 2: "Prioridad 2 · amarillo", 3: "Prioridad 3 · verde" } as const;
 

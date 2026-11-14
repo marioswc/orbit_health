@@ -1,6 +1,6 @@
 import { FormEvent, memo, useEffect, useState } from "react";
-import { api, post } from "../api/client";
-import type { IndicadorDef, RespuestaLectura } from "../api/tipos";
+import { api, post } from "../../../shared/api/client";
+import type { IndicadorDef, RespuestaLectura } from "../types/medicion";
 
 const AVPU = ["A (alerta)", "V (voz)", "P (dolor)", "U (sin respuesta)"];
 

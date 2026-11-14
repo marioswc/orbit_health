@@ -1,6 +1,6 @@
 import { FormEvent, memo, useState } from "react";
-import { post } from "../api/client";
-import type { RespuestaTamizaje } from "../api/tipos";
+import { post } from "../../../shared/api/client";
+import type { RespuestaTamizaje } from "../types/bienestar";
 
 const OPCIONES = ["Nunca", "Varios días", "Más de la mitad de los días", "Casi todos los días"];
 const PREGUNTAS = [
