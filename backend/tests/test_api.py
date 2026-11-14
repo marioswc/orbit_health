@@ -140,3 +140,30 @@ def test_lectura_y_evento_son_atomicos(cliente, monkeypatch):
     conn = sqlite3.connect(config.DB_PATH)
     assert conn.execute("SELECT COUNT(*) FROM lecturas").fetchone()[0] == 0
     conn.close()
+
+
+def test_regla_combinada_sube_el_nivel_y_se_informa(cliente):
+    lectura(cliente, "presion_sistolica", 108)
+    r = lectura(cliente, "frecuencia_cardiaca", 95).json()
+    assert [a["id"] for a in r["reglas_combinadas"]] == ["posible_intolerancia_ortostatica"]
+    assert r["nivel"] == "amarillo" and r["prioridad"] == 2
+    e = cliente.get("/api/estado/T1").json()
+    assert e["nivel_general"] == "amarillo" and e["reglas_combinadas"]
+
+
+def test_sin_dato_de_ambas_variables_no_hay_regla(cliente):
+    r = lectura(cliente, "frecuencia_cardiaca", 95).json()
+    assert r["reglas_combinadas"] == [] and r["nivel"] == "verde"
+
+
+def test_alerta_colectiva_co2_con_dos_tripulantes_afectados(cliente):
+    assert cliente.get("/api/alertas/colectivas").json()["alertas"] == []
+    lectura(cliente, "co2", 3.6, tid="T3")                    # ambiental: no cuenta como afectado
+    lectura(cliente, "spo2", 90, tid="T1")                    # rojo
+    assert cliente.get("/api/alertas/colectivas").json()["alertas"] == []   # solo 1 afectado
+    lectura(cliente, "spo2", 92, tid="T2")
+    lectura(cliente, "frecuencia_respiratoria", 26, tid="T2")  # rojo
+    r = cliente.get("/api/alertas/colectivas").json()
+    assert r["alertas"] and r["alertas"][0]["id"] == "alerta_ambiental_colectiva"
+    assert r["alertas"][0]["afectados"] == 2
+    assert r["alertas"][0]["nivel"] == "rojo"

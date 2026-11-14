@@ -5,7 +5,7 @@ import sqlite3
 from datetime import datetime, timedelta, timezone
 
 from .. import config
-from ..dominio import reglas
+from ..dominio import combinadas, reglas
 from ..dominio.catalogos import INDICADORES, NEWS2_VARS, validar
 from ..repositorios import lecturas as repo
 from . import cola
@@ -53,18 +53,22 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
         c = _clasificar(conn, tid, indicador, valor, ventana)
         linea = reglas.desviacion_linea_base(valor, repo.historial(conn, tid, indicador, desde_base))
         nivel = "amarillo" if linea["aviso"] and c["nivel"] == "verde" else c["nivel"]
+        valores = repo.valores_recientes(conn, tid, combinadas.INDICADORES_USADOS, ventana)
+        valores[indicador] = valor
+        activas = combinadas.evaluar_individuales(valores)
+        nivel = combinadas.peor_nivel([nivel, *[a["nivel"] for a in activas]])
         lectura_id = repo.insertar(conn, tid, indicador, valor, INDICADORES[indicador][1],
                                    nivel, c["puntos"], ahora.isoformat())
         evento_id = cola.encolar_sin_commit(
             conn, tid, f"LECTURA_{indicador.upper()}", PRIORIDAD[nivel],
             {"lectura_id": lectura_id, "indicador": indicador, "valor": valor,
-             "nivel": nivel, "news2": c["puntos"]})
+             "nivel": nivel, "news2": c["puntos"], "reglas": [a["id"] for a in activas]})
         conn.commit()
     except Exception:
         conn.rollback()
         raise
     return {"lectura_id": lectura_id, "nivel": nivel, "puntos_news2": c["puntos"],
             "observacion": c["observacion"], "aviso_linea_base": linea["aviso"],
-            "faltantes_news2": c["faltantes"], "cola_evento_id": evento_id,
+            "faltantes_news2": c["faltantes"], "reglas_combinadas": activas, "cola_evento_id": evento_id,
             "prioridad": PRIORIDAD[nivel],
             "proxima_captura_min": reglas.captura_recomendada_min(nivel)}

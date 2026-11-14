@@ -14,6 +14,8 @@ def insertar(conn: sqlite3.Connection, tid: str, indicador: str, valor: float, u
 
 def valores_recientes(conn: sqlite3.Connection, tid: str, indicadores: Sequence[str], desde: str) -> dict[str, float]:
     """Último valor de cada indicador dentro de la ventana."""
+    if not indicadores:
+        return {}
     marcadores = ",".join("?" * len(indicadores))
     filas = conn.execute(
         f"""SELECT indicador, valor FROM lecturas
@@ -28,6 +30,13 @@ def ultimas_en_ventana(conn: sqlite3.Connection, tid: str, desde: str) -> list[d
         "SELECT indicador, valor, unidad, nivel, ts FROM lecturas WHERE tripulante_id=? AND ts>=? ORDER BY id ASC",
         (tid, desde)).fetchall()
     return list({f["indicador"]: dict(f) for f in filas}.values())
+
+
+def ultimo_global(conn: sqlite3.Connection, indicador: str, desde: str) -> float | None:
+    """Última lectura de un indicador entre todos los tripulantes (p. ej. CO2 de cabina)."""
+    f = conn.execute("SELECT valor FROM lecturas WHERE indicador=? AND ts>=? ORDER BY id DESC LIMIT 1",
+                     (indicador, desde)).fetchone()
+    return f["valor"] if f else None
 
 
 def historial(conn: sqlite3.Connection, tid: str, indicador: str, desde: str) -> list[float]:
