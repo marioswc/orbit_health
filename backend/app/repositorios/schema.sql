@@ -114,3 +114,12 @@ CREATE TABLE IF NOT EXISTS animo_diario (
     ts TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_animo_trip_ts ON animo_diario (tripulante_id, ts DESC);
+
+-- Preferencias que el propio astronauta elige para adaptar el asistente (no se deduce nada de su diario ni de su ánimo).
+CREATE TABLE IF NOT EXISTS preferencias (
+    tripulante_id TEXT PRIMARY KEY REFERENCES tripulantes(id) ON DELETE CASCADE,
+    tono TEXT NOT NULL DEFAULT 'directo' CHECK (tono IN ('directo','calido')),
+    detalle TEXT NOT NULL DEFAULT 'completo' CHECK (detalle IN ('breve','completo')),
+    recordatorios TEXT NOT NULL DEFAULT 'normal' CHECK (recordatorios IN ('minimo','normal','frecuente')),
+    actualizado_ts TEXT NOT NULL
+);
