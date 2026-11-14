@@ -15,7 +15,7 @@ body {
 /* ---- Estructura ---- */
 .fondo-estrellas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
 .marca { display: inline-flex; align-items: center; gap: var(--spacing-8); font-size: var(--text-body); font-weight: 600; letter-spacing: -0.01em; margin-right: var(--spacing-16); }
-.pantalla { max-width: var(--page-max-width); margin: 0 auto; padding: var(--spacing-32) var(--spacing-32) var(--spacing-64); display: grid; gap: var(--spacing-24); }
+.pantalla { max-width: var(--page-max-width); margin: 0 auto; padding: var(--spacing-24) var(--spacing-24) var(--spacing-64); display: grid; gap: var(--spacing-24); }
 .avisos { display: grid; gap: var(--spacing-8); }
 .fila-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: var(--spacing-24); align-items: start; }
 .col { display: grid; gap: var(--spacing-24); min-width: 0; }

@@ -1,5 +1,6 @@
 import { memo, useId, useMemo, useState, type PointerEvent } from "react";
 import { useTranslation } from "../../../i18n";
+import { num } from "../../../shared/formato";
 import type { SerieHistorial } from "../types/estado";
 
 interface Props {
@@ -7,9 +8,11 @@ interface Props {
   cargando: boolean;
   error: string;
   alCerrar: () => void;
+  /** Para columnas angostas: lienzo mas cuadrado (el texto no se encoge al escalar). */
+  compacta?: boolean;
 }
 
-const W = 640, H = 250, ML = 46, MR = 16, MT = 16, MB = 30;
+const ML = 46, MR = 16, MT = 16, MB = 30;
 const hora = (ts: string) => new Date(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(ts) ? `${ts.replace(" ", "T")}Z` : ts).getTime();
 const fechaCorta = (ms: number, locale: string) => new Date(ms).toLocaleDateString(locale, { day: "numeric", month: "short" });
 const fechaLarga = (ms: number, locale: string) => new Date(ms).toLocaleString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -49,7 +52,8 @@ function curva(p: { x: number; y: number }[]): string {
 }
 
 /** Grafica SVG de la serie de un indicador: ejes con escala, curva suave con area, media, tooltip y puntos por estado. Sin librerias. */
-function GraficaSerie({ serie, cargando, error, alCerrar }: Props) {
+function GraficaSerie({ serie, cargando, error, alCerrar, compacta = false }: Props) {
+  const W = compacta ? 420 : 640, H = compacta ? 300 : 250;
   const { t, locale } = useTranslation("monitor");
   const [sel, setSel] = useState<number | null>(null);
   const idGrad = useId().replace(/:/g, "");
@@ -71,7 +75,7 @@ function GraficaSerie({ serie, cargando, error, alCerrar }: Props) {
     const area = pts.length > 1 ? `${linea} L${pts[pts.length - 1].x.toFixed(1)} ${H - MB} L${pts[0].x.toFixed(1)} ${H - MB} Z` : "";
     const xs = [t0, (t0 + t1) / 2, t1];
     return { pts, linea, area, ticks, y, x, xs };
-  }, [puntos]);
+  }, [puntos, W, H]);
 
   if (!serie && !cargando && !error) return null;
 
@@ -130,7 +134,7 @@ function GraficaSerie({ serie, cargando, error, alCerrar }: Props) {
           </svg>
           {s && (
             <div className="serie-tip" style={{ left: `${(s.x / W) * 100}%`, top: `${(s.y / H) * 100}%` }} role="status">
-              <strong>{s.p.valor} {serie?.unidad}</strong>
+              <strong>{num(s.p.valor)} {serie?.unidad}</strong>
               <span>{fechaLarga(s.t, locale)}</span>
               <span className={`badge ${s.p.nivel}`}>{t(`common:status.${s.p.nivel}`)}</span>
             </div>

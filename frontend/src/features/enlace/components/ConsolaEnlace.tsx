@@ -50,6 +50,8 @@ export function textoTipoT(t: (k: string, v?: Vars) => string, tipo: string): st
 function ConsolaEnlace() {
   const { t } = useTranslation("enlace");
   const [cola, setCola] = useState<Cola | null>(null);
+  const [cerradas, setCerradas] = useState<number[]>([]); // prioridades plegadas
+  const alternarPrio = (p: number) => setCerradas((c) => (c.includes(p) ? c.filter((x) => x !== p) : [...c, p]));
   const [latencia, setLatencia] = useState<InfoLatencia | null>(null);
   const [verif, setVerif] = useState<{ ok: boolean; texto?: string; total?: number; evento?: number | null } | null>(null);
   const [error, setError] = useState("");
@@ -163,12 +165,14 @@ function ConsolaEnlace() {
         {PRIORIDADES.map(({ p, nivel }) => {
           const items = cola.items.filter((i) => i.prioridad === p);
           return (
-            <div key={p} className={`col-prioridad ${nivel}`}>
-              <header>
+            <div key={p} className={`col-prioridad ${nivel}${cerradas.includes(p) ? " cerrada" : ""}`}>
+              <button type="button" className="col-cab" aria-expanded={!cerradas.includes(p)} aria-controls={`prio-${p}`} onClick={() => alternarPrio(p)}>
                 <span className="col-icono">{IC_PRIO[nivel]}</span>
                 <span className="col-titulo"><strong>{t("prio.title", { n: p })}</strong><span className="suave">{t(`prio.${p}`)}</span></span>
                 <span className="conteo" aria-label={t("prio.count", { count: items.length })}>{items.length}</span>
-              </header>
+                <span className="col-flecha" aria-hidden="true" />
+              </button>
+              <div className="col-cuerpo" id={`prio-${p}`}><div className="col-cuerpo-int">
               {items.length === 0 ? <p className="vacio">{IC_VACIO}{t("prio.empty")}</p> : (
                 <ul>
                   {items.slice(0, 8).map((i) => (
@@ -180,6 +184,7 @@ function ConsolaEnlace() {
                   ))}
                 </ul>
               )}
+              </div></div>
             </div>
           );
         })}

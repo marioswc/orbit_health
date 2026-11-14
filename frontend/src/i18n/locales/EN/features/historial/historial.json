@@ -10,6 +10,20 @@
   "row.open": "Show",
   "row.close": "Hide",
   "base": "14-day baseline: {{media}} {{unidad}}",
-  "noBase": "Not enough baseline ({{n}})",
-  "deviation": "Deviation > 2σ"
+  "noBase": "Building baseline · {{n}}",
+  "deviation": "Deviation > 2σ",
+  "col.indicator": "Indicator",
+  "col.current": "Current",
+  "col.trend": "14-day trend",
+  "col.base": "14-day baseline",
+  "col.status": "Status",
+  "filter.aria": "Indicator filter",
+  "filter.all": "All",
+  "filter.alerts": "With alert",
+  "emptyFilter": "No indicator with an alert. Everything is within the usual range.",
+  "col.min": "Min",
+  "col.mean": "Mean",
+  "col.max": "Max",
+  "col.variation": "Change",
+  "hint": "Tap an indicator to see its chart. Min, mean and max cover the last 14 days."
 }

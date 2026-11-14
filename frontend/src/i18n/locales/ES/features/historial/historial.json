@@ -10,6 +10,20 @@
   "row.open": "Ver",
   "row.close": "Ocultar",
   "base": "Base 14 d: {{media}} {{unidad}}",
-  "noBase": "Sin base suficiente ({{n}})",
-  "deviation": "Desvío > 2σ"
+  "noBase": "Reuniendo base · {{n}}",
+  "deviation": "Desvío > 2σ",
+  "col.indicator": "Indicador",
+  "col.current": "Actual",
+  "col.trend": "Tendencia 14 d",
+  "col.base": "Base 14 d",
+  "col.status": "Estado",
+  "filter.aria": "Filtro de indicadores",
+  "filter.all": "Todos",
+  "filter.alerts": "Con alerta",
+  "emptyFilter": "Ningún indicador con alerta. Todo dentro de lo habitual.",
+  "col.min": "Mín",
+  "col.mean": "Media",
+  "col.max": "Máx",
+  "col.variation": "Variación",
+  "hint": "Toca un indicador para ver su gráfica. Mín, media y máx son de los últimos 14 días."
 }

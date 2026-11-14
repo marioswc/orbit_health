@@ -125,7 +125,7 @@ function Tamizaje({ tripulanteId }: { tripulanteId: string }) {
             {t("tamizaje.q3")}
           </legend>
           <Segmentado
-            etiqueta={t("tamizaje.q3.aria")}
+            rejilla etiqueta={t("tamizaje.q3.aria")}
             valor={riesgoAutolesion ? "1" : "0"}
             alCambiar={(v) => { setRiesgoAutolesion(v === "1"); setError(""); }}
             opciones={OPCIONES_CRISIS}

@@ -1,4 +1,5 @@
 import { useTranslation } from "../../../i18n";
+import { num } from "../../../shared/formato";
 import type { LecturaEstado } from "../types/estado";
 import { FUENTE_EFECTOS, ZONAS, nivelZona, type Capa } from "../zonas";
 
@@ -53,7 +54,7 @@ export default function DetalleZona({ id, lecturas, capa, meses, alMeses }: Prop
         <div key={l.indicador} className={`ind-fila ${l.nivel}`}>
           <div className="ind-dato">
             <span className="ind-nombre">{nombreIndicador(l.indicador, t)}<ExplicacionIndicador clave={l.indicador} /></span>
-            <span className="ind-valor">{l.valor} {l.unidad}</span>
+            <span className="ind-valor">{num(l.valor)} {l.unidad}</span>
           </div>
           <span className={`badge ${l.nivel}`}>{t(`common:status.${l.nivel}`)}</span>
         </div>
