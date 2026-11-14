@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS cola_salida (
     estado TEXT NOT NULL DEFAULT 'retenido' CHECK (estado IN ('retenido','en_transito','recibido')),
     transmitido_ts TEXT,
     llegada_estimada_ts TEXT,
-    ack_estimado_ts TEXT
+    ack_estimado_ts TEXT,
+    resumido INTEGER NOT NULL DEFAULT 0   -- 1 = evento de rutina cubierto por un resumen; sigue guardado, no se envía aparte
 );
 
 -- Sin relación con cola_salida por diseño.

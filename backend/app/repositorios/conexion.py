@@ -32,6 +32,8 @@ def _migrar(conn: sqlite3.Connection) -> None:
     columnas = {f["name"] for f in conn.execute("PRAGMA table_info(cola_salida)")}
     if "ack_estimado_ts" not in columnas:
         conn.execute("ALTER TABLE cola_salida ADD COLUMN ack_estimado_ts TEXT")
+    if "resumido" not in columnas:
+        conn.execute("ALTER TABLE cola_salida ADD COLUMN resumido INTEGER NOT NULL DEFAULT 0")
     col_tam = {f["name"] for f in conn.execute("PRAGMA table_info(tamizajes)")}
     if "riesgo_autolesion" not in col_tam:
         conn.execute("ALTER TABLE tamizajes ADD COLUMN riesgo_autolesion INTEGER NOT NULL DEFAULT 0")
