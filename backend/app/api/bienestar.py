@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from ..servicios import bienestar as servicio
+from ..servicios import preferencias as servicio_preferencias
 from .dependencias import actor, conexion, exigir_propietario, requerir_tripulante
 
 router = APIRouter(prefix="/api", tags=["bienestar"])
@@ -59,3 +60,27 @@ def ver_animo(tid: str, dias: float = 14, conn=Depends(conexion), a: dict = Depe
     requerir_tripulante(conn, tid)
     exigir_propietario(a, tid)
     return servicio.serie_animo(conn, tid, dias)
+
+
+class PreferenciasIn(BaseModel):
+    tono: str = "directo"
+    detalle: str = "completo"
+    recordatorios: str = "normal"
+
+
+@router.get("/preferencias/{tid}")
+def ver_preferencias(tid: str, conn=Depends(conexion), a: dict = Depends(actor)) -> dict:
+    """Cómo quiere cada tripulante que le hable el asistente. Solo cambia la forma, nunca el nivel de alerta."""
+    requerir_tripulante(conn, tid)
+    exigir_propietario(a, tid)
+    return servicio_preferencias.obtener(conn, tid)
+
+
+@router.put("/preferencias/{tid}")
+def guardar_preferencias(tid: str, datos: PreferenciasIn, conn=Depends(conexion), a: dict = Depends(actor)) -> dict:
+    requerir_tripulante(conn, tid)
+    exigir_propietario(a, tid)
+    try:
+        return servicio_preferencias.guardar(conn, tid, datos.tono, datos.detalle, datos.recordatorios)
+    except ValueError as e:
+        raise HTTPException(422, str(e))

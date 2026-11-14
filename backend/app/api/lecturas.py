@@ -5,6 +5,7 @@ from ..servicios import alertas as servicio_alertas
 from ..servicios import estado as servicio_estado
 from ..servicios import lecturas as servicio
 from ..servicios import auditoria
+from ..servicios import preferencias as servicio_preferencias
 from ..servicios import historial as servicio_historial
 from .dependencias import conexion, requerir_tripulante, requiere
 
@@ -22,7 +23,8 @@ def crear_lectura(datos: LecturaIn, conn=Depends(conexion), a: dict = Depends(re
     """Cualquier tripulante autenticado puede registrar signos de un compañero (p. ej. si este queda incapacitado)."""
     requerir_tripulante(conn, datos.tripulante_id)
     try:
-        r = servicio.registrar_lectura(conn, datos.tripulante_id, datos.indicador, datos.valor)
+        estilo = servicio_preferencias.obtener(conn, a["tripulante_id"] or datos.tripulante_id)
+        r = servicio.registrar_lectura(conn, datos.tripulante_id, datos.indicador, datos.valor, estilo)
         if a["tripulante_id"] and a["tripulante_id"] != datos.tripulante_id:
             auditoria.registrar(conn, a["tripulante_id"], "lectura_a_tercero", datos.tripulante_id,
                                 {"indicador": datos.indicador, "valor": datos.valor})
@@ -33,9 +35,10 @@ def crear_lectura(datos: LecturaIn, conn=Depends(conexion), a: dict = Depends(re
 
 
 @router.get("/estado/{tid}")
-def estado(tid: str, conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) -> dict:
+def estado(tid: str, conn=Depends(conexion), a: dict = Depends(requiere("clinico:leer"))) -> dict:
     requerir_tripulante(conn, tid)
-    return servicio_estado.estado_tripulante(conn, tid)
+    estilo = servicio_preferencias.obtener(conn, a["tripulante_id"] or tid)
+    return servicio_estado.estado_tripulante(conn, tid, estilo)
 
 
 @router.get("/alertas/colectivas")

@@ -5,7 +5,7 @@ import sqlite3
 from datetime import datetime, timedelta, timezone
 
 from .. import config
-from ..dominio import acciones, combinadas, reglas
+from ..dominio import acciones, combinadas, peligros, reglas
 from ..dominio.catalogos import INDICADORES, NEWS2_VARS, validar
 from ..repositorios import lecturas as repo
 from . import cola
@@ -51,7 +51,8 @@ def _clasificar(conn, tid: str, indicador: str, valor: float, ventana: str) -> d
     return {**base, "nivel": nivel, "nivel_global": nivel, "observacion": obs}
 
 
-def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor: float) -> dict:
+def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor: float,
+                      estilo: dict | None = None) -> dict:
     error = validar(indicador, valor)
     if error:
         raise ValueError(error)
@@ -81,11 +82,15 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
     except Exception:
         conn.rollback()
         raise
-    proxima = reglas.captura_recomendada_min(nivel_evento)
+    estilo = {**acciones.ESTILO_POR_DEFECTO, **(estilo or {})}
+    proxima = acciones.ajustar_intervalo(reglas.captura_recomendada_min(nivel_evento), nivel_evento, estilo["recordatorios"])
     return {"lectura_id": lectura_id, "nivel": nivel_evento,
             "acciones_sugeridas": acciones.acciones_sugeridas(
-                nivel_evento, proxima, c["observacion"], linea["aviso"], c["faltantes"], activas, ETIQUETAS), "puntos_news2": c["puntos"],
+                nivel_evento, proxima, c["observacion"], linea["aviso"], c["faltantes"], activas, ETIQUETAS,
+                estilo["tono"], estilo["detalle"]),
+            "estilo": {k: estilo[k] for k in ("tono", "detalle", "recordatorios")}, "puntos_news2": c["puntos"],
             "observacion": c["observacion"], "aviso_linea_base": linea["aviso"],
+            "peligros_relacionados": peligros.peligros_de([indicador]) if nivel_evento != "verde" else [],
             "faltantes_news2": c["faltantes"], "reglas_combinadas": activas, "cola_evento_id": evento_id,
             "prioridad": PRIORIDAD[nivel_evento],
-            "proxima_captura_min": reglas.captura_recomendada_min(nivel_evento)}
+            "proxima_captura_min": proxima}
