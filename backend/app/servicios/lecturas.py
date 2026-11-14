@@ -72,7 +72,7 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
     try:
         c = _clasificar(conn, tid, indicador, valor, ventana)
         linea = reglas.desviacion_linea_base(valor, repo.historial(conn, tid, indicador, desde_base),
-                                             solo_baja=indicador in SOLO_BAJA)
+                                             solo_baja=indicador in SOLO_BAJA, piso=reglas.piso_de(indicador))
         nivel_lectura = "amarillo" if linea["aviso"] and c["nivel"] == "verde" else c["nivel"]
         nivel_evento = (max(nivel_lectura, c["nivel_global"], key=_ORDEN.__getitem__)
                         if c["puntos_ind"] > 0 else nivel_lectura)

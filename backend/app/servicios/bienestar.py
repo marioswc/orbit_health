@@ -171,7 +171,7 @@ def registrar_animo(conn: sqlite3.Connection, tid: str, valor: int) -> dict:
     ahora = datetime.now(timezone.utc)
     desde = (ahora - timedelta(days=config.DIAS_LINEA_BASE)).isoformat()
     previo = [p["valor"] for p in repo.animo_desde(conn, tid, desde)]
-    linea = reglas.desviacion_linea_base(float(valor), previo, solo_baja=True)   # un ánimo mejor que el habitual no es aviso
+    linea = reglas.desviacion_linea_base(float(valor), previo, solo_baja=True, piso=reglas.piso_de("animo"))   # un ánimo mejor que el habitual no es aviso
     repo.insertar_animo(conn, tid, valor, ahora.isoformat())
     conn.commit()
     bajo = reglas.animo_bajo(valor)

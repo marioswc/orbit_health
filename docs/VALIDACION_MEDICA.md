@@ -33,6 +33,7 @@ Los valores numéricos viven en `backend/app/datos/umbrales.json`. Para aplicar 
 | 14 | Regla combinada: pulso >90 con presión sistólica ≤110 | Nivel amarillo | `datos/umbrales.json` (`reglas_combinadas`) | ¿Es útil como aviso? ¿Debe ser rojo? | Criterio clínico |
 | 15 | Regla combinada: temperatura ≥38.1 con pulso >90 | Nivel amarillo | `datos/umbrales.json` (`reglas_combinadas`) | ¿Sensibilidad adecuada o genera ruido? | Criterio clínico |
 | 16 | Alerta colectiva de CO₂ | CO₂ >3.0 mmHg y ≥2 tripulantes en amarillo o peor, resultado rojo | `datos/umbrales.json` (`colectiva_co2`) | ¿Mínimo de tripulantes y nivel correctos? | Criterio clínico y normas de cabina |
+| 17 | Piso de variación de la línea base (variación mínima que cuenta como cambio real) | FC 4 lpm, FR 2 rpm, SpO₂ 1.5 %, PAS 6 mmHg, temperatura 0.3 °C, sueño 0.5 h, ejercicio 10 min, CO₂ 0.2 mmHg, entre otros | `datos/umbrales.json` (`linea_base.piso_desviacion`) | ¿Son valores razonables para que una serie muy estable no dé falsas alarmas? | Criterio clínico |
 
 ## 3. Salud mental: puntos que requieren decisión humana
 
