@@ -18,6 +18,7 @@ button.activo { background: var(--acento); color: #0b1020; border-color: var(--a
 .panel { background: var(--panel); border: 1px solid var(--borde); border-radius: 12px; padding: 16px; }
 .fila { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; align-items: center; }
 .suave { color: var(--suave); font-size: .9rem; }
+.aviso { border: 1px solid var(--amarillo); color: var(--amarillo); border-radius: 8px; padding: 8px 12px; }
 .error { color: var(--rojo); } .ok { color: var(--verde); }
 .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .85rem; color: #0b1020; }
 .badge.verde { background: var(--verde); } .badge.amarillo { background: var(--amarillo); }
