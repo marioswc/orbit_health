@@ -7,7 +7,7 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ / "backend"))
-from app import engine  # noqa: E402
+from app.dominio import reglas as engine  # noqa: E402
 
 BASE = dict(frecuencia_respiratoria=16, spo2=98, presion_sistolica=120,
             frecuencia_cardiaca=70, avpu="A", temperatura=36.8)

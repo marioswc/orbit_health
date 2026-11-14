@@ -4,8 +4,9 @@ from __future__ import annotations
 import sqlite3
 from datetime import datetime, timedelta, timezone
 
-from . import config, engine, queue_manager as qm
-from .validacion import INDICADORES, NEWS2_VARS, validar
+from . import config, queue_manager as qm
+from .dominio import reglas as engine
+from .dominio.catalogos import INDICADORES, NEWS2_VARS, validar
 
 PRIORIDAD = {"rojo": 1, "amarillo": 2, "verde": 3}
 AVPU = "AVPU"

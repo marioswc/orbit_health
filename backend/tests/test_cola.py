@@ -49,3 +49,16 @@ def test_recibido_tras_latencia(conn):
     assert qm.actualizar_recibidos(conn, futuro) == 1
     # estado no afecta la cadena
     assert qm.verificar_cadena(conn)["valida"] is True
+
+
+def test_integridad_pura_sin_base_de_datos():
+    from app.dominio import integridad as i
+    h1 = i.calcular_hash(i.GENESIS, "T1", "X", 1, "{}", "t1")
+    h2 = i.calcular_hash(h1, "T1", "X", 2, "{}", "t2")
+    filas = [
+        {"id": 1, "tripulante_id": "T1", "tipo_evento": "X", "prioridad": 1, "payload": "{}", "ts_guardado": "t1", "hash_prev": i.GENESIS, "hash": h1},
+        {"id": 2, "tripulante_id": "T1", "tipo_evento": "X", "prioridad": 2, "payload": "{}", "ts_guardado": "t2", "hash_prev": h1, "hash": h2},
+    ]
+    assert i.verificar_filas(filas)["valida"] is True
+    filas[1]["prioridad"] = 3
+    assert i.verificar_filas(filas) == {"valida": False, "total": 2, "primer_invalido": 2}

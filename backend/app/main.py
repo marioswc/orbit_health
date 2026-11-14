@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 from . import config, queue_manager as qm, servicio
 from .db import get_conn, init_db
 from .seed import sembrar
-from .validacion import INDICADORES
+from .dominio.catalogos import INDICADORES
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):

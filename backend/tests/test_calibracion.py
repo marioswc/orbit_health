@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
-from app import calibracion, config, db, engine
+from app import calibracion, config, db
+from app.dominio import reglas as engine
 
 
 def _csv(tmp_path, filas):
