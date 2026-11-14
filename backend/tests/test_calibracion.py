@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
-from app import calibracion, config, db
+from app.fuentes import calibracion
+from app.repositorios import conexion as db
 from app.dominio import reglas as engine
 
 

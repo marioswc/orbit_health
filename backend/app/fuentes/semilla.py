@@ -1,4 +1,6 @@
 """Datos de demostración ficticios (no son personas reales)."""
+from ..repositorios import bienestar, tripulantes
+
 TRIPULANTES = [
     ("T1", "Tripulante Uno", "Comandante", "1985-03-12"),
     ("T2", "Tripulante Dos", "Médico de a bordo", "1988-07-21"),
@@ -18,10 +20,8 @@ CAPSULAS = [
 
 
 def sembrar(conn) -> None:
-    if conn.execute("SELECT COUNT(*) FROM tripulantes").fetchone()[0] == 0:
-        conn.executemany(
-            "INSERT INTO tripulantes (id,nombre,rol,fecha_nacimiento) VALUES (?,?,?,?)", TRIPULANTES)
-    if conn.execute("SELECT COUNT(*) FROM capsulas").fetchone()[0] == 0:
-        conn.executemany(
-            "INSERT INTO capsulas (id,categoria,titulo,contenido_markdown) VALUES (?,?,?,?)", CAPSULAS)
+    if tripulantes.contar(conn) == 0:
+        tripulantes.insertar_varios(conn, TRIPULANTES)
+    if bienestar.contar_capsulas(conn) == 0:
+        bienestar.insertar_capsulas(conn, CAPSULAS)
     conn.commit()

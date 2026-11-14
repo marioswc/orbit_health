@@ -1,6 +1,7 @@
 import pytest
 
-from app import db, queue_manager as qm
+from app.repositorios import conexion as db
+from app.servicios import cola as qm
 
 
 @pytest.fixture()

@@ -13,10 +13,11 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import config
-from .db import get_conn, init_db
-from .dominio import reglas as engine
-from .dominio.catalogos import INDICADORES, validar
+from .. import config
+from ..dominio import reglas
+from ..dominio.catalogos import INDICADORES, validar
+from ..repositorios import tripulantes
+from ..repositorios.conexion import get_conn, init_db
 
 COLUMNAS = {"HR": "frecuencia_cardiaca", "RESP": "frecuencia_respiratoria", "SpO2": "spo2"}
 VENTANA_S = 20          # una lectura por cada 20 s (mediana de la ventana)
@@ -56,7 +57,7 @@ def cargar(tripulante_id: str, ruta: Path, db_path: str | None = None,
     init_db(db_path)
     conn = get_conn(db_path)
     try:
-        if conn.execute("SELECT 1 FROM tripulantes WHERE id=?", (tripulante_id,)).fetchone() is None:
+        if not tripulantes.existe(conn, tripulante_id):
             raise ValueError(f"Tripulante inexistente: {tripulante_id}")
         conn.execute("DELETE FROM lecturas WHERE tripulante_id=? AND origen='calibracion'", (tripulante_id,))
         total = 0
@@ -64,7 +65,7 @@ def cargar(tripulante_id: str, ruta: Path, db_path: str | None = None,
             n = len(valores)
             for i, v in enumerate(valores):
                 ts = inicio + (fin - inicio) * (i / max(n - 1, 1))
-                r = engine.evaluar_news2({ind: v})
+                r = reglas.evaluar_news2({ind: v})
                 conn.execute(
                     """INSERT INTO lecturas (tripulante_id, indicador, valor, unidad, nivel, puntos_news2, origen, ts)
                        VALUES (?,?,?,?,?,?, 'calibracion', ?)""",
@@ -78,15 +79,15 @@ def cargar(tripulante_id: str, ruta: Path, db_path: str | None = None,
 
 
 def main(argv: list[str]) -> int:
-    """Uso: python -m app.calibracion [directorio_csv]. Asigna un registro por tripulante."""
-    directorio = Path(argv[0]) if argv else config.RAIZ.parent / "data" / "physionet"
+    """Uso: python -m app.fuentes.calibracion [directorio_csv]. Asigna un registro por tripulante."""
+    directorio = Path(argv[0]) if argv else config.RAIZ / "data" / "physionet"
     archivos = sorted(directorio.glob("bidmc_*_Numerics.csv"))
     if not archivos:
         print(f"No hay CSV en {directorio}. Ejecuta scripts/descargar_physionet.sh (con red).")
         return 1
     init_db()
     conn = get_conn()
-    ids = [f["id"] for f in conn.execute("SELECT id FROM tripulantes ORDER BY id")]
+    ids = tripulantes.ids(conn)
     conn.close()
     if not ids:
         print("No hay tripulantes. Arranca el servidor una vez (siembra demo) o créalos antes.")

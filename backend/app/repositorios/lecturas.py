@@ -1,0 +1,36 @@
+"""Acceso a datos: lecturas fisiológicas y ambientales."""
+import sqlite3
+from typing import Sequence
+
+
+def insertar(conn: sqlite3.Connection, tid: str, indicador: str, valor: float, unidad: str,
+             nivel: str, puntos: int, ts: str, origen: str = "manual") -> int:
+    cur = conn.execute(
+        """INSERT INTO lecturas (tripulante_id, indicador, valor, unidad, nivel, puntos_news2, origen, ts)
+           VALUES (?,?,?,?,?,?,?,?)""",
+        (tid, indicador, valor, unidad, nivel, puntos, origen, ts))
+    return cur.lastrowid
+
+
+def valores_recientes(conn: sqlite3.Connection, tid: str, indicadores: Sequence[str], desde: str) -> dict[str, float]:
+    """Último valor de cada indicador dentro de la ventana."""
+    marcadores = ",".join("?" * len(indicadores))
+    filas = conn.execute(
+        f"""SELECT indicador, valor FROM lecturas
+            WHERE tripulante_id=? AND ts>=? AND indicador IN ({marcadores}) ORDER BY id ASC""",
+        (tid, desde, *indicadores)).fetchall()
+    return {f["indicador"]: f["valor"] for f in filas}
+
+
+def ultimas_en_ventana(conn: sqlite3.Connection, tid: str, desde: str) -> list[dict]:
+    """Última lectura completa de cada indicador dentro de la ventana."""
+    filas = conn.execute(
+        "SELECT indicador, valor, unidad, nivel, ts FROM lecturas WHERE tripulante_id=? AND ts>=? ORDER BY id ASC",
+        (tid, desde)).fetchall()
+    return list({f["indicador"]: dict(f) for f in filas}.values())
+
+
+def historial(conn: sqlite3.Connection, tid: str, indicador: str, desde: str) -> list[float]:
+    return [f["valor"] for f in conn.execute(
+        "SELECT valor FROM lecturas WHERE tripulante_id=? AND indicador=? AND ts>=?",
+        (tid, indicador, desde))]
