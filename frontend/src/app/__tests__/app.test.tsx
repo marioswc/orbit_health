@@ -1,13 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import BarraLateral from "../BarraLateral";
 import BarraSuperior from "../BarraSuperior";
 import BotonCaptura from "../BotonCaptura";
 import { nombreIndicador } from "../../features/monitor/utils/nombreIndicador";
 import ConsolaEnlace, { textoTipo } from "../../features/enlace/components/ConsolaEnlace";
 
 
-const base = { vista: "monitor" as const, alCambiarVista: vi.fn(), tema: "light" as const, alAlternarTema: vi.fn(), selector: <span>selector</span> };
+const lateral = { vista: "monitor" as const, alCambiarVista: vi.fn() };
+const base = { tema: "light" as const, alAlternarTema: vi.fn(), selector: <span>selector</span> };
 
 describe("BotonCaptura", () => {
   it("abre la captura manual y se deshabilita sin tripulante", async () => {
@@ -20,14 +22,21 @@ describe("BotonCaptura", () => {
   });
 });
 
-describe("BarraSuperior", () => {
+describe("BarraLateral", () => {
   it("marca la vista actual y cambia de vista", async () => {
     const alCambiarVista = vi.fn();
-    render(<BarraSuperior {...base} alCambiarVista={alCambiarVista} />);
+    render(<BarraLateral {...lateral} alCambiarVista={alCambiarVista} />);
     expect(screen.getByRole("button", { name: "Monitor" })).toHaveAttribute("aria-current", "page");
     await userEvent.click(screen.getByRole("button", { name: "Enlace" }));
     expect(alCambiarVista).toHaveBeenCalledWith("enlace");
   });
+  it("muestra el aviso del prototipo al pie", () => {
+    render(<BarraLateral {...lateral} aviso={{ titulo: "Prototipo de apoyo", texto: "Umbrales v0.1.0" }} />);
+    expect(screen.getByRole("note")).toHaveTextContent("Prototipo de apoyo");
+  });
+});
+
+describe("BarraSuperior", () => {
   it("incluye el selector de tripulante", () => {
     render(<BarraSuperior {...base} />);
     expect(screen.getByText("selector")).toBeInTheDocument();

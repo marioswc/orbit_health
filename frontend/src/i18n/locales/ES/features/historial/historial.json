@@ -1,0 +1,15 @@
+{
+  "page.kicker": "Historial",
+  "page.title": "Tus indicadores en el tiempo",
+  "page.desc": "Cada valor frente a tu propia línea base de 14 días. Abre una fila para ver su gráfica.",
+  "count_one": "{{count}} indicador",
+  "count_other": "{{count}} indicadores",
+  "empty": "Aún no hay lecturas. Registra una con \"Captura manual\".",
+  "aria.list": "Indicadores",
+  "row.aria": "{{nombre}}: {{valor}} {{unidad}}, {{nivel}}. {{accion}} gráfica",
+  "row.open": "Ver",
+  "row.close": "Ocultar",
+  "base": "Base 14 d: {{media}} {{unidad}}",
+  "noBase": "Sin base suficiente ({{n}})",
+  "deviation": "Desvío > 2σ"
+}

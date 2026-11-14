@@ -9,32 +9,35 @@ import { MonitorPage, useEstadoTripulante } from "../features/monitor";
 import { PanelMedicion } from "../features/mediciones";
 import { MonitorCabina, resolverAmbiente, useAlertasColectivas } from "../features/cabina";
 import { AccesoTripulante, useAuth } from "../features/seguridad";
-import BarraSuperior, { type Vista } from "./BarraSuperior";
+import { useTranslation } from "../i18n";
+import CambioIdioma from "../shared/components/CambioIdioma";
+import BarraLateral, { VISTAS } from "./BarraLateral";
+import { useRuta } from "./useRuta";
+import BarraSuperior from "./BarraSuperior";
 import BotonCaptura from "./BotonCaptura";
 
 // Vistas secundarias: se descargan solo al abrirlas
 const BienestarPage = lazy(() => import("../features/bienestar").then((m) => ({ default: m.BienestarPage })));
 const HistorialPage = lazy(() => import("../features/historial").then((m) => ({ default: m.HistorialPage })));
+const SistemaPage = lazy(() => import("../features/sistema").then((m) => ({ default: m.SistemaPage })));
 const RiesgosPage = lazy(() => import("../features/peligros").then((m) => ({ default: m.RiesgosPage })));
 const EnlacePage = lazy(() => import("../features/enlace").then((m) => ({ default: m.EnlacePage })));
 
+const estadoUmbral = (t: (k: string) => string, estado: string) => { const k = `prototype.estado.${estado}`; const r = t(k); return r === k ? estado : r; };
+
 interface EstadoUmbrales { version: string; estado: string }
 
-/** Estado inicial desde la URL (?vista=enlace&captura=1): sirve para compartir o ensayar una pantalla de la demo. */
-function desdeUrl() {
-  const q = new URLSearchParams(window.location.search);
-  const v = q.get("vista");
-  return { vista: (v === "bienestar" || v === "enlace" || v === "riesgos" || v === "historial" ? v : "monitor") as Vista, captura: q.get("captura") === "1" };
-}
+/** Estado inicial desde la URL (?captura=1): sirve para ensayar una pantalla de la demo. La vista va en la ruta (#/historial). */
+const capturaDesdeUrl = () => new URLSearchParams(window.location.search).get("captura") === "1";
 
 export default function App() {
+  const { t } = useTranslation();
   const auth = useAuth();
   const { tripulantes, tid, setTid, error: errorTripulantes } = useTripulantes();
   const { estado, error: errorEstado, refrescar } = useEstadoTripulante(auth.requiereAcceso ? "" : tid);
   const { tema, alternar } = useTema();
-  const [ini] = useState(desdeUrl);
-  const [vista, setVista] = useState<Vista>(ini.vista);
-  const [captura, setCaptura] = useState(ini.captura);
+  const [vista, setVista] = useRuta();
+  const [captura, setCaptura] = useState(capturaDesdeUrl);
   const [umbrales, setUmbrales] = useState<EstadoUmbrales | null>(null);
   const error = errorTripulantes || errorEstado;
   const { datos: colectivas } = useAlertasColectivas(estado);
@@ -45,29 +48,34 @@ export default function App() {
     estado?.indicadores.find((i) => i.indicador === "dosis_pct") ?? null,
   );
   // Direccion del cambio de vista: el contenido entra desde el lado hacia el que se movio la pestana
-  const orden = ["monitor", "historial", "bienestar", "riesgos", "enlace"];
-  const previa = useRef(orden.indexOf(ini.vista));
+  const orden = ["monitor", "historial", "bienestar", "riesgos", "enlace", "sistema"];
+  const previa = useRef(orden.indexOf(vista));
   const dx = orden.indexOf(vista) >= previa.current ? 32 : -32;
   useEffect(() => { previa.current = orden.indexOf(vista); });
   const cerrarCaptura = useCallback(() => setCaptura(false), []);
   const abrirCaptura = useCallback(() => setCaptura(true), []);
 
+  const aviso = umbrales && !umbrales.estado.startsWith("validado")
+    ? { titulo: t("prototype.title"), texto: t("prototype.text", { version: umbrales.version, estado: estadoUmbral(t, umbrales.estado) }) } : null;
   useEffect(() => { api<EstadoUmbrales>("/umbrales").then(setUmbrales).catch(() => setUmbrales(null)); }, []);
 
   return (
     <>
       <FondoEstrellas />
+      <CambioIdioma />
       <div className="app">
+      <BarraLateral vista={vista} alCambiarVista={setVista} aviso={aviso} />
+      <div className="app-col">
       <BarraSuperior
-        vista={vista} alCambiarVista={setVista}
+        titulo={VISTAS.some((v) => v.id === vista) ? t(`nav.${vista}`) : undefined}
         tema={tema} alAlternarTema={alternar}
         selector={
           auth.requiereAcceso ? null : (
             <>
               <SelectorTripulante tripulantes={tripulantes} valor={tid} alCambiar={setTid} />
               {auth.actor && (
-                <button type="button" className="ghost" onClick={auth.logout} aria-label={`Cerrar sesión (${auth.actor.rol})`}>
-                  Salir
+                <button type="button" className="ghost" onClick={auth.logout} aria-label={t("topbar.logoutAria", { rol: auth.actor.rol })}>
+                  {t("topbar.logout")}
                 </button>
               )}
             </>
@@ -76,10 +84,8 @@ export default function App() {
       />
       <main className="pantalla">
         <div className="avisos">
-          {umbrales && !umbrales.estado.startsWith("validado") && (
-            <Alerta tono="aviso" titulo="Prototipo de apoyo, no sustituye criterio médico">Umbrales v{umbrales.version}: {umbrales.estado}.</Alerta>
-          )}
-          {error && <Alerta tono="error" titulo="Algo salió mal">{error}</Alerta>}
+          {aviso && <div className="aviso-movil"><Alerta tono="aviso" titulo={aviso.titulo}>{aviso.texto}</Alerta></div>}
+          {error && <Alerta tono="error" titulo={t("errors.generic")}>{error}</Alerta>}
         </div>
         {auth.requiereAcceso ? (
           <AccesoTripulante
@@ -101,11 +107,13 @@ export default function App() {
             {tid && vista === "bienestar" && <BienestarPage tripulanteId={tid} />}
             {tid && vista === "historial" && <HistorialPage tripulanteId={tid} estado={estado} />}
             {vista === "riesgos" && <RiesgosPage />}
+            {vista === "sistema" && <SistemaPage />}
             {vista === "enlace" && <EnlacePage />}
           </Suspense>
         </div>
         )}
       </main>
+      </div>
       </div>
 
       {!auth.requiereAcceso && !captura && <BotonCaptura alAbrir={abrirCaptura} disponible={!!tid} />}

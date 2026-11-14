@@ -1,0 +1,21 @@
+{
+  "aria": "Onboard access",
+  "kicker": "Onboard security",
+  "title": "Sign in",
+  "desc": "Sign in with your numeric PIN (6 to 10 digits). After 5 failed attempts a temporary 5-minute lockout applies.",
+  "crew": "Crew member",
+  "pin": "PIN",
+  "pin_ph": "6 to 10 digits",
+  "enter": "Sign in",
+  "recover": "Recover PIN",
+  "code": "Recovery code",
+  "code_ph": "Code issued at enrollment",
+  "pin_new": "New PIN",
+  "change": "Change PIN",
+  "back": "Back",
+  "err.login": "Select your profile and enter your PIN",
+  "err.recover": "Enter the recovery code and a new PIN",
+  "ok.updated": "PIN updated. You can now sign in.",
+  "alert.ok": "Done",
+  "alert.error": "Access error"
+}

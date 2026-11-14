@@ -1,3 +1,4 @@
+import { useTranslation } from "../../i18n";
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 
 export interface Opcion { valor: string; etiqueta: string }
@@ -12,7 +13,8 @@ interface Props {
 }
 
 /** Lista desplegable accesible (combobox + listbox) con el diseno de la app. */
-export default function Selector({ opciones, valor, alCambiar, etiqueta, marcador = "Selecciona…", className = "" }: Props) {
+export default function Selector({ opciones, valor, alCambiar, etiqueta, marcador, className = "" }: Props) {
+  const { t } = useTranslation("shared");
   const [abierto, setAbierto] = useState(false);
   const [activo, setActivo] = useState(0);
   const raiz = useRef<HTMLDivElement>(null);
@@ -56,7 +58,7 @@ export default function Selector({ opciones, valor, alCambiar, etiqueta, marcado
         aria-activedescendant={abierto ? `${id}-${activo}` : undefined}
         onClick={() => (abierto ? setAbierto(false) : abrir())} onKeyDown={teclas}
       >
-        <span className={sel < 0 ? "marcador" : undefined}>{sel >= 0 ? opciones[sel].etiqueta : marcador}</span>
+        <span className={sel < 0 ? "marcador" : undefined}>{sel >= 0 ? opciones[sel].etiqueta : (marcador ?? t("selector.placeholder"))}</span>
         <svg className="selector-flecha" width="12" height="8" viewBox="0 0 12 8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5" /></svg>
       </button>
       {abierto && (

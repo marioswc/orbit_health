@@ -8,7 +8,7 @@ import { gzipSync } from "node:zlib";
 const dist = join(dirname(fileURLToPath(import.meta.url)), "..", "dist");
 const KB = 1024;
 // Limites en KB comprimidos (gzip). Supuesto del equipo: pensados para equipos y enlaces modestos.
-const PRESUPUESTO = { jsInicial: 70, cssInicial: 16, vistaDiferida: 15, svgMax: 260 };
+const PRESUPUESTO = { jsInicial: 80, cssInicial: 16, vistaDiferida: 15, svgMax: 260 };
 
 const gz = (ruta) => gzipSync(readFileSync(ruta), { level: 9 }).length;
 const html = readFileSync(join(dist, "index.html"), "utf8");

@@ -1,0 +1,17 @@
+{
+  "page.kicker": "Riesgos",
+  "page.title": "Peligros del vuelo espacial",
+  "page.desc": "El marco de peligros y riesgos del Programa de Investigación Humana de la NASA, y qué parte vigila este prototipo.",
+  "chip.summary": "{{c}} cubiertos · {{p}} parciales · {{n}} sin cubrir de {{t}}",
+  "chip.aria": "Cobertura de riesgos",
+  "loadError": "No se pudo cargar el marco de riesgos",
+  "hazards.aria": "Los cinco peligros",
+  "hazards.how": "Cómo responde ORBIT",
+  "hazards.nasa": "{{nombre}} (NASA)",
+  "risks.title": "Riesgos del HRP",
+  "risks.note": "La asociación entre indicadores y peligros es una decisión de diseño del equipo; la NASA no los clasifica así.",
+  "risks.aria": "Riesgos y cobertura",
+  "cover.cubierto": "Cubierto",
+  "cover.parcial": "Parcial",
+  "cover.no_cubierto": "No cubierto"
+}

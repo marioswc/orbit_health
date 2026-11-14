@@ -1,8 +1,9 @@
+import { useTranslation } from "../../../i18n";
 import { nivelActual } from "../../../shared/rendimiento";
 import { memo, useEffect, useMemo, useRef, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import type { LecturaEstado } from "../types/estado";
 import { ETIQUETAS, anguloFlecha, origenEtiqueta } from "../etiquetas";
-import { CAPAS, ZONAS, ancla, nivelZona, type Capa, type NivelZona } from "../zonas";
+import { ZONAS, ancla, nivelZona, type Capa, type NivelZona } from "../zonas";
 import { ZONA_PATHS } from "../zonasPaths";
 import { CAPAS_ANAT, Capas, VB, VIEWBOX, precargar } from "./ArteAstronauta";
 
@@ -39,6 +40,7 @@ export function estiloCamara(zonaId: string, capa: Capa, acercado: boolean): CSS
 const ZONAS_AMBIENTE = ["snc", "resp"]; // el CO2 y la radiacion afectan sobre todo al SNC y al sistema respiratorio
 
 function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSeleccionar, alAlejar, ambiente = null }: Props) {
+  const { t } = useTranslation("monitor");
   const plataforma = useRef<HTMLDivElement>(null);
   const visitadas = useRef<Set<Capa>>(new Set(["traje"]));
   visitadas.current.add(capa);
@@ -83,7 +85,9 @@ function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSelecci
     const amb = ambienteDe(id);
     return {
       className: `zona ${n}`, role: "button", tabIndex: 0, "aria-pressed": seleccionada === id,
-      "aria-label": `${z.etiqueta}: ${n === "sin_datos" ? "sin datos" : n}${amb ? `, entorno de cabina ${amb}` : ""}`,
+      "aria-label": amb
+        ? t("figura.zonaAriaAmb", { zona: t(`zona.${id}.etiqueta`), estado: t(`common:status.${n}`), amb: t(`common:status.${amb}`) })
+        : t("figura.zonaAria", { zona: t(`zona.${id}.etiqueta`), estado: t(`common:status.${n}`) }),
       onClick: () => alSeleccionar(id),
       onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); alSeleccionar(id); } },
     };
@@ -96,16 +100,16 @@ function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSelecci
       <span key={`barrido-${seleccionada}-${capa}`} className="barrido" aria-hidden="true" />
       <i className="esquina e1" aria-hidden="true" /><i className="esquina e2" aria-hidden="true" />
       <i className="esquina e3" aria-hidden="true" /><i className="esquina e4" aria-hidden="true" />
-      <span className="hud-capa" aria-hidden="true">{CAPAS.find((c) => c.id === capa)?.etiqueta}</span>
+      <span className="hud-capa" aria-hidden="true">{t(`capa.${capa}`)}</span>
 
       <div className="inclina">
-        <div className="lienzo" role="group" aria-label="Astronauta de frente: mapa de estado clínico por zona">
+        <div className="lienzo" role="group" aria-label={t("figura.grupoAria")}>
           <div className="camara" style={estiloCamara(seleccionada, capa, acercado)}>
             <Capas capa={capa} meses={meses} zona={seleccionada} enfocar={acercado} visitadas={visitadas.current} />
 
             <svg className="overlay" viewBox={VIEWBOX} preserveAspectRatio="none">
               <g className="zonas">
-                {ORDEN_HIT.map((id) => <g key={id} {...propsZona(id)}><title>{ZONAS.find((z) => z.id === id)!.etiqueta}</title><path d={ZONA_PATHS[id]} /></g>)}
+                {ORDEN_HIT.map((id) => <g key={id} {...propsZona(id)}><title>{t(`zona.${id}.etiqueta`)}</title><path d={ZONA_PATHS[id]} /></g>)}
               </g>
 
               {/* flechas que senalan los organos / musculos / huesos de la capa visible */}
@@ -119,7 +123,7 @@ function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSelecci
                         <path className="flecha-punta" d="M0 0 L-5.5 -2.6 L-5.5 2.6 Z" />
                       </g>
                       <g transform={`translate(${ox} ${oy}) scale(${1 / s})`}>
-                        <text className="flecha-texto" x={e.lado === "izq" ? -3 : 3} y={1.8} textAnchor={e.lado === "izq" ? "end" : "start"}>{e.texto}</text>
+                        <text className="flecha-texto" x={e.lado === "izq" ? -3 : 3} y={1.8} textAnchor={e.lado === "izq" ? "end" : "start"}>{t(`etiqueta.${e.texto}`)}</text>
                       </g>
                     </g>
                   );
@@ -146,7 +150,7 @@ function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSelecci
           </div>
         </div>
       </div>
-      {acercado && <button type="button" className="ver-todo" onClick={alAlejar}>Ver cuerpo completo</button>}
+      {acercado && <button type="button" className="ver-todo" onClick={alAlejar}>{t("figura.verTodo")}</button>}
     </div>
   );
 }

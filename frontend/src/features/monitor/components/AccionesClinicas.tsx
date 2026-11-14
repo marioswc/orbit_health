@@ -1,5 +1,6 @@
 import { memo } from "react";
 import Alerta from "../../../shared/components/Alerta";
+import { useTranslation } from "../../../i18n";
 import type { Nivel } from "../../../shared/types/nivel";
 import type { ReglaCombinada } from "../types/estado";
 
@@ -14,23 +15,24 @@ const TONO: Record<Nivel, "ok" | "aviso" | "error"> = { verde: "ok", amarillo: "
 
 /** Reglas combinadas activas y pasos procedimentales sugeridos por el backend. */
 function AccionesClinicas({ nivel, proximaCapturaMin, reglas = [], acciones = [] }: Props) {
+  const { t } = useTranslation("monitor");
   if (reglas.length === 0 && acciones.length === 0 && proximaCapturaMin === undefined) return null;
 
   return (
-    <section className="tarjeta acciones-clinicas" aria-label="Acciones y reglas activas">
+    <section className="tarjeta acciones-clinicas" aria-label={t("acciones.aria")}>
       <div className="acciones-cab">
-        <h2>Acciones sugeridas</h2>
+        <h2>{t("acciones.titulo")}</h2>
         {proximaCapturaMin !== undefined && (
-          <span className="captura-rec">Repetir medición cada {proximaCapturaMin} min</span>
+          <span className="captura-rec">{t("acciones.repetir", { min: proximaCapturaMin })}</span>
         )}
       </div>
 
       {reglas.length > 0 && (
-        <div className="reglas-activas" role="list" aria-label="Reglas combinadas activas">
+        <div className="reglas-activas" role="list" aria-label={t("acciones.reglasAria")}>
           {reglas.map((r) => (
             <div key={r.id} role="listitem">
               <Alerta tono={TONO[r.nivel]} titulo={r.nombre}>
-                Cruce de señales detectado · nivel {r.nivel} (supuesto de diseño).
+                {t("acciones.cruce", { nivel: t(`common:status.${r.nivel}`) })}
               </Alerta>
             </div>
           ))}

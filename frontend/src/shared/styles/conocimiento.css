@@ -48,3 +48,27 @@
 .hist-fila.abierta .hist-grafica { padding-bottom: var(--spacing-16); }
 .hist-grafica .grafica-serie { margin-top: 0; }
 @media (max-width: 900px) { .hist-cab { grid-template-columns: minmax(0, 1fr) auto 20px; row-gap: var(--spacing-4); } .hist-base { grid-column: 1; grid-row: 2; } .hist-valor { grid-column: 2; grid-row: 1; justify-self: end; } .hist-estado { grid-column: 2; grid-row: 2; } .hist-flecha { grid-column: 3; grid-row: 1 / span 2; } }
+
+/* ---- Sistema: salud, PIN temporal, auditoria ---- */
+.datos { margin: var(--spacing-16) 0 0; display: grid; }
+.datos > div { display: flex; justify-content: space-between; gap: var(--spacing-16); padding: var(--spacing-12) 0; border-bottom: 1px solid var(--color-stone); }
+.datos > div:last-child { border-bottom: 0; }
+.datos dt { color: var(--color-smoke); } .datos dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+.pin-temporal { display: block; margin-top: var(--spacing-8); font: 600 28px var(--font-geist-mono); letter-spacing: .3em; color: var(--color-ink); }
+.auditoria { list-style: none; margin: var(--spacing-16) 0 0; padding: 0; display: grid; max-height: 420px; overflow: auto; }
+.auditoria li { display: grid; grid-template-columns: 170px 160px minmax(0, 1fr); gap: var(--spacing-12); align-items: baseline; padding: var(--spacing-8) 0; border-bottom: 1px solid var(--color-stone); }
+.auditoria time { font: var(--text-caption) var(--font-geist-mono); color: var(--color-smoke); }
+.aud-accion { font-weight: 500; text-transform: capitalize; }
+@media (max-width: 700px) { .auditoria li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+
+/* ---- Avisos de salud mental ---- */
+.avisos-lista { list-style: none; margin: var(--spacing-16) 0 0; padding: 0; display: grid; gap: var(--spacing-8); }
+.aviso-sm { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: var(--spacing-12); padding: var(--spacing-12) var(--spacing-16); border-radius: 16px; border: 1px solid var(--color-stone); background: color-mix(in srgb, var(--color-eggshell) 70%, transparent); }
+.aviso-sm > div { display: grid; gap: 2px; min-width: 0; }
+.aviso-sm .suave { font-size: var(--text-caption); overflow-wrap: anywhere; }
+.aviso-sm.crisis.pendiente { border-color: color-mix(in srgb, var(--estado-rojo) 45%, transparent); }
+.aviso-sm.revocado { opacity: .6; }
+.estado-aviso { padding: 2px var(--spacing-12); border-radius: var(--radius-pill); font-size: var(--text-caption); font-weight: 500; color: var(--color-graphite); border: 1px solid var(--color-stone); }
+.estado-aviso.pendiente { color: var(--estado-amarillo); border-color: color-mix(in srgb, var(--estado-amarillo) 45%, transparent); }
+.estado-aviso.atendido { color: var(--estado-verde); border-color: color-mix(in srgb, var(--estado-verde) 45%, transparent); }
+@media (max-width: 600px) { .aviso-sm { grid-template-columns: minmax(0, 1fr); } }

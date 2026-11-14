@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { useTranslation } from "../../../i18n";
 import type { Capa } from "../zonas";
 import astronauta from "../assets/astronauta.svg";
 import esqueleto from "../assets/esqueleto.svg";
@@ -81,10 +82,11 @@ interface Props {
  * El traje es la base; la capa de anatomia activa se ve completa y, al acercar, solo su region a color.
  */
 export function Capas({ capa, meses, zona, enfocar, visitadas }: Props) {
+  const { t } = useTranslation("monitor");
   const regiones = REGIONES[zona] ?? [];
   return (
     <>
-      <img className="capa-traje" src={URL_CAPA.traje} alt="Astronauta con traje y casco EMU de la NASA" draggable={false}
+      <img className="capa-traje" src={URL_CAPA.traje} alt={t("figura.altTraje")} draggable={false}
         decoding="async" {...{ fetchpriority: "high" }} style={{ ...aPorcentaje(CAJAS.traje), opacity: capa === "traje" ? 1 : 0.16 }} />
 
       {CAPAS_ANAT.filter((c) => visitadas.has(c) || c === capa).map((c) => {

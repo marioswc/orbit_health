@@ -1,0 +1,17 @@
+{
+  "page.kicker": "Risks",
+  "page.title": "Spaceflight hazards",
+  "page.desc": "NASA's Human Research Program hazard and risk framework, and which part this prototype monitors.",
+  "chip.summary": "{{c}} covered · {{p}} partial · {{n}} not covered of {{t}}",
+  "chip.aria": "Risk coverage",
+  "loadError": "Could not load the risk framework",
+  "hazards.aria": "The five hazards",
+  "hazards.how": "How ORBIT responds",
+  "hazards.nasa": "{{nombre}} (NASA)",
+  "risks.title": "HRP risks",
+  "risks.note": "Linking indicators to hazards is a team design decision; NASA does not classify them this way.",
+  "risks.aria": "Risks and coverage",
+  "cover.cubierto": "Covered",
+  "cover.parcial": "Partial",
+  "cover.no_cubierto": "Not covered"
+}

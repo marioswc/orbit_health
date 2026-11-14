@@ -1,4 +1,5 @@
 import { FormEvent, memo, useState } from "react";
+import { useTranslation } from "../../../i18n";
 import Alerta from "../../../shared/components/Alerta";
 import Selector, { type Opcion } from "../../../shared/components/Selector";
 
@@ -10,6 +11,7 @@ interface Props {
 
 /** Pantalla de acceso a bordo con PIN numerico (pensada para pantalla tactil / guantes). */
 function AccesoTripulante({ tripulantes, alEntrar, alRecuperar }: Props) {
+  const { t } = useTranslation("seguridad");
   const [tid, setTid] = useState(tripulantes[0]?.valor ?? "");
   const [pin, setPin] = useState("");
   const [modoRec, setModoRec] = useState(false);
@@ -21,7 +23,7 @@ function AccesoTripulante({ tripulantes, alEntrar, alRecuperar }: Props) {
 
   async function enviarLogin(e: FormEvent) {
     e.preventDefault();
-    if (!elegido || !pin) return setMsg({ ok: false, texto: "Selecciona tu perfil e ingresa tu PIN" });
+    if (!elegido || !pin) return setMsg({ ok: false, texto: t("err.login") });
     setMsg(null);
     try {
       await alEntrar(elegido, pin);
@@ -32,7 +34,7 @@ function AccesoTripulante({ tripulantes, alEntrar, alRecuperar }: Props) {
 
   async function enviarRecuperar(e: FormEvent) {
     e.preventDefault();
-    if (!elegido || !codigo || !pinNuevo) return setMsg({ ok: false, texto: "Completa código de recuperación y PIN nuevo" });
+    if (!elegido || !codigo || !pinNuevo) return setMsg({ ok: false, texto: t("err.recover") });
     setMsg(null);
     try {
       await alRecuperar(elegido, codigo, pinNuevo);
@@ -40,55 +42,55 @@ function AccesoTripulante({ tripulantes, alEntrar, alRecuperar }: Props) {
       setCodigo("");
       setPinNuevo("");
       setPin("");
-      setMsg({ ok: true, texto: "PIN actualizado. Ahora puedes iniciar sesión." });
+      setMsg({ ok: true, texto: t("ok.updated") });
     } catch (err) {
       setMsg({ ok: false, texto: (err as Error).message });
     }
   }
 
   return (
-    <section className="tarjeta acceso" aria-label="Acceso a bordo">
-      <p className="etiqueta-pagina">Seguridad a bordo</p>
-      <h1>Iniciar sesión</h1>
-      <p className="suave">Ingresa con tu PIN numérico (6 a 10 dígitos). Tras 5 intentos fallidos se aplica bloqueo temporal de 5 minutos.</p>
+    <section className="tarjeta acceso" aria-label={t("aria")}>
+      <p className="etiqueta-pagina">{t("kicker")}</p>
+      <h1>{t("title")}</h1>
+      <p className="suave">{t("desc")}</p>
 
       {!modoRec ? (
         <form onSubmit={enviarLogin} className="acceso-form">
           <label className="campo-form">
-            <span>Tripulante</span>
-            <Selector opciones={tripulantes} valor={elegido} alCambiar={setTid} etiqueta="Tripulante" />
+            <span>{t("crew")}</span>
+            <Selector opciones={tripulantes} valor={elegido} alCambiar={setTid} etiqueta={t("crew")} />
           </label>
           <label className="campo-form">
-            <span>PIN</span>
-            <input type="password" inputMode="numeric" pattern="[0-9]{6,10}" maxLength={10} value={pin} onChange={(e) => setPin(e.target.value)} placeholder="6 a 10 dígitos" autoComplete="current-password" />
+            <span>{t("pin")}</span>
+            <input type="password" inputMode="numeric" pattern="[0-9]{6,10}" maxLength={10} value={pin} onChange={(e) => setPin(e.target.value)} placeholder={t("pin_ph")} autoComplete="current-password" />
           </label>
           <div className="fila">
-            <button type="submit">Entrar</button>
-            <button type="button" className="ghost" onClick={() => { setModoRec(true); setMsg(null); }}>Recuperar PIN</button>
+            <button type="submit">{t("enter")}</button>
+            <button type="button" className="ghost" onClick={() => { setModoRec(true); setMsg(null); }}>{t("recover")}</button>
           </div>
         </form>
       ) : (
         <form onSubmit={enviarRecuperar} className="acceso-form">
           <label className="campo-form">
-            <span>Tripulante</span>
-            <Selector opciones={tripulantes} valor={elegido} alCambiar={setTid} etiqueta="Tripulante" />
+            <span>{t("crew")}</span>
+            <Selector opciones={tripulantes} valor={elegido} alCambiar={setTid} etiqueta={t("crew")} />
           </label>
           <label className="campo-form">
-            <span>Código de recuperación</span>
-            <input value={codigo} onChange={(e) => setCodigo(e.target.value)} placeholder="Código entregado al alta" />
+            <span>{t("code")}</span>
+            <input value={codigo} onChange={(e) => setCodigo(e.target.value)} placeholder={t("code_ph")} />
           </label>
           <label className="campo-form">
-            <span>PIN nuevo</span>
-            <input type="password" inputMode="numeric" pattern="[0-9]{6,10}" maxLength={10} value={pinNuevo} onChange={(e) => setPinNuevo(e.target.value)} placeholder="6 a 10 dígitos" />
+            <span>{t("pin_new")}</span>
+            <input type="password" inputMode="numeric" pattern="[0-9]{6,10}" maxLength={10} value={pinNuevo} onChange={(e) => setPinNuevo(e.target.value)} placeholder={t("pin_ph")} />
           </label>
           <div className="fila">
-            <button type="submit">Cambiar PIN</button>
-            <button type="button" className="ghost" onClick={() => { setModoRec(false); setMsg(null); }}>Volver</button>
+            <button type="submit">{t("change")}</button>
+            <button type="button" className="ghost" onClick={() => { setModoRec(false); setMsg(null); }}>{t("back")}</button>
           </div>
         </form>
       )}
 
-      {msg && <Alerta tono={msg.ok ? "ok" : "error"} titulo={msg.ok ? "Listo" : "Error de acceso"}>{msg.texto}</Alerta>}
+      {msg && <Alerta tono={msg.ok ? "ok" : "error"} titulo={msg.ok ? t("alert.ok") : t("alert.error")}>{msg.texto}</Alerta>}
     </section>
   );
 }

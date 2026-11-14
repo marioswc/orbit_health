@@ -1,17 +1,20 @@
 import { memo, useEffect, useState } from "react";
+import { useTranslation } from "../../../i18n";
 import { api } from "../../../shared/api/client";
 import Alerta from "../../../shared/components/Alerta";
 import Segmentado from "../../../shared/components/Segmentado";
 
 interface Prefs { tono: string; detalle: string; recordatorios: string }
 const POR_DEFECTO: Prefs = { tono: "directo", detalle: "completo", recordatorios: "normal" };
-const TONOS = [{ valor: "directo", etiqueta: "Directo" }, { valor: "calido", etiqueta: "Cálido" }];
-const DETALLES = [{ valor: "breve", etiqueta: "Breve" }, { valor: "completo", etiqueta: "Completo" }];
-const RECORDATORIOS = [{ valor: "minimo", etiqueta: "Mínimos" }, { valor: "normal", etiqueta: "Normales" }, { valor: "frecuente", etiqueta: "Frecuentes" }];
+const TONOS = ["directo", "calido"];
+const DETALLES = ["breve", "completo"];
+const RECORDATORIOS = ["minimo", "normal", "frecuente"];
 
 /** Preferencias del asistente (GET/PUT /api/preferencias/{id}); se guardan al elegir y solo las ve su dueño. */
 function AsistentePreferencias({ tripulanteId }: { tripulanteId: string }) {
+  const { t } = useTranslation("bienestar");
   const [p, setP] = useState<Prefs>(POR_DEFECTO);
+  const opts = (campo: string, vals: string[]) => vals.map((v) => ({ valor: v, etiqueta: t(`prefs.${campo}.${v}`) }));
   const [msg, setMsg] = useState<{ ok: boolean; texto: string } | null>(null);
   useEffect(() => { setMsg(null); api<Prefs>(`/preferencias/${tripulanteId}`).then(setP).catch(() => setP(POR_DEFECTO)); }, [tripulanteId]);
 
@@ -20,17 +23,17 @@ function AsistentePreferencias({ tripulanteId }: { tripulanteId: string }) {
     setP(nuevo);
     try {
       setP(await api<Prefs>(`/preferencias/${tripulanteId}`, { method: "PUT", body: JSON.stringify(nuevo) }));
-      setMsg({ ok: true, texto: "Guardado. Las recomendaciones usarán este estilo." });
+      setMsg({ ok: true, texto: t("prefs.saved") });
     } catch (e) { setMsg({ ok: false, texto: (e as Error).message }); }
   }
 
   return (
     <section className="tarjeta pieza">
-      <div className="pieza-cab"><div><h2>Tu asistente</h2><p className="suave">Elige cómo quieres que te hable. Solo se guarda lo que eliges.</p></div></div>
+      <div className="pieza-cab"><div><h2>{t("prefs.title")}</h2><p className="suave">{t("prefs.hint")}</p></div></div>
       <div className="formulario">
-        <div className="campo"><span className="campo-etiqueta">Tono</span><Segmentado etiqueta="Tono" opciones={TONOS} valor={p.tono} alCambiar={(v) => cambiar("tono", v)} /></div>
-        <div className="campo"><span className="campo-etiqueta">Detalle</span><Segmentado etiqueta="Detalle" opciones={DETALLES} valor={p.detalle} alCambiar={(v) => cambiar("detalle", v)} /></div>
-        <div className="campo"><span className="campo-etiqueta">Recordatorios</span><Segmentado etiqueta="Recordatorios" opciones={RECORDATORIOS} valor={p.recordatorios} alCambiar={(v) => cambiar("recordatorios", v)} /></div>
+        <div className="campo"><span className="campo-etiqueta">{t("prefs.tone")}</span><Segmentado etiqueta={t("prefs.tone")} opciones={opts("tone", TONOS)} valor={p.tono} alCambiar={(v) => cambiar("tono", v)} /></div>
+        <div className="campo"><span className="campo-etiqueta">{t("prefs.detail")}</span><Segmentado etiqueta={t("prefs.detail")} opciones={opts("detail", DETALLES)} valor={p.detalle} alCambiar={(v) => cambiar("detalle", v)} /></div>
+        <div className="campo"><span className="campo-etiqueta">{t("prefs.reminders")}</span><Segmentado etiqueta={t("prefs.reminders")} opciones={opts("reminders", RECORDATORIOS)} valor={p.recordatorios} alCambiar={(v) => cambiar("recordatorios", v)} /></div>
         {msg && <Alerta tono={msg.ok ? "ok" : "error"}>{msg.texto}</Alerta>}
       </div>
     </section>

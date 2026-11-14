@@ -1,0 +1,17 @@
+{
+  "aria": "Cabin monitor",
+  "titulo": "Cabin",
+  "co2": "Cabin CO₂",
+  "co2.sinNivel": "The backend did not report the level for this reading.",
+  "co2.sinLectura": "No recent CO₂ reading.",
+  "co2.desc.verde": "Nominal",
+  "co2.desc.amarillo": "Partial filter saturation",
+  "co2.desc.rojo": "Risk of headache or acidosis",
+  "dosis": "Cumulative dose",
+  "dosis.limite": "% of mission limit",
+  "dosis.aria": "Cumulative radiation dose",
+  "dosis.sinLectura": "No recent dose reading.",
+  "alerta.afectados_one": "{{count}} crew member affected · CO₂ {{co2}} mmHg",
+  "alerta.afectados_other": "{{count}} crew members affected · CO₂ {{co2}} mmHg",
+  "umbrales": "Thresholds: design assumptions, pending medical validation."
+}

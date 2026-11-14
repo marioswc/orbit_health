@@ -1,15 +1,11 @@
 import { memo, useEffect, useState } from "react";
+import { useTranslation } from "../../../i18n";
 import { api, post } from "../../../shared/api/client";
 import Alerta from "../../../shared/components/Alerta";
 import Segmentado from "../../../shared/components/Segmentado";
 import type { ComparativaOrbit, EscenarioDemo } from "../types/cola";
 
-const PERFILES = [
-  { valor: "luna", etiqueta: "Luna" },
-  { valor: "marte_cercano", etiqueta: "Marte mín" },
-  { valor: "marte_medio", etiqueta: "Marte medio" },
-  { valor: "marte", etiqueta: "Marte máx" },
-];
+const PERFILES = ["luna", "marte_cercano", "marte_medio", "marte"] as const;
 
 function formatoTiempo(s: number): string {
   if (s === 0) return "0 s";
@@ -19,6 +15,9 @@ function formatoTiempo(s: number): string {
 
 /** Escenarios guionizados y linea de tiempo comparativa con y sin ORBIT. */
 function SimuladorDemo() {
+  const { t } = useTranslation("enlace");
+  const perfiles = PERFILES.map((v) => ({ valor: v, etiqueta: t(`env.short.${v}`) }));
+  const nivel = (n: string) => (["verde", "amarillo", "rojo", "sin_datos"].includes(n) ? t(`common:status.${n}`) : n);
   const [escenarios, setEscenarios] = useState<EscenarioDemo[]>([]);
   const [entorno, setEntorno] = useState("marte");
   const [comp, setComp] = useState<ComparativaOrbit | null>(null);
@@ -59,20 +58,20 @@ function SimuladorDemo() {
   return (
     <div className="demo-bloque">
       {comp && (
-        <section className="tarjeta pieza comparativa" aria-label="Comparativa con y sin ORBIT">
+        <section className="tarjeta pieza comparativa" aria-label={t("demo.cmp.aria")}>
           <div className="comparativa-cab">
             <div>
-              <h2>El dilema de la latencia: {comp.evento}</h2>
+              <h2>{t("demo.cmp.title", { evento: comp.evento })}</h2>
               <p className="suave">
-                Ventana sin respuesta de Tierra: <strong>{comp.ventana_sin_apoyo_min} min</strong> ({comp.ventana_sin_apoyo_s} s).
+                {t("demo.cmp.window")} <strong>{comp.ventana_sin_apoyo_min} min</strong> ({comp.ventana_sin_apoyo_s} s).
               </p>
             </div>
-            <Segmentado etiqueta="Entorno comparativa" opciones={PERFILES} valor={entorno} alCambiar={setEntorno} />
+            <Segmentado etiqueta={t("demo.cmp.env_aria")} opciones={perfiles} valor={entorno} alCambiar={setEntorno} />
           </div>
 
           <div className="comparativa-cols">
             <div className="comparativa-col con">
-              <h3>Con ORBIT a bordo</h3>
+              <h3>{t("demo.cmp.with")}</h3>
               <ol>
                 {comp.con_orbit.map((p, i) => (
                   <li key={i}>
@@ -83,7 +82,7 @@ function SimuladorDemo() {
               </ol>
             </div>
             <div className="comparativa-col sin">
-              <h3>Sin ORBIT</h3>
+              <h3>{t("demo.cmp.without")}</h3>
               <ol>
                 {comp.sin_orbit.map((p, i) => (
                   <li key={i}>
@@ -100,9 +99,9 @@ function SimuladorDemo() {
       )}
 
       {escenarios.length > 0 && (
-        <section className="tarjeta pieza escenarios" aria-label="Escenarios reproducibles de demo">
-          <h2>Escenarios de demostración</h2>
-          <p className="suave">Simulan casos completos en la base local para ensayar la cola y las alertas.</p>
+        <section className="tarjeta pieza escenarios" aria-label={t("demo.sc.aria")}>
+          <h2>{t("demo.sc.title")}</h2>
+          <p className="suave">{t("demo.sc.desc")}</p>
           <div className="escenarios-lista">
             {escenarios.map((e) => (
               <div key={e.id} className="escenario-item">
@@ -111,8 +110,8 @@ function SimuladorDemo() {
                   <p className="suave">{e.descripcion}</p>
                 </div>
                 <div className="fila">
-                  <button type="button" onClick={() => correr(e.id, false)}>Ejecutar</button>
-                  <button type="button" className="ghost" onClick={() => correr(e.id, true)}>Ejecutar + reconectar</button>
+                  <button type="button" onClick={() => correr(e.id, false)}>{t("demo.sc.run")}</button>
+                  <button type="button" className="ghost" onClick={() => correr(e.id, true)}>{t("demo.sc.run_reconnect")}</button>
                 </div>
               </div>
             ))}
@@ -120,13 +119,13 @@ function SimuladorDemo() {
 
           {resultado && (
             <div className="escenario-res">
-              <strong>Último escenario ejecutado: {resultado.escenario}</strong>
+              <strong>{t("demo.sc.last", { nombre: resultado.escenario })}</strong>
               <ul>
                 {resultado.pasos.map((p, idx) => (
                   <li key={idx}>
                     <span>{p.paso}</span>
-                    {p.nivel && <span className={`badge ${p.nivel}`}>{p.nivel}</span>}
-                    {p.despachados !== undefined && <span className="suave">{p.despachados} despachados</span>}
+                    {p.nivel && <span className={`badge ${p.nivel}`}>{nivel(p.nivel)}</span>}
+                    {p.despachados !== undefined && <span className="suave">{t("demo.sc.dispatched", { n: p.despachados })}</span>}
                   </li>
                 ))}
               </ul>
@@ -135,28 +134,28 @@ function SimuladorDemo() {
         </section>
       )}
 
-      <section className="tarjeta pieza escenarios" aria-label="Dispositivo portátil simulado">
+      <section className="tarjeta pieza escenarios" aria-label={t("demo.sensor.title")}>
         <div className="tierra-cab">
           <div>
-            <h2>Dispositivo portátil simulado</h2>
-            <p className="suave">Envía 12 rondas de signos vitales continuos sobre T1 con origen sensor.</p>
+            <h2>{t("demo.sensor.title")}</h2>
+            <p className="suave">{t("demo.sensor.desc")}</p>
           </div>
           <div className="fila">
-            <button type="button" onClick={() => correrSensor("deterioro_respiratorio")}>Simular deterioro</button>
-            <button type="button" className="ghost" onClick={() => correrSensor("estable")}>Simular estable</button>
+            <button type="button" onClick={() => correrSensor("deterioro_respiratorio")}>{t("demo.sensor.worsen")}</button>
+            <button type="button" className="ghost" onClick={() => correrSensor("estable")}>{t("demo.sensor.stable")}</button>
           </div>
         </div>
         {sensorRes && (
           <div className="escenario-res">
-            <strong>{sensorRes.rondas.length} rondas ({sensorRes.perfil.replace(/_/g, " ")})</strong>
+            <strong>{t("demo.sensor.rounds", { n: sensorRes.rondas.length, perfil: sensorRes.perfil.replace(/_/g, " ") })}</strong>
             <span className="suave" style={{ marginLeft: 8 }}>
-              Primer amarillo: {sensorRes.primera_ronda_amarillo ?? "—"} · Primer rojo: {sensorRes.primera_ronda_rojo ?? "—"}
+              {t("demo.sensor.first", { y: sensorRes.primera_ronda_amarillo ?? "—", r: sensorRes.primera_ronda_rojo ?? "—" })}
             </span>
           </div>
         )}
       </section>
 
-      {error && <Alerta tono="error" titulo="No se pudo cargar el simulador">{error}</Alerta>}
+      {error && <Alerta tono="error" titulo={t("demo.error")}>{error}</Alerta>}
     </div>
   );
 }
