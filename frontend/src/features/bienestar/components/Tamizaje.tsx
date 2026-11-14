@@ -1,6 +1,7 @@
 import { FormEvent, memo, useState } from "react";
-import { post } from "../api/client";
-import type { RespuestaTamizaje } from "../api/tipos";
+import { post } from "../../../shared/api/client";
+import Selector from "../../../shared/components/Selector";
+import type { RespuestaTamizaje } from "../types/bienestar";
 
 const OPCIONES = ["Nunca", "Varios días", "Más de la mitad de los días", "Casi todos los días"];
 const PREGUNTAS = [
@@ -23,26 +24,27 @@ function Tamizaje({ tripulanteId }: { tripulanteId: string }) {
   }
 
   return (
-    <section className="panel">
+    <section className="tarjeta">
       <h2>Tamizaje de ánimo (PHQ-2)</h2>
       <p className="suave">Últimas dos semanas. Resultado privado: no se transmite. Es un tamizaje, no un diagnóstico.</p>
       <form onSubmit={enviar}>
         {PREGUNTAS.map((p, i) => (
-          <div key={p} className="fila">
-            <span style={{ flex: "1 1 100%" }}>{p}</span>
-            <select value={resp[i] ?? ""} onChange={(e) => setResp(resp.map((r, j) => (j === i ? Number(e.target.value) : r)))}>
-              <option value="">Selecciona…</option>
-              {OPCIONES.map((o, v) => <option key={o} value={v}>{o}</option>)}
-            </select>
+          <div key={p} className="pregunta">
+            <span id={`preg-${i}`}>{p}</span>
+            <Selector
+              etiqueta={p} valor={resp[i] === null ? "" : String(resp[i])}
+              alCambiar={(v) => setResp(resp.map((r, j) => (j === i ? Number(v) : r)))}
+              opciones={OPCIONES.map((o, v) => ({ valor: String(v), etiqueta: o }))}
+            />
           </div>
         ))}
         <button type="submit">Ver resultado</button>
       </form>
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error" role="alert" style={{ marginTop: 16 }}>{error}</p>}
       {res && (
-        <div>
+        <div style={{ marginTop: 16 }}>
           <p>Puntaje {res.total}/6 · {res.positivo ? "positivo en tamizaje" : "negativo"}</p>
-          {res.capsulas.map((c) => <div key={c.id} className="item"><strong>{c.titulo}</strong><br />{c.contenido_markdown}</div>)}
+          {res.capsulas.map((c) => <div key={c.id} className="item"><strong>{c.titulo}</strong><span>{c.contenido_markdown}</span></div>)}
         </div>
       )}
     </section>

@@ -1,6 +1,7 @@
 import { FormEvent, memo, useEffect, useState } from "react";
-import { api, post } from "../api/client";
-import type { IndicadorDef, RespuestaLectura } from "../api/tipos";
+import { api, post } from "../../../shared/api/client";
+import Selector from "../../../shared/components/Selector";
+import type { IndicadorDef, RespuestaLectura } from "../types/medicion";
 
 const AVPU = ["A (alerta)", "V (voz)", "P (dolor)", "U (sin respuesta)"];
 
@@ -31,26 +32,24 @@ function PanelMedicion({ tripulanteId, alGuardar }: { tripulanteId: string; alGu
   }
 
   return (
-    <section className="panel">
+    <section className="tarjeta">
       <h2>Captura manual</h2>
       <form onSubmit={enviar}>
         <div className="fila">
-          <select value={clave} onChange={(e) => { setClave(e.target.value); setValor(""); }}>
-            {defs.map((d) => <option key={d.clave} value={d.clave}>{d.etiqueta} ({d.unidad})</option>)}
-          </select>
+          <Selector
+            etiqueta="Indicador" valor={clave} alCambiar={(v) => { setClave(v); setValor(""); }}
+            opciones={defs.map((d) => ({ valor: d.clave, etiqueta: `${d.etiqueta} (${d.unidad})` }))}
+          />
           {clave === "avpu" ? (
-            <select value={valor} onChange={(e) => setValor(e.target.value)}>
-              <option value="">Selecciona…</option>
-              {AVPU.map((t, i) => <option key={t} value={i}>{t}</option>)}
-            </select>
+            <Selector etiqueta="Nivel de conciencia" valor={valor} alCambiar={setValor} opciones={AVPU.map((t, i) => ({ valor: String(i), etiqueta: t }))} />
           ) : (
             <input type="number" step="any" value={valor} onChange={(e) => setValor(e.target.value)}
               placeholder={def ? `${def.min}–${def.max}` : ""} aria-label="Valor" />
           )}
-          <button type="submit">Registrar</button>
         </div>
+        <button type="submit" className="btn-primario">Registrar</button>
       </form>
-      {msg && <p className={msg.ok ? "ok" : "error"}>{msg.texto}</p>}
+      {msg && <p className={msg.ok ? "ok" : "error"} style={{ marginTop: 16 }} role="status">{msg.texto}</p>}
     </section>
   );
 }

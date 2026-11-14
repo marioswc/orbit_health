@@ -1,6 +1,6 @@
 import { FormEvent, memo, useCallback, useEffect, useState } from "react";
-import { api, post } from "../api/client";
-import type { NotaDiario } from "../api/tipos";
+import { api, post } from "../../../shared/api/client";
+import type { NotaDiario } from "../types/bienestar";
 
 function DiarioTripulante({ tripulanteId }: { tripulanteId: string }) {
   const [titulo, setTitulo] = useState("");
@@ -26,13 +26,13 @@ function DiarioTripulante({ tripulanteId }: { tripulanteId: string }) {
   }
 
   return (
-    <section className="panel">
+    <section className="tarjeta">
       <h2>Diario personal</h2>
       <div className="etiqueta-local">Almacenamiento local seguro: desconectado de la telemetría externa</div>
       <form onSubmit={guardar}>
         <div className="fila"><input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Título (opcional)" /></div>
         <textarea value={contenido} onChange={(e) => setContenido(e.target.value)} placeholder="Escribe aquí…" />
-        <div className="fila"><button type="submit">Guardar nota</button></div>
+        <div className="fila"><button type="submit" className="btn-primario">Guardar nota</button></div>
       </form>
       {msg && <p className="suave">{msg}</p>}
       {notas.map((n) => (
