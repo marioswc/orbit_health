@@ -58,7 +58,7 @@ def dispositivo_simulado_en_marcha(tid: str, perfil: str = "deterioro_respirator
     rondas, primero = [], {"amarillo": None, "rojo": None}
     for i, tick in enumerate(serie, start=1):
         for indicador, valor in tick.items():
-            servicio_lecturas.registrar_lectura(conn, tid, indicador, valor, origen="sensor")
+            servicio_lecturas.registrar_lectura(conn, tid, indicador, valor, origen="simulado")
         # El nivel de una ronda es el estado global del tripulante al terminarla, no el de la última lectura.
         e = servicio_estado.estado_tripulante(conn, tid)
         nivel = e["nivel_fisiologico"]

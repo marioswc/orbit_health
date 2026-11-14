@@ -1,3 +1,5 @@
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
@@ -18,12 +20,14 @@ class LecturaSensor(BaseModel):
 class LoteIn(BaseModel):
     tripulante_id: str
     dispositivo_id: str | None = Field(default=None, max_length=64)
+    origen: Literal["sensor", "simulado"] = "sensor"      # una fuente simulada debe declararse como tal
     lecturas: list[LecturaSensor]
 
 
 class UnaIn(LecturaSensor):
     tripulante_id: str
     dispositivo_id: str | None = Field(default=None, max_length=64)
+    origen: Literal["sensor", "simulado"] = "sensor"
 
 
 @router.post("/lectura")
@@ -31,7 +35,7 @@ def lectura_de_sensor(datos: UnaIn, conn=Depends(conexion), _: dict = Depends(re
     """Entrada de un dispositivo: misma clasificación y misma cola que la captura manual, con origen 'sensor'."""
     requerir_tripulante(conn, datos.tripulante_id)
     try:
-        return servicio.registrar_lectura(conn, datos.tripulante_id, datos.indicador, datos.valor, origen="sensor")
+        return servicio.registrar_lectura(conn, datos.tripulante_id, datos.indicador, datos.valor, origen=datos.origen)
     except ValueError as e:
         raise HTTPException(422, str(e))
 
@@ -47,7 +51,7 @@ def lote_de_sensor(datos: LoteIn, conn=Depends(conexion), _: dict = Depends(requ
         if error:
             raise HTTPException(422, f"Lectura {i + 1}: {error}")
     orden = {"verde": 0, "amarillo": 1, "rojo": 2}
-    resultados = [servicio.registrar_lectura(conn, datos.tripulante_id, l.indicador, l.valor, origen="sensor")
+    resultados = [servicio.registrar_lectura(conn, datos.tripulante_id, l.indicador, l.valor, origen=datos.origen)
                   for l in datos.lecturas]
     peor = max((r["nivel"] for r in resultados), key=orden.__getitem__)
     return {"guardadas": len(resultados), "peor_nivel": peor, "ultimo": resultados[-1],
@@ -62,6 +66,7 @@ class MuestraIn(BaseModel):
 class FlujoIn(BaseModel):
     tripulante_id: str
     dispositivo_id: str | None = Field(default=None, max_length=64)
+    origen: Literal["sensor", "simulado"] = "sensor"
     muestras: list[MuestraIn]
 
 
@@ -74,7 +79,7 @@ def muestra_de_flujo(datos: UnaIn, conn=Depends(conexion), _: dict = Depends(req
     """Una muestra de un flujo continuo (p. ej. una banda): se agrupa por ventanas, salvo los valores extremos"""
     requerir_tripulante(conn, datos.tripulante_id)
     try:
-        return servicio_flujo.ingresar(conn, datos.tripulante_id, datos.indicador, datos.valor)
+        return servicio_flujo.ingresar(conn, datos.tripulante_id, datos.indicador, datos.valor, origen=datos.origen)
     except ValueError as e:
         raise HTTPException(422, str(e))
 
@@ -86,7 +91,7 @@ def lote_de_flujo(datos: FlujoIn, conn=Depends(conexion), _: dict = Depends(requ
     if not 1 <= len(datos.muestras) <= 500:
         raise HTTPException(422, "El lote debe traer entre 1 y 500 muestras")
     try:
-        return servicio_flujo.ingresar_lote(conn, datos.tripulante_id, [(m.indicador, m.valor) for m in datos.muestras])
+        return servicio_flujo.ingresar_lote(conn, datos.tripulante_id, [(m.indicador, m.valor) for m in datos.muestras], origen=datos.origen)
     except ValueError as e:
         raise HTTPException(422, str(e))
 

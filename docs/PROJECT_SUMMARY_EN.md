@@ -32,7 +32,7 @@ Runs fully offline from a single local server. Optional local authentication (sw
 - [BIDMC PPG and Respiration Dataset v1.0.0](https://physionet.org/content/bidmc/1.0.0/) (PhysioNet, Open Data Commons Attribution License v1.0, DOI 10.13026/C2208R), to give the demo realistic variability. These are records of critically ill hospital patients, not of astronauts or healthy people.
 
 ## Honest limitations
-- The live mission shown in the demo is a script: its values are invented, although they travel through the same sensor channel a real band would use.
+- The live mission shown in the demo is a script: its values are invented, although they travel through the same sensor channel a real band would use. They are stored, shown in the history and sent to Earth tagged as `simulated`, never as real sensor data.
 - This is a **prototype** that supports decisions. It does not replace the flight surgeon.
 - **All thresholds are design assumptions pending clinical validation.** The interface says so on screen.
 - Vital signs are entered by hand, through a simulated device or, for heart rate only, through a Bluetooth bridge. The bridge is tested with simulated packets and against the real server, **not yet with a real band**. Other vitals from consumer bands would need vendor-specific protocols.

@@ -104,7 +104,7 @@ def test_una_mision_completa_se_ejecuta_sola_y_cuenta_la_historia(cliente):
     retenidos = conn.execute("SELECT COUNT(*) FROM cola_salida WHERE estado='retenido'").fetchone()[0]
     ind = {f[0] for f in conn.execute("SELECT DISTINCT indicador FROM lecturas")}
     conn.close()
-    assert origenes == {"sensor"}                                              # todo entró por el canal de sensores
+    assert origenes == {"simulado"}                                            # entró por el canal de sensores, pero se declara simulado
     assert cola_p1 > 0 and retenidos == 0                                      # lo urgente salió al volver el enlace
     assert {"sueno_horas", "ejercicio_min", "co2", "spo2"} <= ind
     assert cliente.get("/api/enlace").json()["activo"] is True                  # el enlace queda normal

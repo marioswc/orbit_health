@@ -24,6 +24,9 @@ backend/.venv/bin/python scripts/puente_ble.py --nombre "<parte del nombre>" --t
 Con la autenticación activada, define antes `ORBIT_TOKEN` con un token de sesión (no se pasa por argumento para que no
 quede en el historial de la terminal).
 
+## Origen de los datos
+`sensor` es **solo para dispositivos reales**. Cualquier fuente simulada (por ejemplo, un botón del navegador que genera valores) debe enviar `"origen": "simulado"` en `/api/sensores/lectura`, `/lote`, `/flujo` o `/flujo/lote`; el origen se guarda, aparece en el historial y viaja en el evento a Tierra. Se rechaza cualquier otro valor.
+
 ## Cómo decide qué guardar
 1. El puente lee cada notificación del dispositivo y **descarta** las que llegan sin contacto con la piel, con 0 o fuera de rango.
 2. El servidor agrupa en ventanas de `ORBIT_FLUJO_VENTANA_S` (60 s por defecto) y guarda la **mediana**, que resiste un artefacto de movimiento.
