@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { api } from "../shared/api/client";
 import Alerta from "../shared/components/Alerta";
 import Drawer from "../shared/components/Drawer";
@@ -14,6 +14,7 @@ import BotonCaptura from "./BotonCaptura";
 
 // Vistas secundarias: se descargan solo al abrirlas
 const BienestarPage = lazy(() => import("../features/bienestar").then((m) => ({ default: m.BienestarPage })));
+const RiesgosPage = lazy(() => import("../features/peligros").then((m) => ({ default: m.RiesgosPage })));
 const EnlacePage = lazy(() => import("../features/enlace").then((m) => ({ default: m.EnlacePage })));
 
 interface EstadoUmbrales { version: string; estado: string }
@@ -22,7 +23,7 @@ interface EstadoUmbrales { version: string; estado: string }
 function desdeUrl() {
   const q = new URLSearchParams(window.location.search);
   const v = q.get("vista");
-  return { vista: (v === "bienestar" || v === "enlace" ? v : "monitor") as Vista, captura: q.get("captura") === "1" };
+  return { vista: (v === "bienestar" || v === "enlace" || v === "riesgos" ? v : "monitor") as Vista, captura: q.get("captura") === "1" };
 }
 
 export default function App() {
@@ -42,6 +43,11 @@ export default function App() {
     estado?.indicadores.find((i) => i.indicador === "co2") ?? null,
     estado?.indicadores.find((i) => i.indicador === "dosis_pct") ?? null,
   );
+  // Direccion del cambio de vista: el contenido entra desde el lado hacia el que se movio la pestana
+  const orden = ["monitor", "bienestar", "riesgos", "enlace"];
+  const previa = useRef(orden.indexOf(ini.vista));
+  const dx = orden.indexOf(vista) >= previa.current ? 32 : -32;
+  useEffect(() => { previa.current = orden.indexOf(vista); });
   const cerrarCaptura = useCallback(() => setCaptura(false), []);
   const abrirCaptura = useCallback(() => setCaptura(true), []);
 
@@ -81,18 +87,18 @@ export default function App() {
             alRecuperar={auth.recuperar}
           />
         ) : (
-        <div className="vista" key={vista} style={{ display: vista === "monitor" ? "contents" : undefined }}>
+        <div className="vista" key={vista} style={{ display: vista === "monitor" ? "contents" : undefined, "--dx": `${dx}px` } as CSSProperties}>
           {tid && vista === "monitor" && (
             <MonitorPage
               tripulanteId={tid}
               estado={estado}
-              alAbrirCaptura={abrirCaptura}
               ambiente={ambiente.nivel}
               cabina={<MonitorCabina ambiente={ambiente} alerta={colectivas?.alertas[0] ?? null} />}
             />
           )}
           <Suspense fallback={<span className="esqueleto" style={{ height: 120 }} aria-busy="true" />}>
             {tid && vista === "bienestar" && <BienestarPage tripulanteId={tid} />}
+            {vista === "riesgos" && <RiesgosPage />}
             {vista === "enlace" && <EnlacePage />}
           </Suspense>
         </div>

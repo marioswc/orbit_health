@@ -48,6 +48,24 @@ Registro del trabajo de interfaz en curso. Rama creada desde `frontend` (2026-11
 - **Captura manual:** el botón sale del header y pasa a un botón flotante abajo a la derecha (`app/BotonCaptura.tsx`, `.fab`); en móvil queda solo con icono. Se oculta mientras el drawer está abierto.
 - `pnpm test` (57) y `tsc --noEmit` pasan. Falta revisión visual en navegador.
 
+## Rendimiento (2026-11-14)
+
+Meta: que corra en equipos muy modestos. Tres niveles (`shared/rendimiento.ts`), fijados en `<html data-rendimiento>`:
+
+| Nivel | Cuándo | Qué cambia |
+|---|---|---|
+| alto | Equipo potente o sin datos para medirlo | Todo: cristal con desenfoque, animaciones, estrellas a 30 fps con fugaces |
+| medio | ≤ 4 GB o ≤ 4 núcleos | Sin `backdrop-filter`, sin animaciones infinitas, estrellas a 20 fps sin fugaces |
+| bajo | ≤ 2 GB o ≤ 2 núcleos, ahorro de datos, o ?ligero=1 | Además sin animaciones ni transiciones, sin degradados fijos, estrellas estáticas, consulta de Enlace cada 8 s, sin precarga de capas del astronauta |
+
+- **Baja sola:** el fondo mide los fotogramas reales; si dos ventanas de 60 cuadros seguidas superan el límite del nivel (alto 26 ms, medio 40 ms), baja un nivel y lo recuerda en `localStorage` (`orbit-rendimiento`).
+- **Forzar o probar:** `?rendimiento=alto|medio|bajo` (o `?ligero=1|0`) se recuerda; `alto` borra lo guardado. `?perf=1` muestra un HUD con nivel, fps y número de estrellas.
+- **Estrellas:** arrays tipados, 6 trazos por cuadro (antes ~200), resolución reducida, parallax solo al hacer scroll.
+- **Enlace:** una consulta a la vez y sin re-render si la cola no cambió.
+- **Presupuesto de peso:** `pnpm perf` compila y falla si se superan: JS inicial 70 KB gz, CSS inicial 16 KB gz, vistas diferidas 15 KB gz, imágenes 260 KB gz. Hoy: JS 60.1 KB, CSS 11.3 KB.
+- **Pendiente:** medir fps reales en un equipo modesto (no hay navegador automatizado en este entorno); `esqueleto.svg` (77 KB gz) es la imagen más pesada.
+- Los tests en Windows deben correrse desde una terminal con la ruta en su capitalización canónica (`C:\...`); desde `/c/...` en Git Bash React se carga dos veces y fallan 26 tests por "Invalid hook call" (artefacto del entorno, no del código).
+
 ## Pendiente / siguientes pasos
 
 | # | Tarea | Nota |

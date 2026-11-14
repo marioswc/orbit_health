@@ -1,3 +1,4 @@
+import { nivelActual } from "../../../shared/rendimiento";
 import { memo, useEffect, useMemo, useRef, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import type { LecturaEstado } from "../types/estado";
 import { ETIQUETAS, anguloFlecha, origenEtiqueta } from "../etiquetas";
@@ -44,6 +45,7 @@ function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSelecci
 
   // Descarga las capas de anatomia cuando el navegador esta libre (no bloquea la primera carga)
   useEffect(() => {
+    if (nivelActual() === "bajo") return; // equipos modestos: las capas se bajan solo al elegirlas
     const idle = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 1500));
     const id = idle(() => CAPAS_ANAT.forEach(precargar));
     return () => { if (window.cancelIdleCallback) window.cancelIdleCallback(id as number); else window.clearTimeout(id as number); };

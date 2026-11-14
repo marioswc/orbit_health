@@ -13,13 +13,11 @@ describe("AnimoDiario", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<AnimoDiario tripulanteId="T1" />);
-    expect(await screen.findByText(/Media 14 días:/)).toBeInTheDocument();
+    expect(await screen.findByLabelText(/Ánimo de los últimos 14 días, media 4/)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /2 · Bajo/ }));
-    fireEvent.click(screen.getByRole("button", { name: "Registrar ánimo" }));
+    fireEvent.click(screen.getByRole("button", { name: "Bajo" }));
 
-    await waitFor(() => expect(screen.getByText(/Registrado: 2\/5/)).toBeInTheDocument());
-    expect(screen.getByText("Respiración")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("Respiración")).toBeInTheDocument());
   });
 });
 

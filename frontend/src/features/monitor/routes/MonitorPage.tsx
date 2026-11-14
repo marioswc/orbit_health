@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Contador from "../../../shared/components/Contador";
 import Titular from "../../../shared/components/Titular";
-import TiraIndicadores from "../components/TiraIndicadores";
 import AccionesClinicas from "../components/AccionesClinicas";
 import DetalleZona from "../components/DetalleZona";
 import FiguraHumana from "../components/FiguraHumana";
@@ -15,8 +14,6 @@ import { CAPAS, ZONAS, nivelZona, type NivelZona } from "../zonas";
 interface Props {
   tripulanteId?: string;
   estado: Estado | null;
-  /** Abre la captura manual (la compone app/ para no acoplar features). */
-  alAbrirCaptura?: () => void;
   /** Monitor de cabina (feature cabina), compuesto desde app/: se muestra en la columna izquierda. */
   cabina?: ReactNode;
   /** Peor nivel del aire/radiacion de cabina, para marcar Cabeza y Respiratorio en la figura. */
@@ -27,7 +24,7 @@ const SIN_LECTURAS: LecturaEstado[] = []; // referencia estable: evita recalcula
 const TITULAR = { verde: "Sin alertas activas", amarillo: "Requiere vigilancia", rojo: "Atención inmediata", sin_datos: "Sin lecturas recientes" } as const;
 const LEYENDA: [string, string][] = [["verde", "Verde"], ["amarillo", "Amarillo"], ["rojo", "Rojo"], ["sin_datos", "Sin datos"]];
 
-export default function MonitorPage({ tripulanteId = "", estado, alAbrirCaptura, cabina, ambiente = null }: Props) {
+export default function MonitorPage({ tripulanteId = "", estado, cabina, ambiente = null }: Props) {
   const { zona, acercado, capa, setCapa, elegir, alejar } = useZonaSeleccionada();
   const [meses, setMeses] = useState(0);
   const [indicadorHist, setIndicadorHist] = useState<string | null>(null);
@@ -35,8 +32,6 @@ export default function MonitorPage({ tripulanteId = "", estado, alAbrirCaptura,
   const nivel = estado?.nivel_general ?? "sin_datos";
   const lecturas = estado?.indicadores ?? SIN_LECTURAS;
   const toggleHist = (ind: string) => setIndicadorHist((actual) => (actual === ind ? null : ind));
-
-  // Tras la primera carga, las filas cuyo valor cambia destellan (la clave incluye valor y hora)
   const cargado = useRef(false);
   const destellar = cargado.current;
   useEffect(() => { if (estado) cargado.current = true; }, [estado]);
@@ -64,7 +59,6 @@ export default function MonitorPage({ tripulanteId = "", estado, alAbrirCaptura,
         )}
       </div>
 
-      <TiraIndicadores lecturas={lecturas} destellar={destellar} alAbrirCaptura={alAbrirCaptura} />
 
       <section className="escenario" aria-label="Estado por zona del cuerpo">
         <aside className="lado izq">

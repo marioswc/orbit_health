@@ -10,10 +10,13 @@ interface Props {
   /** Si se pasa, permite abrir la grafica de historial al hacer clic. */
   activa?: boolean;
   alSeleccionar?: (indicador: string) => void;
+  /** Si se pasa, permite abrir la explicacion pedagogica del indicador. */
+  explicacionActiva?: boolean;
+  alExplicar?: (indicador: string) => void;
 }
 
 /** Signo vital con su valor actual y la comparacion contra la linea base personal. */
-function TarjetaSignoVital({ lectura: l, destello = false, activa = false, alSeleccionar }: Props) {
+function TarjetaSignoVital({ lectura: l, destello = false, activa = false, alSeleccionar, explicacionActiva = false, alExplicar }: Props) {
   const c = compararConBase(l);
   const nombre = nombreIndicador(l.indicador);
   const fueraDeRango = l.nivel !== "verde";
@@ -36,6 +39,11 @@ function TarjetaSignoVital({ lectura: l, destello = false, activa = false, alSel
         {normal && <span className="etiqueta-estado">Normal</span>}
         {fueraDeRango && <span className="etiqueta-estado alerta">Fuera de rango</span>}
         {c.desvio && <span className="etiqueta-estado desvio">Desvío &gt; 2σ</span>}
+        {alExplicar && (
+          <button type="button" className="ghost signo-hist" onClick={() => alExplicar(l.indicador)} aria-pressed={explicacionActiva}>
+            {explicacionActiva ? "Ocultar info" : "¿Qué es?"}
+          </button>
+        )}
         {alSeleccionar && (
           <button type="button" className="ghost signo-hist" onClick={() => alSeleccionar(l.indicador)} aria-pressed={activa}>
             {activa ? "Ocultar historial" : "Historial"}

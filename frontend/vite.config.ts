@@ -1,10 +1,10 @@
-/// <reference types="vitest" />
+﻿/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  server: { port: 3000, proxy: { "/api": "http://localhost:8000" } },
+  server: { port: 3000, proxy: { "/api": process.env.ORBIT_API ?? "http://localhost:8000" } },
   build: {
     rollupOptions: { output: { manualChunks: { react: ["react", "react-dom"] } } },
   },
@@ -15,3 +15,4 @@ export default defineConfig({
     css: false,
   },
 });
+
