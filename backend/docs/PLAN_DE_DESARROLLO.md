@@ -38,12 +38,13 @@ Sistema de apoyo a la decisión clínica para tripulaciones en misiones de espac
 ## 4. Arquitectura
 
 ```
-React + TS (build estático)  ──HTTP local──▶  FastAPI
-                                                 │
-                              ┌──────────────────┼──────────────────┐
-                           engine.py        queue_manager.py     SQLite (WAL)
-                        (NEWS2, ambiente,    (cola, hash,        orbit_health.db
-                         línea base)          despacho)
+React + TS (build estático) ──HTTP local──▶ api (routers FastAPI)
+                                              │
+                                          servicios (casos de uso)
+                                           │            │
+                                    repositorios      dominio
+                                    (SQL, SQLite)   (reglas, hash,
+                                                     umbrales.json)
 ```
 
 | Capa | Tecnología | Responsabilidad |
