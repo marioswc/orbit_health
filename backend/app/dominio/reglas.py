@@ -1,7 +1,6 @@
-"""Motor clínico determinista: NEWS2, ambiente y línea base personal.
+"""Reglas clínicas deterministas: NEWS2, ambiente, glucosa, diastólica y línea base personal.
 
-Los umbrales de ambiente y línea base son supuestos de diseño pendientes de
-validación médica (ver PLAN_DE_DESARROLLO.md, secciones 6.2 y 6.3).
+Los umbrales se leen de datos/umbrales.json (supuestos de diseño pendientes de validación médica).
 """
 from __future__ import annotations
 
@@ -10,12 +9,20 @@ import statistics
 from dataclasses import dataclass, field
 from typing import Mapping, Sequence
 
+from .umbrales import UMBRALES
+
+_N2 = UMBRALES["news2"]
+_AMB = UMBRALES["ambiente"]
+_GLU = UMBRALES["glucosa_mg_dl"]
+_LB = UMBRALES["linea_base"]
+
 # "conservador": un parámetro aislado en 3 puntos es rojo (adaptación propia).
 # "rcp": un parámetro aislado en 3 puntos es amarillo (esquema RCP).
-MODO_PARAMETRO_EXTREMO = os.getenv("ORBIT_MODO_PARAMETRO_EXTREMO", "conservador")
+MODO_PARAMETRO_EXTREMO = os.getenv("ORBIT_MODO_PARAMETRO_EXTREMO") or _N2["modo_parametro_extremo"]
 
-MIN_MUESTRAS_BASE = 5  # Supuesto
-K_DESVIACIONES = 2.0
+MIN_MUESTRAS_BASE = _LB["min_muestras"]
+K_DESVIACIONES = _LB["desviaciones"]
+_ORDEN = {"verde": 0, "amarillo": 1, "rojo": 2}
 
 
 @dataclass
@@ -27,91 +34,48 @@ class ResultadoNews2:
     faltantes: list[str] = field(default_factory=list)
 
 
-def _fr(v: float) -> int:
-    if v <= 8 or v >= 25:
-        return 3
-    if v >= 21:
-        return 2
-    if v <= 11:
-        return 1
-    return 0
+def _puntos_por_bandas(bandas: list[dict], valor: float) -> int:
+    for b in bandas[:-1]:
+        if valor <= b["hasta"]:
+            return b["puntos"]
+    return bandas[-1]["puntos"]
 
 
-def _spo2(v: float) -> int:
-    if v <= 91:
-        return 3
-    if v <= 93:
-        return 2
-    if v <= 95:
-        return 1
-    return 0
+def _avpu(valor: str) -> int:
+    tabla = _N2["avpu"]
+    return tabla.get(str(valor).upper(), tabla["otro"])
 
 
-def _pas(v: float) -> int:
-    if v <= 90 or v >= 220:
-        return 3
-    if v <= 100:
-        return 2
-    if v <= 110:
-        return 1
-    return 0
+def _puntaje(variable: str, valor) -> int:
+    if variable == "avpu":
+        return _avpu(valor)
+    return _puntos_por_bandas(_N2["bandas"][variable], valor)
 
 
-def _fc(v: float) -> int:
-    if v <= 40 or v >= 131:
-        return 3
-    if v >= 111:
-        return 2
-    if v <= 50 or v >= 91:
-        return 1
-    return 0
-
-
-def _avpu(v: str) -> int:
-    return 0 if str(v).upper() == "A" else 3
-
-
-def _temp(v: float) -> int:
-    if v <= 35.0:
-        return 3
-    if v <= 36.0:
-        return 1
-    if v <= 38.0:
-        return 0
-    if v <= 39.0:
-        return 1
-    return 2
-
-
-_REGLAS = {
-    "frecuencia_respiratoria": _fr,
-    "spo2": _spo2,
-    "presion_sistolica": _pas,
-    "frecuencia_cardiaca": _fc,
-    "avpu": _avpu,
-    "temperatura": _temp,
-}
+VARIABLES_NEWS2 = ("frecuencia_respiratoria", "spo2", "presion_sistolica",
+                   "frecuencia_cardiaca", "avpu", "temperatura")
 
 
 def evaluar_news2(signos: Mapping[str, float | str]) -> ResultadoNews2:
     """Puntúa las variables presentes. Las ausentes suman 0 y se reportan en `faltantes`."""
     desglose: dict[str, int] = {}
     faltantes: list[str] = []
-    for nombre, regla in _REGLAS.items():
-        valor = signos.get(nombre)
+    for variable in VARIABLES_NEWS2:
+        valor = signos.get(variable)
         if valor is None:
-            faltantes.append(nombre)
+            faltantes.append(variable)
         else:
-            desglose[nombre] = regla(valor)
+            desglose[variable] = _puntaje(variable, valor)
 
     puntos = sum(desglose.values())
     extremos = [n for n, p in desglose.items() if p == 3]
+    niveles = _N2["nivel"]
 
-    if puntos >= 7:
+    if puntos >= niveles["rojo_desde_total"]:
         nivel = "rojo"
     elif extremos:
         nivel = "rojo" if MODO_PARAMETRO_EXTREMO == "conservador" else "amarillo"
-    elif puntos >= 5:
+    elif puntos >= niveles["amarillo_desde_total"]:
         nivel = "amarillo"
     else:
         nivel = "verde"
@@ -122,15 +86,33 @@ def evaluar_ambiente(co2_mmhg: float | None = None, dosis_pct: float | None = No
     """Peor nivel entre CO2 y dosis acumulada (% del límite de misión)."""
     niveles = ["verde"]
     if co2_mmhg is not None:
-        niveles.append("rojo" if co2_mmhg > 4.0 else "amarillo" if co2_mmhg > 3.0 else "verde")
+        c = _AMB["co2_mmhg"]
+        niveles.append("rojo" if co2_mmhg > c["rojo_sobre"]
+                       else "amarillo" if co2_mmhg > c["amarillo_sobre"] else "verde")
     if dosis_pct is not None:
-        niveles.append("rojo" if dosis_pct >= 90 else "amarillo" if dosis_pct >= 70 else "verde")
-    orden = {"verde": 0, "amarillo": 1, "rojo": 2}
-    return max(niveles, key=orden.__getitem__)
+        d = _AMB["dosis_pct"]
+        niveles.append("rojo" if dosis_pct >= d["rojo_desde"]
+                       else "amarillo" if dosis_pct >= d["amarillo_desde"] else "verde")
+    return max(niveles, key=_ORDEN.__getitem__)
+
+
+def evaluar_glucosa(mg_dl: float) -> tuple[str, bool]:
+    """Devuelve (nivel, observacion). Supuesto: umbrales pendientes de validación médica."""
+    g = _GLU
+    if mg_dl < g["rojo_menor_que"] or mg_dl >= g["rojo_desde"]:
+        return "rojo", False
+    if mg_dl < g["amarillo_menor_que"] or mg_dl >= g["amarillo_desde"]:
+        return "amarillo", False
+    return "verde", g["observacion_desde"] <= mg_dl <= g["observacion_hasta"]
+
+
+def evaluar_diastolica(mmhg: float) -> tuple[str, bool]:
+    """Supuesto: valores bajos se marcan como observación de perfusión, no como alerta."""
+    return "verde", mmhg < UMBRALES["diastolica_mmhg"]["observacion_menor_que"]
 
 
 def desviacion_linea_base(valor: float, historial: Sequence[float]) -> dict:
-    """Compara `valor` con media y DE muestral del historial (últimos 14 días)."""
+    """Compara `valor` con media y DE muestral del historial."""
     n = len(historial)
     if n < MIN_MUESTRAS_BASE:
         return {"aplica": False, "n": n, "aviso": False}
@@ -143,17 +125,3 @@ def desviacion_linea_base(valor: float, historial: Sequence[float]) -> dict:
         z = (valor - mu) / sigma
         aviso = abs(z) > K_DESVIACIONES
     return {"aplica": True, "n": n, "media": mu, "desviacion": sigma, "z": z, "aviso": aviso}
-
-
-def evaluar_glucosa(mg_dl: float) -> tuple[str, bool]:
-    """Devuelve (nivel, observacion). Supuesto: umbrales de diseño pendientes de validación médica."""
-    if mg_dl < 54 or mg_dl >= 300:
-        return "rojo", False
-    if mg_dl < 70 or mg_dl >= 126:
-        return "amarillo", False
-    return "verde", 100 <= mg_dl <= 125
-
-
-def evaluar_diastolica(mmhg: float) -> tuple[str, bool]:
-    """Supuesto: <60 mmHg se marca como observación de perfusión, no como alerta."""
-    return "verde", mmhg < 60

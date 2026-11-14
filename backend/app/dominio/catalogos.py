@@ -1,18 +1,9 @@
-"""Catálogo de indicadores y rangos de captura (supuestos de diseño, validar con médico)."""
+"""Catálogo de indicadores y rangos de captura. Los valores viven en datos/umbrales.json."""
+from .umbrales import UMBRALES
 
 # clave: (etiqueta, unidad, mínimo, máximo)
-INDICADORES = {
-    "temperatura": ("Temperatura", "°C", 30.0, 43.0),
-    "presion_sistolica": ("Presión sistólica", "mmHg", 40, 280),
-    "presion_diastolica": ("Presión diastólica", "mmHg", 20, 180),
-    "frecuencia_cardiaca": ("Frecuencia cardíaca", "lpm", 20, 250),
-    "frecuencia_respiratoria": ("Frecuencia respiratoria", "rpm", 4, 60),
-    "spo2": ("SpO₂", "%", 50, 100),
-    "avpu": ("Conciencia (AVPU)", "AVPU", 0, 3),
-    "glucosa": ("Glucosa capilar", "mg/dL", 20, 600),
-    "co2": ("CO₂ de cabina", "mmHg", 0, 20),
-    "dosis_pct": ("Dosis acumulada", "% del límite", 0, 200),
-}
+INDICADORES = {k: (d["etiqueta"], d["unidad"], d["min"], d["max"])
+               for k, d in UMBRALES["indicadores"].items()}
 
 NEWS2_VARS = ("frecuencia_respiratoria", "spo2", "presion_sistolica",
               "frecuencia_cardiaca", "avpu", "temperatura")
