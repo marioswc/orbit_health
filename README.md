@@ -1,6 +1,8 @@
 # ORBIT Health
 
 Apoyo a la decisión clínica para tripulaciones con comunicación degradada. Funciona 100 % local.
+English summary for judges: [docs/PROJECT_SUMMARY_EN.md](docs/PROJECT_SUMMARY_EN.md).
+
 Plan completo: [PLAN_DE_DESARROLLO.md](backend/docs/PLAN_DE_DESARROLLO.md).
 
 ## Producción local (un solo servidor, sin internet)
