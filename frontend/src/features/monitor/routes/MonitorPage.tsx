@@ -4,7 +4,7 @@ import Titular from "../../../shared/components/Titular";
 import DetalleZona from "../components/DetalleZona";
 import FiguraHumana from "../components/FiguraHumana";
 import { useZonaSeleccionada } from "../hooks/useZonaSeleccionada";
-import type { Estado } from "../types/estado";
+import type { Estado, LecturaEstado } from "../types/estado";
 import { CAPAS, ZONAS, nivelZona } from "../zonas";
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
   children?: ReactNode;
 }
 
+const SIN_LECTURAS: LecturaEstado[] = []; // referencia estable: evita recalcular niveles en cada render
 const TITULAR = { verde: "Sin alertas activas", amarillo: "Requiere vigilancia", rojo: "Atención inmediata", sin_datos: "Sin lecturas recientes" } as const;
 const LEYENDA: [string, string][] = [["verde", "Verde"], ["amarillo", "Amarillo"], ["rojo", "Rojo"], ["sin_datos", "Sin datos"]];
 
@@ -20,7 +21,7 @@ export default function MonitorPage({ estado, children }: Props) {
   const { zona, acercado, capa, setCapa, elegir, alejar } = useZonaSeleccionada();
   const [meses, setMeses] = useState(0);
   const nivel = estado?.nivel_general ?? "sin_datos";
-  const lecturas = estado?.indicadores ?? [];
+  const lecturas = estado?.indicadores ?? SIN_LECTURAS;
 
   // Tras la primera carga, las filas cuyo valor cambia destellan (la clave incluye valor y hora)
   const cargado = useRef(false);

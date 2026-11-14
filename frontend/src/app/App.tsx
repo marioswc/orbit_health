@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { api } from "../shared/api/client";
 import Logo from "../shared/components/Logo";
 import FondoEstrellas from "../shared/components/FondoEstrellas";
@@ -7,8 +7,10 @@ import { useTema } from "../shared/hooks/useTema";
 import { SelectorTripulante, useTripulantes } from "../features/tripulantes";
 import { MonitorPage, useEstadoTripulante } from "../features/monitor";
 import { PanelMedicion } from "../features/mediciones";
-import { BienestarPage } from "../features/bienestar";
-import { EnlacePage } from "../features/enlace";
+
+// Vistas secundarias: se descargan solo al abrirlas
+const BienestarPage = lazy(() => import("../features/bienestar").then((m) => ({ default: m.BienestarPage })));
+const EnlacePage = lazy(() => import("../features/enlace").then((m) => ({ default: m.EnlacePage })));
 
 interface EstadoUmbrales { version: string; estado: string }
 
@@ -53,8 +55,10 @@ export default function App() {
             <PanelMedicion tripulanteId={tid} alGuardar={refrescar} />
           </MonitorPage>
         )}
-        {tid && vista === "bienestar" && <BienestarPage tripulanteId={tid} />}
-        {vista === "enlace" && <EnlacePage />}
+        <Suspense fallback={<span className="esqueleto" style={{ height: 120 }} aria-busy="true" />}>
+          {tid && vista === "bienestar" && <BienestarPage tripulanteId={tid} />}
+          {vista === "enlace" && <EnlacePage />}
+        </Suspense>
         </div>
       </main>
     </>

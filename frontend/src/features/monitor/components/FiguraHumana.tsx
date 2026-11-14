@@ -1,8 +1,9 @@
-import { memo, useRef, type KeyboardEvent, type PointerEvent } from "react";
+import { memo, useEffect, useMemo, useRef, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import type { LecturaEstado } from "../types/estado";
+import { ETIQUETAS, anguloFlecha, origenEtiqueta } from "../etiquetas";
 import { CAPAS, ZONAS, ancla, nivelZona, type Capa } from "../zonas";
 import { ZONA_PATHS } from "../zonasPaths";
-import { Capas, VIEWBOX } from "./ArteAstronauta";
+import { CAPAS_ANAT, Capas, VB, VIEWBOX, precargar } from "./ArteAstronauta";
 
 interface Props {
   lecturas: LecturaEstado[];
@@ -17,30 +18,60 @@ interface Props {
 
 // Orden de dibujo: lo pequeno encima de lo grande para que reciba el clic
 const ORDEN_HIT = ["piernas", "brazos", "metab", "cardio", "resp", "snc"];
-const CENTRO = { x: 237, y: 236 };
-const CENTRO_PAR: [number, number] = [237, 236]; // hacia donde se lleva la zona al acercar la camara
+const CENTRO = { x: 237, y: 236 }; // hacia donde se lleva la zona al acercar la camara
+
+/** Estilo de la camara en CSS (porcentajes del lienzo): acerca con escala desde el punto y lo centra. */
+export function estiloCamara(zonaId: string, capa: Capa, acercado: boolean): CSSProperties {
+  const z = ZONAS.find((x) => x.id === zonaId);
+  if (!acercado || !z) return { transformOrigin: "50% 50%", transform: "none" };
+  const [ax, ay] = ancla(z, capa);
+  const pctX = (v: number) => ((v - VB.x) / VB.w) * 100;
+  const pctY = (v: number) => ((v - VB.y) / VB.h) * 100;
+  return {
+    transformOrigin: `${pctX(ax)}% ${pctY(ay)}%`,
+    transform: `translate(${((CENTRO.x - ax) / VB.w) * 100}%, ${((CENTRO.y - ay) / VB.h) * 100}%) scale(${z.zoom})`,
+  };
+}
 
 function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSeleccionar, alAlejar }: Props) {
   const plataforma = useRef<HTMLDivElement>(null);
+  const visitadas = useRef<Set<Capa>>(new Set(["traje"]));
+  visitadas.current.add(capa);
+
+  // Descarga las capas de anatomia cuando el navegador esta libre (no bloquea la primera carga)
+  useEffect(() => {
+    const idle = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 1500));
+    const id = idle(() => CAPAS_ANAT.forEach(precargar));
+    return () => { if (window.cancelIdleCallback) window.cancelIdleCallback(id as number); else window.clearTimeout(id as number); };
+  }, []);
+
   const zona = ZONAS.find((z) => z.id === seleccionada);
   const s = acercado && zona ? zona.zoom : 1;
-  const az = zona ? ancla(zona, capa) : CENTRO_PAR;
-  const camara = acercado && zona
-    ? { transformOrigin: `${az[0]}px ${az[1]}px`, transform: `translate(${CENTRO.x - az[0]}px, ${CENTRO.y - az[1]}px) scale(${s})` }
-    : { transformOrigin: `${CENTRO.x}px ${CENTRO.y}px`, transform: "none" };
+  const niveles = useMemo(() => Object.fromEntries(ZONAS.map((z) => [z.id, nivelZona(z.indicadores, lecturas)])), [lecturas]);
 
-  // Inclinacion suave con el cursor (variables CSS, sin re-render)
+  // Inclinacion suave con el cursor: una sola actualizacion por fotograma, sin re-render
+  const pendiente = useRef<{ x: number; y: number } | null>(null);
+  const cuadro = useRef(0);
   function mover(e: PointerEvent<HTMLDivElement>) {
-    if (e.pointerType !== "mouse" || !plataforma.current) return;
+    if (e.pointerType !== "mouse") return;
     const r = e.currentTarget.getBoundingClientRect();
-    plataforma.current.style.setProperty("--rx", ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
-    plataforma.current.style.setProperty("--ry", ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
+    pendiente.current = { x: (e.clientX - r.left) / r.width - 0.5, y: (e.clientY - r.top) / r.height - 0.5 };
+    if (cuadro.current) return;
+    cuadro.current = requestAnimationFrame(() => {
+      cuadro.current = 0;
+      const p = pendiente.current;
+      if (p && plataforma.current) {
+        plataforma.current.style.setProperty("--rx", p.x.toFixed(3));
+        plataforma.current.style.setProperty("--ry", p.y.toFixed(3));
+      }
+    });
   }
   function soltar() { plataforma.current?.style.setProperty("--rx", "0"); plataforma.current?.style.setProperty("--ry", "0"); }
+  useEffect(() => () => { if (cuadro.current) cancelAnimationFrame(cuadro.current); }, []);
 
   const propsZona = (id: string) => {
     const z = ZONAS.find((x) => x.id === id)!;
-    const n = nivelZona(z.indicadores, lecturas);
+    const n = niveles[id];
     return {
       className: `zona ${n}`, role: "button", tabIndex: 0, "aria-pressed": seleccionada === id,
       "aria-label": `${z.etiqueta}: ${n === "sin_datos" ? "sin datos" : n}`,
@@ -48,6 +79,8 @@ function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSelecci
       onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); alSeleccionar(id); } },
     };
   };
+
+  const etiquetas = (ETIQUETAS[capa] ?? []).filter((e) => !acercado || e.zona === seleccionada);
 
   return (
     <div className={`plataforma${capa !== "traje" ? " capa-anat" : ""}`} ref={plataforma} onPointerMove={mover} onPointerLeave={soltar}>
@@ -57,33 +90,50 @@ function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSelecci
       <span className="hud-capa" aria-hidden="true">{CAPAS.find((c) => c.id === capa)?.etiqueta}</span>
 
       <div className="inclina">
-        <svg className="figura" viewBox={VIEWBOX} role="group" aria-label="Astronauta de frente: mapa de estado clínico por zona">
-          <g className="camara" style={camara}>
-            <Capas capa={capa} meses={meses} zona={seleccionada} />
+        <div className="lienzo" role="group" aria-label="Astronauta de frente: mapa de estado clínico por zona">
+          <div className="camara" style={estiloCamara(seleccionada, capa, acercado)}>
+            <Capas capa={capa} meses={meses} zona={seleccionada} enfocar={acercado} visitadas={visitadas.current} />
 
-            <g className="zonas">
-              {ORDEN_HIT.map((id) => <g key={id} {...propsZona(id)}><title>{ZONAS.find((z) => z.id === id)!.etiqueta}</title><path d={ZONA_PATHS[id]} /></g>)}
-            </g>
+            <svg className="overlay" viewBox={VIEWBOX} preserveAspectRatio="none">
+              <g className="zonas">
+                {ORDEN_HIT.map((id) => <g key={id} {...propsZona(id)}><title>{ZONAS.find((z) => z.id === id)!.etiqueta}</title><path d={ZONA_PATHS[id]} /></g>)}
+              </g>
 
-            {acercado && zona && <line key={`ll-${zona.id}`} className="llamada" x1={az[0]} y1={az[1]} x2={az[0] + 300} y2={az[1]} style={{ strokeWidth: 0.7 / s }} />}
-
-            <g className="puntos">
-              {ZONAS.map((z) => {
-                const n = nivelZona(z.indicadores, lecturas);
-                const an = ancla(z, capa);
-                return (
-                  <g key={z.id} transform={`translate(${an[0]} ${an[1]})`}>
-                    <g className={`punto ${n} ${seleccionada === z.id ? "sel" : ""}`} style={{ transform: `scale(${1 / s})` }} aria-hidden="true" pointerEvents="none">
-                      <circle className="p-anillo" r="5" />
-                      <circle className="p-base" r="4" />
-                      <circle className="p-centro" r="1.5" />
+              {/* flechas que senalan los organos / musculos / huesos de la capa visible */}
+              <g className="flechas" pointerEvents="none">
+                {etiquetas.map((e) => {
+                  const [ox, oy] = origenEtiqueta(e, acercado);
+                  return (
+                    <g key={`${capa}-${e.texto}-${acercado}`} className="flecha">
+                      <line className="flecha-linea" x1={ox} y1={oy} x2={e.tx} y2={e.ty} />
+                      <g transform={`translate(${e.tx} ${e.ty}) rotate(${anguloFlecha(e, acercado)}) scale(${1 / s})`}>
+                        <path className="flecha-punta" d="M0 0 L-5.5 -2.6 L-5.5 2.6 Z" />
+                      </g>
+                      <g transform={`translate(${ox} ${oy}) scale(${1 / s})`}>
+                        <text className="flecha-texto" x={e.lado === "izq" ? -3 : 3} y={1.8} textAnchor={e.lado === "izq" ? "end" : "start"}>{e.texto}</text>
+                      </g>
                     </g>
-                  </g>
-                );
-              })}
-            </g>
-          </g>
-        </svg>
+                  );
+                })}
+              </g>
+
+              <g className="puntos">
+                {ZONAS.map((z) => {
+                  const [ax, ay] = ancla(z, capa);
+                  return (
+                    <g key={z.id} transform={`translate(${ax} ${ay})`}>
+                      <g className={`punto ${niveles[z.id]} ${seleccionada === z.id ? "sel" : ""}`} style={{ transform: `scale(${1 / s})` }} aria-hidden="true" pointerEvents="none">
+                        <circle className="p-anillo" r="5" />
+                        <circle className="p-base" r="4" />
+                        <circle className="p-centro" r="1.5" />
+                      </g>
+                    </g>
+                  );
+                })}
+              </g>
+            </svg>
+          </div>
+        </div>
       </div>
       {acercado && <button type="button" className="ver-todo" onClick={alAlejar}>Ver cuerpo completo</button>}
     </div>

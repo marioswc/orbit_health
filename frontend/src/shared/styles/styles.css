@@ -14,7 +14,7 @@ body {
 
 /* ---- Estructura ---- */
 .fondo-estrellas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
-.barra { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--color-eggshell) 80%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--color-stone); }
+.barra { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--glass-line); }
 .barra-interior { display: flex; align-items: center; gap: var(--spacing-24); max-width: var(--page-max-width); margin: 0 auto; padding: var(--spacing-12) var(--spacing-32); }
 .barra nav { display: flex; gap: var(--spacing-4); margin-right: auto; }
 .marca { display: inline-flex; align-items: center; gap: var(--spacing-8); font-size: var(--text-body); font-weight: 600; letter-spacing: -0.01em; margin-right: var(--spacing-16); }
@@ -150,4 +150,18 @@ button.activo { border-color: var(--color-ink); }
   .punto.amarillo::after, .punto.rojo::after { animation: none; }
   .detalle, .efectos li { animation: none; }
   * { transition-duration: .01ms !important; }
+}
+
+/* ---- Liquid glass: gris translucido tipo Apple ---- */
+body::before { content: ""; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background: radial-gradient(60vw 50vh at 12% 8%, color-mix(in srgb, var(--color-ash) 28%, transparent), transparent 70%),
+              radial-gradient(55vw 55vh at 92% 70%, color-mix(in srgb, var(--hud) 12%, transparent), transparent 70%); }
+.cristal, .barra, .panel, .lado.der {
+  background: linear-gradient(135deg, var(--glass-sheen), transparent 55%), var(--glass-bg);
+  -webkit-backdrop-filter: blur(22px) saturate(170%); backdrop-filter: blur(22px) saturate(170%);
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-line), var(--glass-shadow);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cristal, .barra, .panel, .lado.der { background: var(--color-warm-taupe); }
 }

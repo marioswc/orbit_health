@@ -1,12 +1,12 @@
 import { useCallback, useState } from "react";
 import { CAPAS, ZONAS, type Capa } from "../zonas";
 
-/** Estado inicial opcional desde la URL (?zona=brazos&capa=musculo): sirve para compartir o ensayar una vista de la demo. */
+/** Estado inicial opcional desde la URL (?zona=brazos&capa=musculo&zoom=0 para ver el cuerpo completo): sirve para compartir o ensayar una vista de la demo. */
 function desdeUrl() {
   const q = new URLSearchParams(window.location.search);
   const zona = ZONAS.find((z) => z.id === q.get("zona"));
   const capa = CAPAS.find((c) => c.id === q.get("capa"));
-  return { zona: zona?.id, capa: capa?.id, acercado: !!zona };
+  return { zona: zona?.id, capa: capa?.id, acercado: !!zona && q.get("zoom") !== "0" };
 }
 
 /**

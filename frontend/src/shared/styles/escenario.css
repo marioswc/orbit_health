@@ -4,7 +4,7 @@
 .escenario { display: grid; grid-template-columns: minmax(210px, 240px) minmax(0, 1fr) minmax(300px, 360px); gap: var(--spacing-20); align-items: start; }
 .lado { min-width: 0; }
 .lado.izq { display: grid; gap: var(--spacing-16); align-content: start; position: sticky; top: calc(var(--spacing-24) + 64px); }
-.panel, .lado.der { background: color-mix(in srgb, var(--color-warm-taupe) 82%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid var(--color-stone); border-radius: var(--radius-card); padding: var(--spacing-20); }
+.panel, .lado.der { border-radius: var(--radius-card); padding: var(--spacing-20); }
 .panel > h2 { margin: 0 0 var(--spacing-12); font-size: var(--text-caption); color: var(--color-smoke); font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
 .panel .leyenda { margin: 0; }
 .zonas-lista { display: grid; gap: var(--spacing-8); }
@@ -19,13 +19,19 @@
 .plataforma { --rx: 0; --ry: 0; position: relative; width: 100%; margin: 0 auto; height: min(calc(100vh - 120px), 900px); min-height: 600px; overflow: hidden; border-radius: var(--radius-card-lg); border: 1px solid var(--color-stone);
   background:
     radial-gradient(ellipse 55% 50% at 50% 46%, color-mix(in srgb, var(--hud) 18%, transparent) 0%, transparent 72%),
-    color-mix(in srgb, var(--color-eggshell) 72%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+    color-mix(in srgb, var(--color-eggshell) 72%, transparent); contain: layout paint; }
 .plataforma::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .55;
   background-image: linear-gradient(color-mix(in srgb, var(--hud) 10%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--hud) 10%, transparent) 1px, transparent 1px);
   background-size: 32px 32px; -webkit-mask-image: radial-gradient(ellipse 70% 62% at 50% 46%, #000 30%, transparent 78%); mask-image: radial-gradient(ellipse 70% 62% at 50% 46%, #000 30%, transparent 78%); }
-.inclina { position: absolute; inset: 14px 0 6px; display: grid; place-items: center; transform: perspective(1000px) rotateY(calc(var(--rx) * 8deg)) rotateX(calc(var(--ry) * -5deg)); transition: transform .25s ease-out; }
-.figura { width: 100%; height: 100%; overflow: hidden; animation: flotar 7s ease-in-out infinite; }
-.camara { transition: transform .85s var(--ease-out); }
+.inclina { position: absolute; inset: 14px 0 6px; display: grid; place-items: center; transform: perspective(1000px) rotateY(calc(var(--rx) * 8deg)) rotateX(calc(var(--ry) * -5deg)); transition: transform .25s ease-out; will-change: transform; }
+/* Lienzo: caja con la proporcion del dibujo. Todo lo que hay dentro se coloca en % de esta caja. */
+.lienzo { position: relative; height: 100%; max-width: 100%; aspect-ratio: 215.25 / 430.75; animation: flotar 7s ease-in-out infinite; }
+.camara { position: absolute; inset: 0; transition: transform .85s var(--ease-out); will-change: transform; }
+.capa-traje, .capa-grupo { position: absolute; pointer-events: none; user-select: none; }
+.capa-traje { transition: opacity .5s var(--ease-out); }
+.capa-grupo { transition: opacity .5s var(--ease-out); }
+.capa-grupo > img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.overlay { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 
 /* Marco HUD */
 .esquina { position: absolute; width: 22px; height: 22px; pointer-events: none; z-index: 3; border: 0 solid var(--hud); opacity: .8; }
@@ -38,9 +44,8 @@
 @keyframes barrer { 0% { transform: translateY(-100%); opacity: 0; } 15% { opacity: .85; } 100% { transform: translateY(0); opacity: 0; } }
 
 /* Capas del cuerpo (imagenes alineadas con el astronauta) */
-.capa-img { transition: opacity .6s var(--ease-out); pointer-events: none; }
 /* En la capa activa: la region de la zona elegida a todo color, el resto apagado */
-.anat-apagada { filter: grayscale(.9) brightness(.7); opacity: .5; }
+.anat-apagada { filter: grayscale(.55) brightness(.8); opacity: .7; }
 
 /* Zonas clicables */
 .zona { --c: var(--estado-sin-datos); cursor: pointer; outline: none; }
@@ -49,7 +54,7 @@
 .zona.verde :is(path, circle, rect), .zona.amarillo :is(path, circle, rect), .zona.rojo :is(path, circle, rect) { fill: color-mix(in srgb, var(--c) 24%, transparent); }
 .zona:hover :is(path, circle, rect) { stroke: var(--hud); stroke-dasharray: 3 2.4; fill: color-mix(in srgb, var(--hud) 14%, transparent); }
 .zona:focus-visible :is(path, circle, rect) { stroke: var(--color-ink); stroke-dasharray: none; stroke-width: 1.8; }
-.zona[aria-pressed="true"] :is(path, circle, rect) { stroke: var(--hud); stroke-dasharray: none; stroke-width: 1.6; filter: drop-shadow(0 0 3px var(--hud)); }
+.zona[aria-pressed="true"] :is(path, circle, rect) { stroke: var(--hud); stroke-dasharray: none; stroke-width: 1.6; }
 .zona.rojo :is(path, circle, rect) { animation: pulso-zona 1.6s ease-in-out infinite; }
 @keyframes pulso-zona { 50% { opacity: .6; } }
 
@@ -66,6 +71,13 @@
 .llamada { stroke: var(--hud); stroke-dasharray: 600; stroke-dashoffset: 600; animation: trazar .9s var(--ease-out) .15s forwards; opacity: .9; }
 @keyframes trazar { to { stroke-dashoffset: 0; } }
 
+/* Flechas que senalan organos, musculos y huesos (el trazo no se escala con la camara) */
+.flecha-linea { stroke: var(--hud); stroke-width: 1.3; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-dasharray: 900; stroke-dashoffset: 900; animation: trazar-flecha .7s var(--ease-out) .25s forwards; }
+.flecha-punta { fill: var(--hud); opacity: 0; animation: aparecer-flecha .25s ease-out .8s forwards; }
+.flecha-texto { font-family: var(--font-geist-mono); font-size: 6.6px; font-weight: 500; letter-spacing: 0; fill: var(--color-ink); paint-order: stroke; stroke: var(--color-eggshell); stroke-width: 2.4px; stroke-linejoin: round; opacity: 0; animation: aparecer-flecha .35s ease-out .15s forwards; }
+@keyframes trazar-flecha { to { stroke-dashoffset: 0; } }
+@keyframes aparecer-flecha { to { opacity: 1; } }
+
 /* Panel derecho */
 .detalle { min-width: 0; }
 .capa-info { margin-top: var(--spacing-16); padding: var(--spacing-16); background: var(--color-eggshell); border-radius: var(--radius-card); border: 1px solid var(--color-stone); animation: entrar .3s var(--ease-out) both; }
@@ -81,10 +93,10 @@
   .lado.izq { position: static; }
   .zonas-lista { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
   .plataforma { height: min(70vh, 640px); }
-  .llamada { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .figura { animation: none; }
+  .lienzo { animation: none; }
+  .flecha-linea { animation: none; stroke-dashoffset: 0; }
   .inclina { transform: none; }
   .llamada { animation: none; stroke-dashoffset: 0; }
   .zona.rojo :is(path, circle, rect), .punto .p-anillo { animation: none; }
