@@ -81,6 +81,12 @@
     "avpu": [],
     "ejercicio_min": [
       "campos_gravedad"
+    ],
+    "sueno_eficiencia_pct": [
+      "aislamiento_confinamiento"
+    ],
+    "sueno_despertares_min": [
+      "aislamiento_confinamiento"
     ]
   },
   "riesgos": [
@@ -196,9 +202,11 @@
       "url": "https://www.nasa.gov/reference/risk-from-inadequate-sleep-and-irregular-schedules/",
       "cobertura": "parcial",
       "indicadores": [
-        "sueno_horas"
+        "sueno_horas",
+        "sueno_eficiencia_pct",
+        "sueno_despertares_min"
       ],
-      "nota": "Solo cuenta horas dormidas; no mide calidad ni horarios."
+      "nota": "Cuenta horas dormidas, eficiencia y tiempo despierto; no mide los horarios ni la calidad más allá de eso."
     },
     {
       "nombre_oficial": "Risk of Inadequate Systems Operations Support",

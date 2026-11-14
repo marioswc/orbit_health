@@ -176,7 +176,9 @@
       "co2": 0.2,
       "dosis_pct": 2,
       "o2_cabina": 0.5,
-      "animo": 0.5
+      "animo": 0.5,
+      "sueno_eficiencia_pct": 3,
+      "sueno_despertares_min": 10
     },
     "nota_piso": "Variación mínima que se considera un cambio real. Evita que una serie muy estable (desviación casi cero) convierta una diferencia insignificante en un aviso. Supuestos de diseño pendientes de validación clínica."
   },
@@ -310,6 +312,18 @@
     },
     "ejercicio_min": {
       "etiqueta": "Minutos de ejercicio",
+      "unidad": "min",
+      "min": 0,
+      "max": 600
+    },
+    "sueno_eficiencia_pct": {
+      "etiqueta": "Eficiencia del sueño",
+      "unidad": "%",
+      "min": 0,
+      "max": 100
+    },
+    "sueno_despertares_min": {
+      "etiqueta": "Tiempo despierto durante el sueño",
       "unidad": "min",
       "min": 0,
       "max": 600
