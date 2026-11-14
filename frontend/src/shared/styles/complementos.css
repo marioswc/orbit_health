@@ -115,5 +115,17 @@
 .informe-acciones { display: flex; align-items: center; gap: var(--spacing-8); }
 .informe-btn { text-decoration: none; min-height: 40px; display: inline-flex; align-items: center; }
 
+/* ---- Racha y citas NASA ---- */
+.racha-bloque { margin-top: var(--spacing-16); display: grid; gap: var(--spacing-12); }
+.racha-cab { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--spacing-12); }
+.racha-cab h2 { margin: 0 0 var(--spacing-4); }
+.racha-nums { display: grid; gap: var(--spacing-4); justify-items: end; }
+.racha-hoy { margin: 0; font-size: var(--text-body-sm); color: var(--color-graphite); }
+.racha-logros { display: flex; flex-wrap: wrap; gap: var(--spacing-8); }
+.citas-nasa { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--spacing-12); }
+.citas-nasa li { display: grid; gap: var(--spacing-4); }
+.citas-nasa p { margin: 0; }
+.cita-textual { margin: 0; padding-left: var(--spacing-12); border-left: 2px solid var(--color-stone); font-size: var(--text-body-sm); font-style: italic; color: var(--color-smoke); }
+
 
 

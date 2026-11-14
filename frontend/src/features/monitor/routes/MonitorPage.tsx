@@ -7,8 +7,10 @@ import AccionesClinicas from "../components/AccionesClinicas";
 import DetalleZona from "../components/DetalleZona";
 import FiguraHumana from "../components/FiguraHumana";
 import GraficaSerie from "../components/GraficaSerie";
+import RachaMediciones from "../components/RachaMediciones";
 import RecordatorioCaptura from "../components/RecordatorioCaptura";
 import { AnilloNews2, PulsoCardiaco, SignosVitales } from "../components/TableroSignos";
+import { useEntornos } from "../hooks/useEntornos";
 import { useHistorialIndicador } from "../hooks/useHistorialIndicador";
 import { useSeries } from "../hooks/useSeries";
 import { useZonaSeleccionada } from "../hooks/useZonaSeleccionada";
@@ -35,6 +37,9 @@ export default function MonitorPage({ tripulanteId = "", estado, cabina, ambient
   const { t: tc } = useTranslation("consola");
   const { zona, acercado, capa, setCapa, elegir, alejar } = useZonaSeleccionada();
   const [meses, setMeses] = useState(0);
+  const [entornoId, setEntornoId] = useState("nave_en_transito");
+  const entornos = useEntornos();
+  const entornoActual = entornos?.entornos[entornoId] ?? null;
   const nivel = estado?.nivel_general ?? "sin_datos";
   const lecturas = estado?.indicadores ?? SIN_LECTURAS;
 
@@ -91,7 +96,7 @@ export default function MonitorPage({ tripulanteId = "", estado, cabina, ambient
 
         <div className="t-col t-cen">
           <section className="panel panel-detalle">
-            <DetalleZona id={zona} lecturas={lecturas} capa={capa} meses={meses} alMeses={setMeses} />
+            <DetalleZona id={zona} lecturas={lecturas} capa={capa} meses={meses} alMeses={setMeses} entorno={entornoActual} />
           </section>
           <section className="panel consola-panel" aria-label={tc("vitals.title")}>
             <h2>{tc("vitals.title")}</h2>
@@ -101,6 +106,7 @@ export default function MonitorPage({ tripulanteId = "", estado, cabina, ambient
             <AccionesClinicas nivel={nivel} proximaCapturaMin={estado.proxima_captura_min} reglas={estado.reglas_combinadas} acciones={estado.acciones_sugeridas} />
           )}
           {tripulanteId && <RecordatorioCaptura tripulanteId={tripulanteId} estado={estado} />}
+          {tripulanteId && <RachaMediciones tripulanteId={tripulanteId} estado={estado} />}
         </div>
 
         <div className="panel t-fig">
@@ -119,6 +125,24 @@ export default function MonitorPage({ tripulanteId = "", estado, cabina, ambient
                 <button key={c.id} type="button" className={capa === c.id ? "activo" : ""} aria-pressed={capa === c.id} onClick={() => setCapa(c.id)}>{t(`capa.${c.id}`)}</button>
               ))}
             </div>
+            {entornos && (
+              <>
+                <span className="fig-etiqueta">Entorno</span>
+                <div className="capas" role="group" aria-label="Entorno de la misión">
+                  {Object.entries(entornos.entornos).map(([clave, ent]) => (
+                    <button
+                      key={clave}
+                      type="button"
+                      className={entornoId === clave ? "activo" : ""}
+                      aria-pressed={entornoId === clave}
+                      onClick={() => setEntornoId(clave)}
+                    >
+                      {ent.nombre}{ent.gravedad_g !== null ? ` (${ent.gravedad_g} g)` : ""}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
           <div className="centro">
             <FiguraHumana lecturas={lecturas} seleccionada={zona} acercado={acercado} capa={capa} meses={meses} alSeleccionar={elegir} alAlejar={alejar} ambiente={ambiente} />
