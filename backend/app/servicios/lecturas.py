@@ -53,7 +53,7 @@ def _clasificar(conn, tid: str, indicador: str, valor: float, ventana: str) -> d
 
 
 def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor: float,
-                      estilo: dict | None = None) -> dict:
+                      estilo: dict | None = None, origen: str = "manual") -> dict:
     error = validar(indicador, valor)
     if error:
         raise ValueError(error)
@@ -73,7 +73,7 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
         activas = combinadas.evaluar_individuales(valores)
         nivel_evento = combinadas.peor_nivel([nivel_evento, *[a["nivel"] for a in activas]])
         lectura_id = repo.insertar(conn, tid, indicador, valor, INDICADORES[indicador][1],
-                                   nivel_lectura, c["puntos"], ahora.isoformat())
+                                   nivel_lectura, c["puntos"], ahora.isoformat(), origen)
         evento_id = cola.encolar_sin_commit(
             conn, tid, f"LECTURA_{indicador.upper()}", PRIORIDAD[nivel_evento],
             {"lectura_id": lectura_id, "indicador": indicador, "valor": valor,
