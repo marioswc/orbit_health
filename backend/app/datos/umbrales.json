@@ -85,6 +85,7 @@
     "glucosa": {"etiqueta": "Glucosa capilar", "unidad": "mg/dL", "min": 20, "max": 600},
     "co2": {"etiqueta": "CO₂ de cabina", "unidad": "mmHg", "min": 0, "max": 20},
     "dosis_pct": {"etiqueta": "Dosis acumulada", "unidad": "% del límite", "min": 0, "max": 200},
-    "sueno_horas": {"etiqueta": "Horas de sueño", "unidad": "h", "min": 0, "max": 24}
+    "sueno_horas": {"etiqueta": "Horas de sueño", "unidad": "h", "min": 0, "max": 24},
+    "ejercicio_min": {"etiqueta": "Minutos de ejercicio", "unidad": "min", "min": 0, "max": 600}
   }
 }

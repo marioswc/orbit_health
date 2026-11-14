@@ -15,6 +15,8 @@ PRIORIDAD = {"rojo": 1, "amarillo": 2, "verde": 3}
 _ORDEN = {"verde": 0, "amarillo": 1, "rojo": 2}
 AVPU = "AVPU"
 ETIQUETAS = {k: v[0] for k, v in INDICADORES.items()}
+# Indicadores donde tener MÁS de lo habitual no es un problema: solo avisa la desviación hacia abajo.
+SOLO_BAJA = {"sueno_horas", "ejercicio_min"}
 
 
 def signos_recientes(conn: sqlite3.Connection, tid: str, desde: str) -> dict:
@@ -47,6 +49,8 @@ def _clasificar(conn, tid: str, indicador: str, valor: float, ventana: str) -> d
         nivel, obs = reglas.evaluar_glucosa(valor)
     elif indicador == "sueno_horas":
         nivel, obs = reglas.evaluar_sueno(valor)
+    elif indicador == "ejercicio_min":
+        nivel, obs = "verde", False        # sin umbral absoluto: solo cuenta la comparación con la propia base
     else:  # presion_diastolica
         nivel, obs = reglas.evaluar_diastolica(valor)
     return {**base, "nivel": nivel, "nivel_global": nivel, "observacion": obs}
@@ -64,7 +68,8 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
     conn.execute("BEGIN IMMEDIATE")  # lectura y evento de cola: ambos o ninguno
     try:
         c = _clasificar(conn, tid, indicador, valor, ventana)
-        linea = reglas.desviacion_linea_base(valor, repo.historial(conn, tid, indicador, desde_base))
+        linea = reglas.desviacion_linea_base(valor, repo.historial(conn, tid, indicador, desde_base),
+                                             solo_baja=indicador in SOLO_BAJA)
         nivel_lectura = "amarillo" if linea["aviso"] and c["nivel"] == "verde" else c["nivel"]
         nivel_evento = (max(nivel_lectura, c["nivel_global"], key=_ORDEN.__getitem__)
                         if c["puntos_ind"] > 0 else nivel_lectura)
