@@ -1,3 +1,5 @@
+> **Reemplazado.** Este sistema de diseño (referencia Dala/ElevenLabs inicial) ya no es el vigente. Usar [ESTILO_PLATAFORMA.md](./ESTILO_PLATAFORMA.md). Se conserva como historial.
+
 # Sistema de diseño — referencia "ElevenLabs" adaptada a ORBIT Health
 
 Papel crema, tinta negra, titulares de peso ligero y superficies planas. Es una **aplicación** (modo operar), no una landing: densidad cómoda, componentes conocidos y movimiento con propósito. Tokens en `src/shared/styles/tokens.css`; estilos en `styles.css`.

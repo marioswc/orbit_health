@@ -2,7 +2,7 @@ import { nivelActual } from "../../../shared/rendimiento";
 import { memo, useEffect, useMemo, useRef, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import type { LecturaEstado } from "../types/estado";
 import { ETIQUETAS, anguloFlecha, origenEtiqueta } from "../etiquetas";
-import { CAPAS, ZONAS, ancla, nivelZona, type Capa } from "../zonas";
+import { CAPAS, ZONAS, ancla, nivelZona, type Capa, type NivelZona } from "../zonas";
 import { ZONA_PATHS } from "../zonasPaths";
 import { CAPAS_ANAT, Capas, VB, VIEWBOX, precargar } from "./ArteAstronauta";
 
@@ -15,6 +15,8 @@ interface Props {
   meses: number;
   alSeleccionar: (id: string) => void;
   alAlejar: () => void;
+  /** Peor nivel del aire/radiacion de cabina (lo informa el backend). Si es amarillo o rojo, marca Cabeza y Respiratorio. */
+  ambiente?: NivelZona | null;
 }
 
 // Orden de dibujo: lo pequeno encima de lo grande para que reciba el clic
@@ -34,7 +36,9 @@ export function estiloCamara(zonaId: string, capa: Capa, acercado: boolean): CSS
   };
 }
 
-function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSeleccionar, alAlejar }: Props) {
+const ZONAS_AMBIENTE = ["snc", "resp"]; // el CO2 y la radiacion afectan sobre todo al SNC y al sistema respiratorio
+
+function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSeleccionar, alAlejar, ambiente = null }: Props) {
   const plataforma = useRef<HTMLDivElement>(null);
   const visitadas = useRef<Set<Capa>>(new Set(["traje"]));
   visitadas.current.add(capa);
@@ -71,12 +75,15 @@ function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSelecci
   function soltar() { plataforma.current?.style.setProperty("--rx", "0"); plataforma.current?.style.setProperty("--ry", "0"); }
   useEffect(() => () => { if (cuadro.current) cancelAnimationFrame(cuadro.current); }, []);
 
+  const ambienteDe = (id: string) => (ZONAS_AMBIENTE.includes(id) && (ambiente === "amarillo" || ambiente === "rojo") ? ambiente : null);
+
   const propsZona = (id: string) => {
     const z = ZONAS.find((x) => x.id === id)!;
     const n = niveles[id];
+    const amb = ambienteDe(id);
     return {
       className: `zona ${n}`, role: "button", tabIndex: 0, "aria-pressed": seleccionada === id,
-      "aria-label": `${z.etiqueta}: ${n === "sin_datos" ? "sin datos" : n}`,
+      "aria-label": `${z.etiqueta}: ${n === "sin_datos" ? "sin datos" : n}${amb ? `, entorno de cabina ${amb}` : ""}`,
       onClick: () => alSeleccionar(id),
       onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); alSeleccionar(id); } },
     };
@@ -122,9 +129,11 @@ function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSelecci
               <g className="puntos">
                 {ZONAS.map((z) => {
                   const [ax, ay] = ancla(z, capa);
+                  const amb = ambienteDe(z.id);
                   return (
                     <g key={z.id} transform={`translate(${ax} ${ay})`}>
-                      <g className={`punto ${niveles[z.id]} ${seleccionada === z.id ? "sel" : ""}`} style={{ transform: `scale(${1 / s})` }} aria-hidden="true" pointerEvents="none">
+                      <g className={`punto ${niveles[z.id]} ${seleccionada === z.id ? "sel" : ""}${amb ? ` amb-${amb}` : ""}`} style={{ transform: `scale(${1 / s})` }} aria-hidden="true" pointerEvents="none">
+                        {amb && <circle className="p-ambiente" r="8.5" />}
                         <circle className="p-anillo" r="5" />
                         <circle className="p-base" r="4" />
                         <circle className="p-centro" r="1.5" />

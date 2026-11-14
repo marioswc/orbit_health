@@ -4,7 +4,7 @@ import Alerta from "../../../shared/components/Alerta";
 import EncabezadoPagina from "../../../shared/components/EncabezadoPagina";
 import Segmentado from "../../../shared/components/Segmentado";
 import { nivelActual } from "../../../shared/rendimiento";
-import type { Cola, ItemCola } from "../types/cola";
+import type { Cola, InfoLatencia, ItemCola } from "../types/cola";
 
 const INTERVALO_MS = { alto: 2000, medio: 4000, bajo: 8000 } as const;
 
@@ -14,8 +14,13 @@ const PRIORIDADES = [
   { p: 3, nivel: "verde", titulo: "Prioridad 3", detalle: "Verde" },
 ] as const;
 const ESTADOS: Record<ItemCola["estado"], string> = { retenido: "Retenido", en_transito: "En tránsito", recibido: "Recibido" };
-const ENTORNOS = [{ valor: "luna", etiqueta: "Luna · 1.3 s" }, { valor: "marte", etiqueta: "Marte · 1200 s" }];
-const RETARDO: Record<string, string> = { luna: "1.3 s", marte: "1200 s" };
+const ENTORNOS = [
+  { valor: "luna", etiqueta: "Luna · 1.3 s" },
+  { valor: "marte_cercano", etiqueta: "Marte mín · 3 min" },
+  { valor: "marte_medio", etiqueta: "Marte medio · 12.5 min" },
+  { valor: "marte", etiqueta: "Marte máx · 20 min" },
+];
+const RETARDO: Record<string, string> = { luna: "1.3 s", marte_cercano: "180 s", marte_medio: "750 s", marte: "1200 s" };
 
 const I = { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true } as const;
 const IC_NAVE = <svg {...I} width={26} height={26}><path d="M12 3c3 2.5 4.5 6 4.5 9.5V16h-9v-3.5C7.5 9 9 5.5 12 3z" /><circle cx="12" cy="10" r="1.6" /><path d="M7.5 14 5 17.5l3-.5M16.5 14l2.5 3.5-3-.5M10 19.5c.5 1 1 1.5 2 2.5 1-1 1.5-1.5 2-2.5" /></svg>;
@@ -43,6 +48,7 @@ export function textoTipo(t: string): string {
 
 function ConsolaEnlace() {
   const [cola, setCola] = useState<Cola | null>(null);
+  const [latencia, setLatencia] = useState<InfoLatencia | null>(null);
   const [verif, setVerif] = useState<{ ok: boolean; texto: string } | null>(null);
   const [error, setError] = useState("");
 
@@ -56,6 +62,7 @@ function ConsolaEnlace() {
       const c = await api<Cola>("/cola");
       const huella = JSON.stringify(c);
       if (huella !== previa.current) { previa.current = huella; setCola(c); }
+      api<InfoLatencia>("/enlace/latencia").then(setLatencia).catch(() => {});
       setError("");
     } catch (e) { setError((e as Error).message); } finally { enVuelo.current = false; }
   }, []);
@@ -129,6 +136,13 @@ function ConsolaEnlace() {
           </div>
           <div className="nodo"><span className="nodo-icono">{IC_TIERRA}</span>Tierra</div>
         </div>
+        {latencia && (
+          <p className="suave latencia-detalle">
+            Ida y vuelta real: <strong>{Math.round(latencia.ida_y_vuelta_real_s / 60 * 10) / 10} min</strong> ({latencia.ida_y_vuelta_real_s} s)
+            {" · "}Simulado: {latencia.ida_y_vuelta_simulada_s} s (×{latencia.factor_aceleracion}
+            {latencia.jitter_pct > 0 ? `, ±${latencia.jitter_pct}% jitter` : ""})
+          </p>
+        )}
         <div className="controles-enlace">
           <div className="campo">
             <span className="campo-etiqueta">Entorno</span>
@@ -157,7 +171,7 @@ function ConsolaEnlace() {
                     <li key={i.id}>
                       <span className="id-mono">#{i.id}</span>
                       <span className="tipo" title={i.tipo_evento}>{textoTipo(i.tipo_evento)}</span>
-                      <span className={`estado-cola ${i.estado}`}>{ESTADOS[i.estado]}</span>
+                      <span className={`estado-cola ${i.estado}`}>{i.confirmado ? "Confirmado" : ESTADOS[i.estado]}</span>
                     </li>
                   ))}
                 </ul>

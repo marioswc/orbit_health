@@ -12,6 +12,16 @@ describe("FiguraHumana", () => {
     expect(screen.getByRole("button", { name: /Respiratorio: rojo/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Cardiovascular: sin datos/ })).toBeInTheDocument();
   });
+  it("el aire o la radiacion de cabina marcan solo Cabeza y Respiratorio", () => {
+    const { container, rerender } = render(<FiguraHumana {...props} ambiente="verde" />);
+    expect(container.querySelectorAll(".p-ambiente").length).toBe(0);
+    rerender(<FiguraHumana {...props} ambiente="amarillo" />);
+    expect(container.querySelectorAll(".p-ambiente").length).toBe(2);
+    expect(container.querySelectorAll(".punto.amb-amarillo").length).toBe(2);
+    expect(screen.getByRole("button", { name: /Respiratorio.*entorno de cabina amarillo/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Cabeza.*entorno de cabina amarillo/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Cardiovascular: sin datos$/ })).toBeInTheDocument();
+  });
   it("clic y teclado seleccionan la zona", () => {
     const alSeleccionar = vi.fn();
     render(<FiguraHumana {...props} alSeleccionar={alSeleccionar} />);
