@@ -36,5 +36,6 @@
   "language.switching": "Cambiando a {{idioma}}…",
   "language.es": "español",
   "language.en": "inglés",
-  "language.hint": "Traduciendo la interfaz"
+  "language.hint": "Traduciendo la interfaz",
+  "nav.banda": "Banda"
 }

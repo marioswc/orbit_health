@@ -2,12 +2,13 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "../i18n";
 import Logo from "../shared/components/Logo";
 
-export type Vista = "monitor" | "bienestar" | "enlace" | "riesgos" | "historial" | "sistema";
+export type Vista = "monitor" | "bienestar" | "enlace" | "riesgos" | "historial" | "sistema" | "banda";
 
 const ICONO = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true } as const;
 
 export const VISTAS: { id: Vista; etiqueta: string; icono: ReactNode }[] = [
   { id: "monitor", etiqueta: "Monitor", icono: <svg {...ICONO}><path d="M3 12h4l2.5-7 4 14 2.5-7H21" /></svg> },
+  { id: "banda", etiqueta: "Banda", icono: <svg {...ICONO}><rect x="7" y="6.5" width="10" height="11" rx="3" /><path d="M9 6.5 9.8 3h4.4l.8 3.5M9 17.5 9.8 21h4.4l.8-3.5M12 10v2.4l1.6 1" /></svg> },
   { id: "historial", etiqueta: "Historial", icono: <svg {...ICONO}><path d="M4 19V5M4 19h16" /><path d="m7.5 14 3.5-4 3 2.5 4.5-6" /></svg> },
   { id: "bienestar", etiqueta: "Bienestar", icono: <svg {...ICONO}><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" /></svg> },
   { id: "riesgos", etiqueta: "Riesgos", icono: <svg {...ICONO}><path d="M12 3 4.5 6v5.5c0 4.4 3 7.9 7.5 9.5 4.5-1.6 7.5-5.1 7.5-9.5V6L12 3z" /><path d="M12 8.5v4M12 15.5v.1" /></svg> },
