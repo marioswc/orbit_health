@@ -56,7 +56,7 @@ Ver `.env.example`. Umbrales marcados como *Supuesto* en el plan requieren valid
 
 ## Validación médica
 
-Ver [docs/VALIDACION_MEDICA.md](docs/VALIDACION_MEDICA.md) y `docs/casos_validacion.csv`.
+Ver [docs/VALIDACION_MEDICA.md](docs/VALIDACION_MEDICA.md), [docs/DECISIONES_EQUIPO.md](docs/DECISIONES_EQUIPO.md) y `docs/casos_validacion.csv`.
 
 ## Estructura
 
