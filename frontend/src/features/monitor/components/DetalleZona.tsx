@@ -48,9 +48,12 @@ export default function DetalleZona({ id, lecturas, capa, meses, alMeses }: Prop
       {zona.indicadores.length === 0 && <p className="suave">Esta zona no tiene indicadores en el prototipo.</p>}
       {zona.indicadores.length > 0 && dentro.length === 0 && <p className="suave">Sin lecturas recientes de: {zona.indicadores.join(", ")}.</p>}
       {dentro.map((l) => (
-        <div key={l.indicador} className="item">
-          <span>{nombreIndicador(l.indicador)}<ExplicacionIndicador clave={l.indicador} /></span>
-          <span className="valor"><span>{l.valor} {l.unidad}</span><span className={`badge ${l.nivel}`}>{l.nivel}</span></span>
+        <div key={l.indicador} className={`ind-fila ${l.nivel}`}>
+          <div className="ind-dato">
+            <span className="ind-nombre">{nombreIndicador(l.indicador)}<ExplicacionIndicador clave={l.indicador} /></span>
+            <span className="ind-valor">{l.valor} {l.unidad}</span>
+          </div>
+          <span className={`badge ${l.nivel}`}>{l.nivel}</span>
         </div>
       ))}
 
