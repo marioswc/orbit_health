@@ -10,6 +10,18 @@
       "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al médico de a bordo.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-altered-immune-system-responses/"
+      ],
+      "senales_a_vigilar": [
+        {
+          "texto": "En la estación, algunos astronautas han reportado herpes labial, erupciones y alergias atípicas.",
+          "cita": "Some astronauts aboard the International Space Station have reported cold sores, rashes, atypical allergies",
+          "fuente": "https://www.nasa.gov/reference/risk-of-altered-immune-system-responses/"
+        },
+        {
+          "texto": "La radiación, la microgravedad, el sueño deficiente y otros factores del vuelo pueden alterar el sistema inmunitario.",
+          "cita": "Radiation, microgravity, poor sleep and other spaceflight stressors can alter the immune system of astronauts",
+          "fuente": "https://www.nasa.gov/reference/risk-of-altered-immune-system-responses/"
+        }
       ]
     },
     "presion_sistolica": {
@@ -21,6 +33,13 @@
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/",
         "https://www.nasa.gov/hrp/hazard-gravity-fields/"
+      ],
+      "medidas_nasa": [
+        {
+          "texto": "Según la NASA, el ejercicio regular y una dieta saludable ayudan a la tripulación a mantener la condición cardiovascular.",
+          "cita": "Regular exercise and healthy diets help crews maintain cardiovascular fitness",
+          "fuente": "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/"
+        }
       ]
     },
     "presion_diastolica": {
@@ -31,6 +50,13 @@
       "cuando_avisar": "Un valor bajo se marca solo como observación; si te sientes mal, avisa al médico de a bordo.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/"
+      ],
+      "medidas_nasa": [
+        {
+          "texto": "Según la NASA, el ejercicio regular y una dieta saludable ayudan a la tripulación a mantener la condición cardiovascular.",
+          "cita": "Regular exercise and healthy diets help crews maintain cardiovascular fitness",
+          "fuente": "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/"
+        }
       ]
     },
     "frecuencia_cardiaca": {
@@ -41,6 +67,13 @@
       "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al médico de a bordo.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/"
+      ],
+      "medidas_nasa": [
+        {
+          "texto": "Según la NASA, el ejercicio regular y una dieta saludable ayudan a la tripulación a mantener la condición cardiovascular.",
+          "cita": "Regular exercise and healthy diets help crews maintain cardiovascular fitness",
+          "fuente": "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/"
+        }
       ]
     },
     "frecuencia_respiratoria": {
@@ -51,6 +84,13 @@
       "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al médico de a bordo.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-hypoxia/"
+      ],
+      "senales_a_vigilar": [
+        {
+          "texto": "La hipoxia leve, si no se atiende, puede causar confusión, dolor de cabeza, alteraciones de la visión y dificultad para dormir.",
+          "cita": "Mild hypoxia, if untreated, can cause confusion, headaches, vision impairment, and trouble sleeping",
+          "fuente": "https://www.nasa.gov/reference/risk-of-hypoxia/"
+        }
       ]
     },
     "spo2": {
@@ -61,6 +101,13 @@
       "cuando_avisar": "Si baja, repite la medición enseguida para descartar un error y avisa al médico de a bordo o al comandante.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-hypoxia/"
+      ],
+      "senales_a_vigilar": [
+        {
+          "texto": "La hipoxia leve, si no se atiende, puede causar confusión, dolor de cabeza, alteraciones de la visión y dificultad para dormir.",
+          "cita": "Mild hypoxia, if untreated, can cause confusion, headaches, vision impairment, and trouble sleeping",
+          "fuente": "https://www.nasa.gov/reference/risk-of-hypoxia/"
+        }
       ]
     },
     "avpu": {
@@ -81,7 +128,8 @@
       "cuando_avisar": "Los valores un poco elevados se marcan como observación; los extremos, como alerta.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-inadequate-food-and-nutrition/"
-      ]
+      ],
+      "nota_nasa": "La página de la NASA sobre nutrición no da recomendaciones sobre glucosa ni una dieta concreta: habla de nutrición adecuada, de haber reducido el sodio y de añadir variedad. Por eso aquí no se ofrecen medidas."
     },
     "co2": {
       "que_es": "La cantidad de dióxido de carbono en el aire de la cabina.",
@@ -128,7 +176,20 @@
       "fuentes": [
         "https://www.nasa.gov/reference/risk-from-inadequate-sleep-and-irregular-schedules/",
         "https://www.nasa.gov/reference/archer"
-      ]
+      ],
+      "medidas_nasa": [
+        {
+          "texto": "En la estación, luces LED simulan el ciclo de luz y oscuridad de la Tierra para ayudar a dormir mejor.",
+          "cita": "light-emitting diodes, or LEDs, simulate Earth's light-dark cycle to help astronauts sleep better",
+          "fuente": "https://www.nasa.gov/reference/risk-from-inadequate-sleep-and-irregular-schedules/"
+        },
+        {
+          "texto": "La rutina incluye tiempos designados de relajación y autocuidado para ayudar a prevenir el agotamiento.",
+          "cita": "Astronauts are also given designated times for relaxation and self-care as part of their routine to help prevent burnout",
+          "fuente": "https://www.nasa.gov/reference/risk-from-inadequate-sleep-and-irregular-schedules/"
+        }
+      ],
+      "habitos_generales_origen": "Consejo general de sentido común, no es una recomendación de la NASA. Pendiente de validación clínica."
     },
     "animo": {
       "que_es": "Cómo te sientes hoy, de 1 (muy mal) a 5 (muy bien).",
@@ -142,7 +203,20 @@
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-behavioral-conditions-and-psychiatric-disorders/",
         "https://www.nasa.gov/hrp/hazard-isolation-and-confinement/"
-      ]
+      ],
+      "medidas_nasa": [
+        {
+          "texto": "La NASA anima a los astronautas a explorar opciones de autocuidado, como llevar un diario regular.",
+          "cita": "NASA encourages astronauts to explore self-care options including keeping a regular journal",
+          "fuente": "https://www.nasa.gov/reference/risk-of-behavioral-conditions-and-psychiatric-disorders/"
+        },
+        {
+          "texto": "La investigación sugiere que cultivar vegetales frescos en el espacio puede tener beneficios terapéuticos.",
+          "cita": "research suggests growing fresh vegetables in space may provide therapeutic benefits",
+          "fuente": "https://www.nasa.gov/reference/risk-of-behavioral-conditions-and-psychiatric-disorders/"
+        }
+      ],
+      "habitos_generales_origen": "Consejo general de sentido común, no es una recomendación de la NASA. Pendiente de validación clínica."
     },
     "ejercicio_min": {
       "que_es": "Los minutos de ejercicio físico que hiciste hoy.",
@@ -153,7 +227,20 @@
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-reduced-cardiorespiratory-and-musculoskeletal-fitness/",
         "https://www.nasa.gov/hrp/hazard-gravity-fields/"
+      ],
+      "medidas_nasa": [
+        {
+          "texto": "En la estación espacial, la tripulación hace entrenamiento de resistencia de 6 a 7 días por semana y ejercicio aeróbico durante 1.5 horas al día.",
+          "cita": "Six to seven days a week, astronauts on the International Space Station perform resistance training ... and aerobic exercises for 1.5 hours per day",
+          "fuente": "https://www.nasa.gov/reference/risk-of-reduced-cardiorespiratory-and-musculoskeletal-fitness/"
+        },
+        {
+          "texto": "Los astronautas se hacen autoevaluaciones periódicas de su condición física.",
+          "cita": "Crew members also undergo periodic fitness self-evaluations",
+          "fuente": "https://www.nasa.gov/reference/risk-of-reduced-cardiorespiratory-and-musculoskeletal-fitness/"
+        }
       ]
     }
-  }
+  },
+  "nota_medidas": "`medidas_nasa` y `senales_a_vigilar` vienen de las páginas oficiales de la NASA, con su cita textual y su enlace. `habitos_generales` son consejos de sentido común nuestros y no se atribuyen a la NASA."
 }
