@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 from .. import config
 from ..dominio import acciones, combinadas, peligros, reglas
+from ..dominio.umbrales import UMBRALES
 from ..dominio.catalogos import INDICADORES, NEWS2_VARS, validar
 from ..repositorios import lecturas as repo
 from . import cola
@@ -76,7 +77,8 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
         evento_id = cola.encolar_sin_commit(
             conn, tid, f"LECTURA_{indicador.upper()}", PRIORIDAD[nivel_evento],
             {"lectura_id": lectura_id, "indicador": indicador, "valor": valor,
-             "nivel": nivel_evento, "news2": c["puntos"], "reglas": [a["id"] for a in activas]})
+             "nivel": nivel_evento, "news2": c["puntos"], "reglas": [a["id"] for a in activas],
+             "reglas_version": UMBRALES["version"], "reglas_estado": UMBRALES["estado"]})
         cola.despachar_si_activo(conn, ahora)
         conn.commit()
     except Exception:

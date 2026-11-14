@@ -49,6 +49,13 @@ def serie(conn: sqlite3.Connection, tid: str, indicador: str, desde: str, limite
     return [dict(f) for f in filas]
 
 
+def recientes(conn: sqlite3.Connection, tid: str, limite: int) -> list[dict]:
+    """Últimas lecturas de un tripulante (más reciente primero)."""
+    return [dict(f) for f in conn.execute(
+        "SELECT ts, indicador, valor, unidad, nivel, origen FROM lecturas WHERE tripulante_id=? ORDER BY id DESC LIMIT ?",
+        (tid, limite))]
+
+
 def historial_previo(conn: sqlite3.Connection, tid: str, indicador: str, desde: str, antes_de: str) -> list[float]:
     """Valores del indicador entre `desde` y antes de `antes_de` (excluye la propia lectura)."""
     return [f["valor"] for f in conn.execute(

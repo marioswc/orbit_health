@@ -57,3 +57,8 @@ def recientes(conn: sqlite3.Connection, limite: int = 200) -> list[dict]:
         """SELECT id, tripulante_id, tipo_evento, prioridad, estado, hash, ts_guardado,
                   transmitido_ts, llegada_estimada_ts, ack_estimado_ts
            FROM cola_salida ORDER BY id DESC LIMIT ?""", (limite,))]
+
+
+def conteo_por_estado(conn: sqlite3.Connection, tid: str) -> dict:
+    return {f["estado"]: f["n"] for f in conn.execute(
+        "SELECT estado, COUNT(*) AS n FROM cola_salida WHERE tripulante_id=? GROUP BY estado", (tid,))}
