@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS capsulas (
 
 CREATE INDEX IF NOT EXISTS idx_lecturas_trip_ts ON lecturas (tripulante_id, ts DESC);
 CREATE INDEX IF NOT EXISTS idx_cola_despacho ON cola_salida (estado, prioridad ASC, id ASC);
+CREATE INDEX IF NOT EXISTS idx_cola_llegada ON cola_salida (estado, llegada_estimada_ts);
 CREATE INDEX IF NOT EXISTS idx_diario_trip ON diario_privado (tripulante_id, ts DESC);
 
 -- Estado del enlace persistente: sobrevive a reinicios del servidor.

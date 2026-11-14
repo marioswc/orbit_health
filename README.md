@@ -66,6 +66,8 @@ variabilidad realista a la demo, no como línea base clínica.
 | `GET/PUT /api/preferencias/{id}` | Tono, detalle y recordatorios del asistente (solo su dueño) |
 | `POST /api/animo`, `GET /api/animo/{id}` | Ánimo diario, privado |
 | `GET /api/demo/comparativa?entorno=&respuesta_tierra_min=` | Línea de tiempo con y sin ORBIT |
+| `GET /api/tierra/mensajes` | Vista del centro de control: solo lo que ya llegó, lo urgente primero. Solo lectura, no consume mensajes |
+| `GET /api/informe` y `/api/informe/{id}` | Informe exportable (JSON o CSV) con huella de integridad |
 
 ## Escenarios de demo
 

@@ -181,3 +181,19 @@ def info_latencia(conn: sqlite3.Connection, ahora: datetime | None = None) -> di
         "proxima_llegada_ts": llegadas[0] if llegadas else None,
         "estado_modelo": modelo_enlace.DATOS["estado"],
     }
+
+
+def vista_tierra(conn: sqlite3.Connection, ahora: datetime | None = None, limite: int = 200) -> dict:
+    """Lo que vería el centro de control: solo lo que ya llegó, la urgencia primero.
+
+    Es de solo lectura e idempotente: leerlo no consume ni cambia nada, así que si el cliente falla
+    o hay varios consumidores, ningún mensaje se pierde ni se reparte.
+    """
+    ahora_iso = (ahora or _ahora()).isoformat()
+    mensajes = repo.llegados(conn, ahora_iso, max(1, min(limite, 1000)))
+    for m in mensajes:
+        m["payload"] = json.loads(m["payload"])
+        m["confirmado"] = bool(m.get("ack_estimado_ts") and m["ack_estimado_ts"] <= ahora_iso)
+    return {"timestamp_tierra": ahora_iso, "recibidos": mensajes,
+            "en_camino": repo.en_camino(conn, ahora_iso),
+            "retenidos_a_bordo": repo.retenidos(conn)}
