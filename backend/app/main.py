@@ -10,9 +10,6 @@ from .db import get_conn, init_db
 from .seed import sembrar
 from .validacion import INDICADORES
 
-ENLACE = {"activo": True, "entorno": "marte"}
-
-
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     init_db()
@@ -120,18 +117,25 @@ def crear_tamizaje(datos: TamizajeIn, conn=Depends(conexion)) -> dict:
     return servicio.registrar_tamizaje(conn, datos.tripulante_id, datos.item1, datos.item2)
 
 
+def leer_enlace(conn) -> dict:
+    f = conn.execute("SELECT activo, entorno FROM estado_enlace WHERE id=1").fetchone()
+    return {"activo": bool(f["activo"]), "entorno": f["entorno"]}
+
+
 @app.get("/api/enlace")
-def ver_enlace() -> dict:
-    return ENLACE
+def ver_enlace(conn=Depends(conexion)) -> dict:
+    return leer_enlace(conn)
 
 
 @app.post("/api/enlace")
 def cambiar_enlace(datos: EnlaceIn, conn=Depends(conexion)) -> dict:
     if datos.entorno.lower() not in ("marte", "luna"):
         raise HTTPException(422, "entorno debe ser 'marte' o 'luna'")
-    ENLACE.update(activo=datos.activo, entorno=datos.entorno.lower())
-    despachados = qm.despachar(conn, ENLACE["activo"], ENLACE["entorno"])
-    return {**ENLACE, "despachados": despachados}
+    entorno = datos.entorno.lower()
+    conn.execute("UPDATE estado_enlace SET activo=?, entorno=? WHERE id=1", (int(datos.activo), entorno))
+    conn.commit()
+    despachados = qm.despachar(conn, datos.activo, entorno)
+    return {"activo": datos.activo, "entorno": entorno, "despachados": despachados}
 
 
 @app.get("/api/cola")
@@ -141,7 +145,7 @@ def cola(conn=Depends(conexion)) -> dict:
     resumen: dict = {}
     for i in items:
         resumen.setdefault(i["estado"], {1: 0, 2: 0, 3: 0})[i["prioridad"]] += 1
-    return {"enlace": ENLACE, "resumen": resumen, "items": items}
+    return {"enlace": leer_enlace(conn), "resumen": resumen, "items": items}
 
 
 @app.get("/api/cola/verificar")
