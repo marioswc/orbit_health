@@ -98,5 +98,8 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 | GET | `/api/demo/escenarios` | requerida | Lista de escenarios de demostración disponibles |
 | POST | `/api/demo/escenarios/{nombre}` | requerida | Ejecuta un escenario guionizado. Escribe datos de demostración; desactivar con ORBIT_DEMO_API=0 |
 | POST | `/api/demo/sensor/{tid}` | requerida | Un dispositivo portátil simulado envía `ticks` rondas de constantes vitales (origen 'sensor'). Escribe datos de demo |
+| POST | `/api/demo/simulacion/detener` | requerida | Detiene la misión simulada, cierra las ventanas abiertas y devuelve el enlace a la normalidad |
+| GET | `/api/demo/simulacion/estado` | requerida | Progreso de la misión simulada: minuto, línea de tiempo narrada y hitos (primer rojo, alerta colectiva, retenidos) |
+| POST | `/api/demo/simulacion/iniciar` | requerida | Pone en marcha una misión simulada en vivo: las bandas envían solas, el enlace se corta y vuelve. Escribe datos de demo |
 
-Total: 52 operaciones, 11 públicas.
+Total: 55 operaciones, 11 públicas.

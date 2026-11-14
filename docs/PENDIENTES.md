@@ -38,6 +38,10 @@
 - `GET /api/salud` es público y muestra nombres de archivos de respaldo y el detalle de un error de arranque. Es de baja sensibilidad; si se prefiere, puede exigir sesión.
 - `frontend/docs/FIGURA_HUMANA.md` cita un script `preparar_musculos.py` que no existe en el repo.
 
+## Para la demo
+- **Misión simulada en vivo** (`docs/DEMO_EN_VIVO.md`): corrida real por HTTP verificada; el frontend puede consultarla con `GET /api/demo/simulacion/estado`.
+- Un apagón largo acumula muchos eventos de rutina (147 en el apagón simulado). Resumirlos antes de enviar sigue pendiente.
+
 ## No verificado (hay que comprobarlo a mano)
 - **Una banda real:** el puente BLE y el flujo continuo están probados con paquetes simulados, no con hardware. Ver `docs/BANDA_BLE.md`.
 - Cómo se ve y se siente la interfaz en el navegador, y el flujo completo con una persona usándola.
