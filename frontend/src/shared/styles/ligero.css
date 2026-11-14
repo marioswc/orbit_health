@@ -14,7 +14,7 @@ html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) :is(.cristal, .ba
 html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) .drawer-fondo { background: rgba(8, 8, 8, .66); }
 
 /* Animaciones infinitas (cada una repinta o recompone sin parar) */
-html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) :is(.badge::before, .latido, .lienzo, .figura, .zona :is(path, circle, rect), .p-anillo, .esqueleto) { animation: none !important; }
+html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) :is(.badge::before, .latido, .lienzo, .figura, .zona :is(path, circle, rect), .p-anillo, .esqueleto, .zc, .corazon-latido, .v-punto, .chispa path) { animation: none !important; }
 html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) .vinculo-pulso { display: none; }
 html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) .vinculo.on .vinculo-linea { border-top-style: solid; }
 

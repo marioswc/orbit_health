@@ -10,6 +10,7 @@ import { PanelMedicion } from "../features/mediciones";
 import { MonitorCabina, resolverAmbiente, useAlertasColectivas } from "../features/cabina";
 import { AccesoTripulante, useAuth } from "../features/seguridad";
 import { useTranslation } from "../i18n";
+import { CapturaContext } from "../shared/capturaContext";
 import CambioIdioma from "../shared/components/CambioIdioma";
 import BarraLateral, { VISTAS } from "./BarraLateral";
 import { useRuta } from "./useRuta";
@@ -60,7 +61,7 @@ export default function App() {
   useEffect(() => { api<EstadoUmbrales>("/umbrales").then(setUmbrales).catch(() => setUmbrales(null)); }, []);
 
   return (
-    <>
+    <CapturaContext.Provider value={{ alAbrir: abrirCaptura, disponible: !!tid }}>
       <FondoEstrellas />
       <CambioIdioma />
       <div className="app">
@@ -82,6 +83,7 @@ export default function App() {
           )
         }
       />
+      {!auth.requiereAcceso && !captura && <BotonCaptura alAbrir={abrirCaptura} disponible={!!tid} />}
       <main className="pantalla">
         <div className="avisos">
           {aviso && <div className="aviso-movil"><Alerta tono="aviso" titulo={aviso.titulo}>{aviso.texto}</Alerta></div>}
@@ -116,10 +118,9 @@ export default function App() {
       </div>
       </div>
 
-      {!auth.requiereAcceso && !captura && <BotonCaptura alAbrir={abrirCaptura} disponible={!!tid} />}
       <Drawer abierto={!auth.requiereAcceso && captura && !!tid} alCerrar={cerrarCaptura} titulo="Captura manual">
         <PanelMedicion tripulanteId={tid} alGuardar={refrescar} />
       </Drawer>
-    </>
+    </CapturaContext.Provider>
   );
 }

@@ -1,0 +1,22 @@
+{
+  "page.kicker": "Consola",
+  "page.title": "Consola de misión",
+  "page.desc": "Signos, zonas y tendencias en un solo tablero, con las lecturas reales del tripulante.",
+  "news2.level": "Nivel general",
+  "news2.aria": "Puntaje NEWS2: {{p}}",
+  "news2.scale": "de {{max}}",
+  "news2.window": "Ventana de {{min}} min",
+  "vitals.title": "Signos vitales",
+  "vitals.empty": "Aún no hay lecturas. Registra una con \"Captura manual\".",
+  "body.title": "Estado por zona",
+  "body.aria": "Mapa de calor del cuerpo por zona",
+  "pulse.title": "Pulso",
+  "pulse.none": "Sin frecuencia cardíaca reciente",
+  "pulse.note": "Late a la última frecuencia registrada",
+  "cabin.title": "Cabina",
+  "cabin.co2": "CO₂ en cabina",
+  "cabin.dosis": "Dosis acumulada",
+  "cabin.none": "Sin lectura",
+  "trend.title": "Tendencia",
+  "actions.title": "Acciones sugeridas"
+}
