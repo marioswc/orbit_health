@@ -77,6 +77,10 @@ La lista completa y siempre actual está en [docs/API_REFERENCIA.md](docs/API_RE
 | `GET /api/informe` y `/api/informe/{id}` | Informe exportable (JSON o CSV) con huella de integridad |
 | `GET /api/crisis/protocolo`, `POST /api/crisis/aviso-medico` | Protocolo de crisis psicológica / riesgo de autolesión con evaluación de calidad de oxígeno en cabina (`o2_cabina`) y aviso al médico solo con consentimiento explícito |
 
+## Banda o pulsómetro por Bluetooth
+
+La frecuencia cardíaca puede llegar sola desde un dispositivo BLE que anuncie el servicio estándar; ver [docs/BANDA_BLE.md](docs/BANDA_BLE.md). El puente está probado con una banda simulada, **no con una real**.
+
 ## Escenarios de demo
 
 ```bash

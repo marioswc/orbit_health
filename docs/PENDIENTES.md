@@ -39,6 +39,7 @@
 - `frontend/docs/FIGURA_HUMANA.md` cita un script `preparar_musculos.py` que no existe en el repo.
 
 ## No verificado (hay que comprobarlo a mano)
+- **Una banda real:** el puente BLE y el flujo continuo están probados con paquetes simulados, no con hardware. Ver `docs/BANDA_BLE.md`.
 - Cómo se ve y se siente la interfaz en el navegador, y el flujo completo con una persona usándola.
 - El video, las diapositivas y el formulario de envío.
 - Que todos los integrantes estén confirmados en el mismo evento local.
