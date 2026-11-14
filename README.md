@@ -30,6 +30,17 @@ scripts/cargar_calibracion.sh     # sin red: carga series BIDMC como historial d
 Los registros son de pacientes críticos hospitalizados (ver `data/physionet/ATRIBUCION.md`): sirven para dar
 variabilidad realista a la demo, no como línea base clínica.
 
+## Despliegue a bordo (más allá de `localhost`)
+
+`localhost` es el modo de una sola estación. Para atender a toda la tripulación:
+
+| Necesidad | Qué hay hoy | Qué falta |
+|---|---|---|
+| Arranque automático y reinicio si falla | `deploy/orbit-health.service` (systemd) | Probarlo en el equipo de destino |
+| Atender otros dispositivos de la cabina | `ORBIT_HOST=0.0.0.0` bloqueado salvo `ORBIT_PERMITIR_RED=1` | **Autenticación por tripulante** antes de usarlo de verdad |
+| Respaldo de datos | `scripts/respaldar_db.sh` (consistente, con rotación) | Programarlo (cron o systemd timer) y definir dónde se guarda |
+| Sin Node ni internet en el destino | El build del frontend es estático y lo sirve el backend | Paquete de instalación con las dependencias de Python precargadas |
+
 ## Simular la latencia del enlace
 
 | Modo | Configuración | Retardo de ida (Marte, peor caso) |
