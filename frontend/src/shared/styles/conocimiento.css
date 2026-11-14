@@ -117,3 +117,13 @@
 .idioma button { min-height: 34px; }
 .segmentado:not(.rejilla) button { min-height: 30px; padding-block: 0; }
 .barra .selector-boton, .icono { min-height: var(--control-alto); }
+
+/* Telefono y tablet angosta (<= 800 px): la captura manual es SOLO el boton flotante, sobre la barra inferior.
+   Va al final del archivo y con mas especificidad porque las reglas generales de botones de pagina la volvian a mostrar. */
+@media (max-width: 800px) {
+  .encabezado-lado .accion-captura, .titulo-accion, .titulo-accion .accion-captura { display: none; }
+  .encabezado-lado { margin-top: 0; }
+  .encabezado, .titulo-pagina { padding-right: 0; }
+  .fab { display: inline-flex; position: fixed; right: 16px; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); top: auto; z-index: 45; width: 56px; height: 56px; min-height: 56px; padding: 0; justify-content: center; box-shadow: 0 8px 22px rgba(0, 0, 0, .4); }
+  .fab-texto { display: none; }
+}

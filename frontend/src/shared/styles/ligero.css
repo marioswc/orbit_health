@@ -31,3 +31,13 @@ html[data-rendimiento="bajo"] .drawer { border-width: 2px; }
 
 /* ---- HUD de prueba (?perf=1) ---- */
 .perf-hud { position: fixed; left: 8px; bottom: 8px; z-index: 100; padding: 2px 8px; border-radius: 8px; font: 11px/1.6 var(--font-geist-mono); color: #9fe9ff; background: rgba(0, 0, 0, .75); pointer-events: none; }
+
+html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) .reloj-idle { animation: none; }
+html[data-rendimiento="bajo"] .reloj-escena::before { display: none; }
+html[data-rendimiento="bajo"] .reloj-pose { transition: none; }
+
+/* La cabecera es siempre opaca, tambien en los niveles ligeros */
+html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) .barra { background: var(--color-eggshell); }
+
+/* Sin transparencia en ningun nivel de rendimiento: cabecera y menu lateral comparten color */
+html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) :is(.barra, .lateral) { background: var(--barra-bg); }

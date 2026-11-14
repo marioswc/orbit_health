@@ -134,3 +134,13 @@ textarea { border-radius: 18px; line-height: 1.5; }
 
 /* El contenido siempre nace arriba: sin esto, al estirarse la pantalla (flex: 1) las filas de la rejilla se reparten el alto sobrante y el encabezado queda a media altura */
 .pantalla, .vista, .pagina { align-content: start; }
+
+/* Cabecera opaca: el contenido que pasa por debajo al hacer scroll no debe verse a traves */
+.barra { background: var(--color-eggshell); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 1px 0 var(--color-stone); }
+
+/* Menu lateral y cabecera: MISMO color y opacos (sin transparencia ni desenfoque), con una linea fina de separacion */
+:root { --barra-bg: var(--color-warm-taupe); }
+.lateral, .barra { background: var(--barra-bg); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+.barra { border-bottom: 1px solid var(--color-stone); }
+.lateral { border-right: 1px solid var(--color-stone); }
+@media (max-width: 800px) { .lateral, .lateral.colapsada { border-right: 0; border-top: 1px solid var(--color-stone); } }
