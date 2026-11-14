@@ -30,6 +30,17 @@ scripts/cargar_calibracion.sh     # sin red: carga series BIDMC como historial d
 Los registros son de pacientes críticos hospitalizados (ver `data/physionet/ATRIBUCION.md`): sirven para dar
 variabilidad realista a la demo, no como línea base clínica.
 
+## Escenarios de demo
+
+```bash
+curl -X POST localhost:3000/api/demo/escenarios/hipoxia_eclipse                 # deja el enlace en eclipse
+curl -X POST "localhost:3000/api/demo/escenarios/hipoxia_eclipse?reconectar=true"  # y reconecta en el mismo paso
+curl -X POST localhost:3000/api/demo/escenarios/co2_colectivo
+curl localhost:3000/api/demo/escenarios                                         # lista de guiones
+```
+
+Escriben datos de demostración: en cualquier otro entorno, desactivar con `ORBIT_DEMO_API=0`.
+
 ## Desarrollo
 
 ```bash
