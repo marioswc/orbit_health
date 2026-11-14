@@ -1,8 +1,7 @@
 import type { LecturaEstado } from "../types/estado";
 import { CAPAS, FUENTE_EFECTOS, ZONAS, nivelZona, type Capa } from "../zonas";
 
-const TASA_MIN = 1; // % por mes (video NASA HRP)
-const TASA_MAX = 1.5; // % por mes (pagina de gravedad de NASA)
+import { MESES_MAX, textoPerdida } from "../utils/perdidaOsea";
 
 interface Props {
   id: string;
@@ -33,9 +32,9 @@ export default function DetalleZona({ id, lecturas, capa, meses, alMeses }: Prop
           {huesoDeCarga && (
             <div className="osea">
               <label htmlFor="meses-mg">Tiempo en microgravedad: <strong>{meses} {meses === 1 ? "mes" : "meses"}</strong></label>
-              <input id="meses-mg" type="range" min={0} max={6} step={1} value={meses} onChange={(e) => alMeses(Number(e.target.value))} />
+              <input id="meses-mg" type="range" min={0} max={MESES_MAX} step={1} value={meses} onChange={(e) => alMeses(Number(e.target.value))} />
               <p className="osea-dato">
-                Pérdida de densidad ósea estimada: <strong>{meses === 0 ? "0 %" : `${(meses * TASA_MIN).toFixed(0)}–${(meses * TASA_MAX).toFixed(1).replace(/\.0$/, "")} %`}</strong>
+                Pérdida de densidad ósea estimada: <strong>{textoPerdida(meses)}</strong>
               </p>
               <p className="fuente">Cálculo simple del equipo con una tasa constante de ≈1–1.5 % por mes (NASA HRP). Es ilustrativo, no una predicción individual; los puntos del dibujo son solo una metáfora visual.</p>
             </div>

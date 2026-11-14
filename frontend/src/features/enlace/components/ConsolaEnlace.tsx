@@ -10,7 +10,14 @@ function ConsolaEnlace() {
   const [error, setError] = useState("");
 
   const cargar = useCallback(() => api<Cola>("/cola").then(setCola).catch((e) => setError(e.message)), []);
-  useEffect(() => { cargar(); const t = setInterval(cargar, 2000); return () => clearInterval(t); }, [cargar]);
+  useEffect(() => {
+    cargar();
+    // no consulta mientras la pestana esta oculta
+    const t = setInterval(() => { if (!document.hidden) cargar(); }, 2000);
+    const visible = () => { if (!document.hidden) cargar(); };
+    document.addEventListener("visibilitychange", visible);
+    return () => { clearInterval(t); document.removeEventListener("visibilitychange", visible); };
+  }, [cargar]);
 
   async function enlace(activo: boolean, entorno: string) {
     try { await post("/enlace", { activo, entorno }); cargar(); } catch (e) { setError((e as Error).message); }

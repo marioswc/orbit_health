@@ -85,3 +85,7 @@
 /* Dibujo del astronauta */
 :root { --suit: #ebe7e1; --suit-2: #d8d3cb; --ink: #17140f; --bone: #f1ece3; --hud: #0447ff; }
 :root[data-theme="dark"] { --suit: #d9d4cc; --suit-2: #bdb7ad; --ink: #0c0b0a; --bone: #e9e4dc; --hud: #6f95ff; }
+
+/* Liquid glass: vidrio gris translucido (desenfoque + saturacion + brillo en el borde superior) */
+:root { --glass-bg: rgba(226, 224, 221, .5); --glass-sheen: rgba(255, 255, 255, .55); --glass-edge: rgba(255, 255, 255, .65); --glass-line: rgba(0, 0, 0, .06); --glass-shadow: 0 8px 30px rgba(20, 18, 16, .06); }
+:root[data-theme="dark"] { --glass-bg: rgba(120, 118, 114, .16); --glass-sheen: rgba(255, 255, 255, .1); --glass-edge: rgba(255, 255, 255, .16); --glass-line: rgba(0, 0, 0, .3); --glass-shadow: 0 8px 30px rgba(0, 0, 0, .35); }

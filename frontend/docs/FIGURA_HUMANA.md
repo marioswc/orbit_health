@@ -9,7 +9,7 @@ Ubicación: `features/monitor/` — `components/FiguraHumana.tsx`, `components/A
 | Capa | Archivo | Origen |
 |---|---|---|
 | Traje | `astronauta.svg` | Vectorización con curvas de la ilustración de referencia del equipo. **Licencia por confirmar** (parece de banco de imágenes) |
-| Músculo | `musculos.svg` | Diseño propio en estilo vectorial plano (músculos coral, huesos crema, cráneo y caja torácica expuestos en una mitad). Se genera con `scripts/gen_musculos.py` si se conserva el generador |
+| Músculo | `musculos.svg` | "Muscles front and back.svg" (Wikimedia Commons; OpenStax, Tomáš Kebert y umimeto.org), recortada a la vista frontal con `scripts/preparar_musculos.py`. **CC BY-SA 4.0**: exige atribución y que las adaptaciones conserven la misma licencia |
 | Hueso | `esqueleto.svg` | Wikimedia Commons, dominio público (LadyofHats) |
 | Órganos | `organos.svg` | Wikimedia Commons, dominio público (LadyofHats) |
 

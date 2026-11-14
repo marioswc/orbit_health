@@ -44,7 +44,8 @@ h1 { animation: revelar .7s var(--ease-out) both; }
 @keyframes ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); } 80%, 100% { box-shadow: 0 0 0 9px transparent; } }
 
 /* ---- Tema: transicion suave de colores al cambiar ---- */
-html.cambiando-tema, html.cambiando-tema *, html.cambiando-tema *::before, html.cambiando-tema *::after { transition: background-color .4s ease, color .4s ease, border-color .4s ease, fill .4s ease, stroke .4s ease !important; }
+/* Solo los bloques grandes: transicionar todos los elementos a la vez provoca tirones */
+html.cambiando-tema :is(body, .barra, .panel, .lado, .plataforma, .tarjeta, .capa-info, button, .badge, .aviso) { transition: background-color .35s ease, color .35s ease, border-color .35s ease !important; }
 .icono svg { animation: girar .55s var(--ease-out) both; }
 @keyframes girar { from { transform: rotate(-90deg) scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
 

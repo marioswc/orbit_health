@@ -1,65 +1,104 @@
+import type { CSSProperties } from "react";
 import type { Capa } from "../zonas";
 import astronauta from "../assets/astronauta.svg";
 import esqueleto from "../assets/esqueleto.svg";
 import musculos from "../assets/musculos.svg";
 import organos from "../assets/organos.svg";
 
-// Coordenadas = px del dibujo original del astronauta. Las capas de anatomia (SVG) se alinean por el centro de la cabeza
+// Coordenadas = px del dibujo original del astronauta. Las capas de anatomia se alinean por el centro de la cabeza
 // con el casco y por los pies con las botas (ver assets/ATRIBUCION.md).
-export const VIEWBOX = "129.25 21.5 215.25 430.75";
-const [VX, VY, VW, VH] = [129.25, 21.5, 215.25, 430.75];
-type Caja = [number, number, number, number]; // x, y, ancho, alto
-const POS: Record<"esqueleto" | "musculos" | "organos", Caja> = {
-  esqueleto: [167.9, 48.9, 171.3, 397.3],
-  musculos: [129.25, 21.5, 215.25, 430.75],
+export const VB = { x: 129.25, y: 21.5, w: 215.25, h: 430.75 };
+export const VIEWBOX = `${VB.x} ${VB.y} ${VB.w} ${VB.h}`;
+
+export type Caja = [number, number, number, number]; // x, y, ancho, alto
+
+export const CAJAS: Record<Capa, Caja> = {
+  traje: [VB.x, VB.y, VB.w, VB.h],
+  musculo: [130.8, 48.4, 218.5, 391],
+  hueso: [167.9, 48.9, 171.3, 397.3],
   organos: [138.9, 49.8, 172.1, 396.5],
 };
 
-// Region del cuerpo que se "enciende" a color al elegir una zona (donde estan los organos y musculos en la anatomia; bordes suavizados)
-const REGIONES: Record<string, Caja[]> = {
+export const URL_CAPA: Record<Capa, string> = { traje: astronauta, musculo: musculos, hueso: esqueleto, organos };
+export const CAPAS_ANAT: Exclude<Capa, "traje">[] = ["musculo", "hueso", "organos"];
+
+// Region del cuerpo que se ve a todo color al acercar la camara a una zona (donde estan los organos y musculos)
+export const REGIONES: Record<string, Caja[]> = {
   snc: [[205, 40, 70, 80]],
   resp: [[200, 118, 78, 70]],
   cardio: [[214, 124, 58, 56]],
   metab: [[205, 180, 70, 72]],
-  brazos: [[100, 112, 100, 200], [278, 112, 100, 200]],
+  brazos: [[118, 108, 92, 236], [268, 108, 92, 236]],
   piernas: [[200, 246, 78, 206]],
 };
 
-const CAPAS_ANAT: { id: Capa; href: string; caja: Caja }[] = [
-  { id: "musculo", href: musculos, caja: POS.musculos },
-  { id: "hueso", href: esqueleto, caja: POS.esqueleto },
-  { id: "organos", href: organos, caja: POS.organos },
-];
+/** Posicion y tamano de una caja (coords del dibujo) como porcentajes del lienzo. */
+export function aPorcentaje(c: Caja): CSSProperties {
+  return {
+    left: `${((c[0] - VB.x) / VB.w) * 100}%`,
+    top: `${((c[1] - VB.y) / VB.h) * 100}%`,
+    width: `${(c[2] / VB.w) * 100}%`,
+    height: `${(c[3] / VB.h) * 100}%`,
+  };
+}
+
+/** Una region (coords del dibujo) como fracciones de la caja de su capa. */
+export function aFraccion(region: Caja, caja: Caja): Caja {
+  return [(region[0] - caja[0]) / caja[2], (region[1] - caja[1]) / caja[3], region[2] / caja[2], region[3] / caja[3]];
+}
+
+/** Mascara radial suave sobre la(s) region(es) de la zona (estatica: no se vuelve a pintar al mover la camara). */
+export function mascara(regiones: Caja[], caja: Caja): CSSProperties {
+  if (regiones.length === 0) return {};
+  const m = regiones.map((r) => {
+    const [x, y, w, h] = aFraccion(r, caja);
+    const f = (n: number) => (n * 100).toFixed(1);
+    return `radial-gradient(ellipse ${f((w / 2) * 1.12)}% ${f((h / 2) * 1.12)}% at ${f(x + w / 2)}% ${f(y + h / 2)}%, #000 50%, transparent 100%)`;
+  }).join(", ");
+  return { maskImage: m, WebkitMaskImage: m } as CSSProperties;
+}
+
+/** Descarga una capa en segundo plano para que aparezca al instante cuando se pida. */
+export function precargar(capa: Capa) {
+  if (typeof Image === "undefined") return;
+  const img = new Image();
+  img.decoding = "async";
+  img.src = URL_CAPA[capa];
+}
+
+interface Props {
+  capa: Capa;
+  meses: number;
+  zona: string;
+  /** true al acercar la camara: solo la region de la zona elegida queda a color. */
+  enfocar: boolean;
+  /** Capas que ya se pidieron alguna vez: las demas no se descargan ni se pintan. */
+  visitadas: ReadonlySet<Capa>;
+}
 
 /**
- * Capas del cuerpo: traje (astronauta), musculo, hueso y organos. Solo la capa activa es visible; el traje queda tenue.
- * En la capa activa, la region de la zona elegida se ve a todo color y el resto, apagado.
+ * Capas del cuerpo como <img> (se componen en la GPU, mucho mas barato que SVG con mascaras).
+ * El traje es la base; la capa de anatomia activa se ve completa y, al acercar, solo su region a color.
  */
-export function Capas({ capa, meses, zona }: { capa: Capa; meses: number; zona: string }) {
+export function Capas({ capa, meses, zona, enfocar, visitadas }: Props) {
   const regiones = REGIONES[zona] ?? [];
   return (
-    <g>
-      <defs>
-        <filter id="borde-suave" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5" /></filter>
-        <mask id="mascara-zona" maskUnits="userSpaceOnUse" x="90" y="10" width="300" height="470">
-          <g filter="url(#borde-suave)">
-            {regiones.map((r, i) => <rect key={i} x={r[0]} y={r[1]} width={r[2]} height={r[3]} fill="#fff" />)}
-          </g>
-        </mask>
-      </defs>
+    <>
+      <img className="capa-traje" src={URL_CAPA.traje} alt="Astronauta con traje y casco EMU de la NASA" draggable={false}
+        decoding="async" style={{ ...aPorcentaje(CAJAS.traje), opacity: capa === "traje" ? 1 : 0.16 }} />
 
-      <image className="capa-img" href={astronauta} x={VX} y={VY} width={VW} height={VH} preserveAspectRatio="none" style={{ opacity: capa === "traje" ? 1 : 0.16 }} />
-
-      {CAPAS_ANAT.map((c) => {
+      {CAPAS_ANAT.filter((c) => visitadas.has(c) || c === capa).map((c) => {
+        const activa = capa === c;
         // con mas meses en microgravedad el hueso se ve menos denso (metafora visual)
-        const visible = capa === c.id ? (c.id === "hueso" ? 1 - (meses / 6) * 0.5 : 1) : 0;
+        const opacidad = activa ? (c === "hueso" ? 1 - (meses / 6) * 0.5 : 1) : 0;
         return (
-          <g key={c.id} className="capa-img" style={{ opacity: visible }}>
-            <image className="anat-apagada" href={c.href} x={c.caja[0]} y={c.caja[1]} width={c.caja[2]} height={c.caja[3]} preserveAspectRatio="none" />
-            <image className="anat-viva" href={c.href} x={c.caja[0]} y={c.caja[1]} width={c.caja[2]} height={c.caja[3]} preserveAspectRatio="none" mask="url(#mascara-zona)" />
-          </g>
+          <div key={c} className="capa-grupo" style={{ ...aPorcentaje(CAJAS[c]), opacity: opacidad }} aria-hidden={!activa}>
+            {activa && enfocar && <img className="anat-apagada" src={URL_CAPA[c]} alt="" draggable={false} decoding="async" />}
+            <img className="anat-viva" src={URL_CAPA[c]} alt="" draggable={false} decoding="async"
+              style={activa && enfocar ? mascara(regiones, CAJAS[c]) : undefined} />
+          </div>
         );
       })}
-    </g>
+    </>
   );
 }
