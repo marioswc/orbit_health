@@ -7,6 +7,7 @@ import { useTema } from "../shared/hooks/useTema";
 import { SelectorTripulante, useTripulantes } from "../features/tripulantes";
 import { MonitorPage, useEstadoTripulante } from "../features/monitor";
 import { PanelMedicion } from "../features/mediciones";
+import { MonitorCabina, resolverAmbiente, useAlertasColectivas } from "../features/cabina";
 
 // Vistas secundarias: se descargan solo al abrirlas
 const BienestarPage = lazy(() => import("../features/bienestar").then((m) => ({ default: m.BienestarPage })));
@@ -24,6 +25,13 @@ export default function App() {
   const [vista, setVista] = useState<Vista>("monitor");
   const [umbrales, setUmbrales] = useState<EstadoUmbrales | null>(null);
   const error = errorTripulantes || errorEstado;
+  const { datos: colectivas } = useAlertasColectivas(estado);
+  // La cabina se compone aqui (una feature no importa de otra): lecturas ya clasificadas por el backend
+  const ambiente = resolverAmbiente(
+    colectivas,
+    estado?.indicadores.find((i) => i.indicador === "co2") ?? null,
+    estado?.indicadores.find((i) => i.indicador === "dosis_pct") ?? null,
+  );
 
   useEffect(() => { api<EstadoUmbrales>("/umbrales").then(setUmbrales).catch(() => setUmbrales(null)); }, []);
 
@@ -51,7 +59,7 @@ export default function App() {
         </div>
         <div className="vista" key={vista} style={{ display: vista === "monitor" ? "contents" : undefined }}>
         {tid && vista === "monitor" && (
-          <MonitorPage estado={estado}>
+          <MonitorPage estado={estado} ambiente={ambiente.nivel} cabina={<MonitorCabina ambiente={ambiente} alerta={colectivas?.alertas[0] ?? null} />}>
             <PanelMedicion tripulanteId={tid} alGuardar={refrescar} />
           </MonitorPage>
         )}

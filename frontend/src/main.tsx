@@ -7,6 +7,7 @@ import "./shared/styles/styles.css";
 import "./shared/styles/componentes.css";
 import "./shared/styles/animaciones.css";
 import "./shared/styles/escenario.css";
+import "./shared/styles/complementos.css";
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
