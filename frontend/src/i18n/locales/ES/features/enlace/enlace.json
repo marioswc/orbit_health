@@ -74,7 +74,7 @@
   "demo.sc.last": "Último escenario ejecutado: {{nombre}}",
   "demo.sc.dispatched": "{{n}} despachados",
   "demo.sensor.title": "Dispositivo portátil simulado",
-  "demo.sensor.desc": "Envía 12 rondas de signos vitales continuos sobre T1 con origen sensor.",
+  "demo.sensor.desc": "Envía 12 rondas de signos vitales continuos sobre T1 con origen simulado.",
   "demo.sensor.worsen": "Simular deterioro",
   "demo.sensor.stable": "Simular estable",
   "demo.sensor.rounds": "{{n}} rondas ({{perfil}})",

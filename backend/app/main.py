@@ -44,6 +44,8 @@ async def lifespan(app: FastAPI):
             log.exception("Falló el respaldo inicial")
         tarea = asyncio.create_task(_respaldos_periodicos())
     yield
+    from .servicios.simulacion_viva import SIMULACION
+    await SIMULACION.detener()
     if tarea:
         tarea.cancel()
 

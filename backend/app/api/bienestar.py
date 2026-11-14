@@ -46,6 +46,7 @@ def crear_diario(nota: DiarioIn, conn=Depends(conexion), a: dict = Depends(actor
 
 @router.get("/diario/{tid}")
 def listar_diario(tid: str, conn=Depends(conexion), a: dict = Depends(actor)) -> list[dict]:
+    """Notas del diario del propio tripulante (privado)"""
     requerir_tripulante(conn, tid)
     exigir_propietario(a, tid)
     return servicio.listar_notas(conn, tid)
@@ -53,6 +54,7 @@ def listar_diario(tid: str, conn=Depends(conexion), a: dict = Depends(actor)) ->
 
 @router.post("/tamizajes")
 def crear_tamizaje(datos: TamizajeIn, conn=Depends(conexion), a: dict = Depends(actor)) -> dict:
+    """Registra un PHQ-2 y, si procede, devuelve el protocolo de apoyo (privado)"""
     requerir_tripulante(conn, datos.tripulante_id)
     exigir_propietario(a, datos.tripulante_id)
     try:
@@ -126,6 +128,7 @@ def listar_avisos_medico(solo_pendientes: bool = False,
 def atender_aviso_medico(aviso_id: int,
                          a: dict = Depends(requiere("salud_mental:avisos")),
                          conn=Depends(conexion)) -> dict:
+    """El médico o el comandante marca un aviso de salud mental como atendido"""
     try:
         return servicio.atender_aviso_medico(conn, aviso_id, a.get("tripulante_id"))
     except LookupError as e:
@@ -147,6 +150,7 @@ def crear_animo(datos: AnimoIn, conn=Depends(conexion), a: dict = Depends(actor)
 
 @router.get("/animo/{tid}")
 def ver_animo(tid: str, dias: float = 14, conn=Depends(conexion), a: dict = Depends(actor)) -> dict:
+    """Serie del ánimo diario del propio tripulante (privado)"""
     requerir_tripulante(conn, tid)
     exigir_propietario(a, tid)
     return servicio.serie_animo(conn, tid, dias)
@@ -168,6 +172,7 @@ def ver_preferencias(tid: str, conn=Depends(conexion), a: dict = Depends(actor))
 
 @router.put("/preferencias/{tid}")
 def guardar_preferencias(tid: str, datos: PreferenciasIn, conn=Depends(conexion), a: dict = Depends(actor)) -> dict:
+    """Guarda el tono, el detalle y los recordatorios elegidos por el tripulante"""
     requerir_tripulante(conn, tid)
     exigir_propietario(a, tid)
     try:

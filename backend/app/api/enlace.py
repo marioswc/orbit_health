@@ -16,11 +16,13 @@ class EnlaceIn(BaseModel):
 
 @router.get("/enlace")
 def ver_enlace(conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) -> dict:
+    """Estado actual del enlace con Tierra (activo o eclipse, y entorno)"""
     return repo.leer(conn)
 
 
 @router.post("/enlace")
 def cambiar_enlace(datos: EnlaceIn, conn=Depends(conexion), a: dict = Depends(requiere("enlace:cambiar"))) -> dict:
+    """Cambia el estado o el entorno del enlace y despacha lo retenido si hay enlace"""
     try:
         r = servicio.cambiar_enlace(conn, datos.activo, datos.entorno)
         auditoria.registrar(conn, a["tripulante_id"], "enlace_cambio", None,
@@ -39,11 +41,13 @@ def latencia(conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))
 
 @router.get("/cola")
 def cola(conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) -> dict:
+    """Cola de salida: resumen por estado y eventos recientes"""
     return servicio.estado_cola(conn)
 
 
 @router.get("/cola/verificar")
 def verificar(conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) -> dict:
+    """Comprueba que la cadena de hash de la cola no fue alterada"""
     return servicio.verificar_cadena(conn)
 
 

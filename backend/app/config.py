@@ -31,3 +31,7 @@ BLOQUEO_MIN = float(os.getenv("ORBIT_BLOQUEO_MIN", "5"))   # temporal: nunca per
 DIR_RESPALDOS = os.getenv("ORBIT_DIR_RESPALDOS") or str(RAIZ / "data" / "respaldos")
 RESPALDO_CADA_MIN = float(os.getenv("ORBIT_RESPALDO_CADA_MIN", "30"))   # 0 = sin respaldos automáticos
 RESPALDOS_CONSERVAR = int(os.getenv("ORBIT_RESPALDOS_CONSERVAR", "24"))
+
+# --- Flujo continuo de sensores (una banda envía una muestra por segundo): se agrupa en ventanas ---
+FLUJO_VENTANA_S = float(os.getenv("ORBIT_FLUJO_VENTANA_S", "60"))             # 0 = sin agrupar
+FLUJO_ENFRIAMIENTO_S = float(os.getenv("ORBIT_FLUJO_ENFRIAMIENTO_S", "30"))   # mínimo entre extremos del mismo indicador

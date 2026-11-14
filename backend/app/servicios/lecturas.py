@@ -72,7 +72,7 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
     try:
         c = _clasificar(conn, tid, indicador, valor, ventana)
         linea = reglas.desviacion_linea_base(valor, repo.historial(conn, tid, indicador, desde_base),
-                                             solo_baja=indicador in SOLO_BAJA)
+                                             solo_baja=indicador in SOLO_BAJA, piso=reglas.piso_de(indicador))
         nivel_lectura = "amarillo" if linea["aviso"] and c["nivel"] == "verde" else c["nivel"]
         nivel_evento = (max(nivel_lectura, c["nivel_global"], key=_ORDEN.__getitem__)
                         if c["puntos_ind"] > 0 else nivel_lectura)
@@ -86,7 +86,7 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
             conn, tid, f"LECTURA_{indicador.upper()}", PRIORIDAD[nivel_evento],
             {"lectura_id": lectura_id, "indicador": indicador, "valor": valor,
              "nivel": nivel_evento, "news2": c["puntos"], "reglas": [a["id"] for a in activas],
-             "reglas_version": UMBRALES["version"], "reglas_estado": UMBRALES["estado"]})
+             "reglas_version": UMBRALES["version"], "reglas_estado": UMBRALES["estado"], "origen": origen})
         cola.despachar_si_activo(conn, ahora)
         conn.commit()
     except Exception:

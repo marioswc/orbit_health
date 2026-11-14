@@ -59,6 +59,9 @@ def validar(datos: dict) -> dict:
             o2["rojo_bajo"] < o2["amarillo_bajo"] < o2["amarillo_alto"] < o2["rojo_alto"]
         ):
             raise UmbralesInvalidos("o2_pct requiere rojo_bajo < amarillo_bajo < amarillo_alto < rojo_alto")
+    pisos = datos["linea_base"].get("piso_desviacion", {})
+    if any(not isinstance(v, (int, float)) or v <= 0 for v in pisos.values()):
+        raise UmbralesInvalidos("linea_base.piso_desviacion: todos los valores deben ser números > 0")
     _validar_combinadas(datos)
     return datos
 

@@ -3,47 +3,183 @@
   "estado": "pendiente de validación clínica",
   "nota": "Todos los valores son supuestos de diseño. Ver docs/VALIDACION_MEDICA.md. Cada banda se evalúa en orden: la primera cuyo 'hasta' (inclusive) contiene el valor aplica; la última no lleva 'hasta'.",
   "ventana_news2_min": 60,
-  "captura_recomendada_min": {"verde": 60, "amarillo": 15, "rojo": 5},
+  "captura_recomendada_min": {
+    "verde": 60,
+    "amarillo": 15,
+    "rojo": 5
+  },
   "news2": {
     "modo_parametro_extremo": "conservador",
     "bandas": {
       "frecuencia_respiratoria": [
-        {"hasta": 8, "puntos": 3}, {"hasta": 11, "puntos": 1}, {"hasta": 20, "puntos": 0},
-        {"hasta": 24, "puntos": 2}, {"puntos": 3}
+        {
+          "hasta": 8,
+          "puntos": 3
+        },
+        {
+          "hasta": 11,
+          "puntos": 1
+        },
+        {
+          "hasta": 20,
+          "puntos": 0
+        },
+        {
+          "hasta": 24,
+          "puntos": 2
+        },
+        {
+          "puntos": 3
+        }
       ],
       "spo2": [
-        {"hasta": 91, "puntos": 3}, {"hasta": 93, "puntos": 2}, {"hasta": 95, "puntos": 1}, {"puntos": 0}
+        {
+          "hasta": 91,
+          "puntos": 3
+        },
+        {
+          "hasta": 93,
+          "puntos": 2
+        },
+        {
+          "hasta": 95,
+          "puntos": 1
+        },
+        {
+          "puntos": 0
+        }
       ],
       "presion_sistolica": [
-        {"hasta": 90, "puntos": 3}, {"hasta": 100, "puntos": 2}, {"hasta": 110, "puntos": 1},
-        {"hasta": 219, "puntos": 0}, {"puntos": 3}
+        {
+          "hasta": 90,
+          "puntos": 3
+        },
+        {
+          "hasta": 100,
+          "puntos": 2
+        },
+        {
+          "hasta": 110,
+          "puntos": 1
+        },
+        {
+          "hasta": 219,
+          "puntos": 0
+        },
+        {
+          "puntos": 3
+        }
       ],
       "frecuencia_cardiaca": [
-        {"hasta": 40, "puntos": 3}, {"hasta": 50, "puntos": 1}, {"hasta": 90, "puntos": 0},
-        {"hasta": 110, "puntos": 1}, {"hasta": 130, "puntos": 2}, {"puntos": 3}
+        {
+          "hasta": 40,
+          "puntos": 3
+        },
+        {
+          "hasta": 50,
+          "puntos": 1
+        },
+        {
+          "hasta": 90,
+          "puntos": 0
+        },
+        {
+          "hasta": 110,
+          "puntos": 1
+        },
+        {
+          "hasta": 130,
+          "puntos": 2
+        },
+        {
+          "puntos": 3
+        }
       ],
       "temperatura": [
-        {"hasta": 35.0, "puntos": 3}, {"hasta": 36.0, "puntos": 1}, {"hasta": 38.0, "puntos": 0},
-        {"hasta": 39.0, "puntos": 1}, {"puntos": 2}
+        {
+          "hasta": 35.0,
+          "puntos": 3
+        },
+        {
+          "hasta": 36.0,
+          "puntos": 1
+        },
+        {
+          "hasta": 38.0,
+          "puntos": 0
+        },
+        {
+          "hasta": 39.0,
+          "puntos": 1
+        },
+        {
+          "puntos": 2
+        }
       ]
     },
-    "avpu": {"A": 0, "otro": 3},
-    "nivel": {"rojo_desde_total": 7, "amarillo_desde_total": 5}
+    "avpu": {
+      "A": 0,
+      "otro": 3
+    },
+    "nivel": {
+      "rojo_desde_total": 7,
+      "amarillo_desde_total": 5
+    }
   },
   "ambiente": {
-    "co2_mmhg": {"amarillo_sobre": 3.0, "rojo_sobre": 4.0},
-    "o2_pct": {"rojo_bajo": 19.0, "amarillo_bajo": 19.5, "amarillo_alto": 23.0, "rojo_alto": 23.5},
-    "dosis_pct": {"amarillo_desde": 70, "rojo_desde": 90}
+    "co2_mmhg": {
+      "amarillo_sobre": 3.0,
+      "rojo_sobre": 4.0
+    },
+    "o2_pct": {
+      "rojo_bajo": 19.0,
+      "amarillo_bajo": 19.5,
+      "amarillo_alto": 23.0,
+      "rojo_alto": 23.5
+    },
+    "dosis_pct": {
+      "amarillo_desde": 70,
+      "rojo_desde": 90
+    }
   },
   "glucosa_mg_dl": {
-    "rojo_menor_que": 54, "amarillo_menor_que": 70,
-    "observacion_desde": 100, "observacion_hasta": 125,
-    "amarillo_desde": 126, "rojo_desde": 300
+    "rojo_menor_que": 54,
+    "amarillo_menor_que": 70,
+    "observacion_desde": 100,
+    "observacion_hasta": 125,
+    "amarillo_desde": 126,
+    "rojo_desde": 300
   },
-  "sueno_horas": {"amarillo_menor_que": 5},
-  "animo": {"bajo_menor_igual": 2},
-  "diastolica_mmhg": {"observacion_menor_que": 60},
-  "linea_base": {"dias": 14, "min_muestras": 5, "desviaciones": 2.0},
+  "sueno_horas": {
+    "amarillo_menor_que": 5
+  },
+  "animo": {
+    "bajo_menor_igual": 2
+  },
+  "diastolica_mmhg": {
+    "observacion_menor_que": 60
+  },
+  "linea_base": {
+    "dias": 14,
+    "min_muestras": 5,
+    "desviaciones": 2.0,
+    "piso_desviacion": {
+      "frecuencia_cardiaca": 4,
+      "frecuencia_respiratoria": 2,
+      "spo2": 1.5,
+      "presion_sistolica": 6,
+      "presion_diastolica": 4,
+      "temperatura": 0.3,
+      "glucosa": 10,
+      "sueno_horas": 0.5,
+      "ejercicio_min": 10,
+      "co2": 0.2,
+      "dosis_pct": 2,
+      "o2_cabina": 0.5,
+      "animo": 0.5
+    },
+    "nota_piso": "Variación mínima que se considera un cambio real. Evita que una serie muy estable (desviación casi cero) convierta una diferencia insignificante en un aviso. Supuestos de diseño pendientes de validación clínica."
+  },
   "reglas_combinadas": {
     "nota": "Cruce de señales. Niveles y condiciones son supuestos de diseño pendientes de validación clínica.",
     "individuales": [
@@ -52,8 +188,16 @@
         "nombre": "Pulso elevado con presión sistólica baja",
         "nivel": "amarillo",
         "condiciones": [
-          {"indicador": "frecuencia_cardiaca", "op": ">", "valor": 90},
-          {"indicador": "presion_sistolica", "op": "<=", "valor": 110}
+          {
+            "indicador": "frecuencia_cardiaca",
+            "op": ">",
+            "valor": 90
+          },
+          {
+            "indicador": "presion_sistolica",
+            "op": "<=",
+            "valor": 110
+          }
         ]
       },
       {
@@ -61,8 +205,16 @@
         "nombre": "Temperatura elevada con pulso elevado",
         "nivel": "amarillo",
         "condiciones": [
-          {"indicador": "temperatura", "op": ">=", "valor": 38.1},
-          {"indicador": "frecuencia_cardiaca", "op": ">", "valor": 90}
+          {
+            "indicador": "temperatura",
+            "op": ">=",
+            "valor": 38.1
+          },
+          {
+            "indicador": "frecuencia_cardiaca",
+            "op": ">",
+            "valor": 90
+          }
         ]
       }
     ],
@@ -84,18 +236,83 @@
     }
   },
   "indicadores": {
-    "temperatura": {"etiqueta": "Temperatura", "unidad": "°C", "min": 30.0, "max": 43.0},
-    "presion_sistolica": {"etiqueta": "Presión sistólica", "unidad": "mmHg", "min": 40, "max": 280},
-    "presion_diastolica": {"etiqueta": "Presión diastólica", "unidad": "mmHg", "min": 20, "max": 180},
-    "frecuencia_cardiaca": {"etiqueta": "Frecuencia cardíaca", "unidad": "lpm", "min": 20, "max": 250},
-    "frecuencia_respiratoria": {"etiqueta": "Frecuencia respiratoria", "unidad": "rpm", "min": 4, "max": 60},
-    "spo2": {"etiqueta": "SpO₂", "unidad": "%", "min": 50, "max": 100},
-    "avpu": {"etiqueta": "Conciencia (AVPU)", "unidad": "AVPU", "min": 0, "max": 3},
-    "glucosa": {"etiqueta": "Glucosa capilar", "unidad": "mg/dL", "min": 20, "max": 600},
-    "co2": {"etiqueta": "CO₂ de cabina", "unidad": "mmHg", "min": 0, "max": 20},
-    "o2_cabina": {"etiqueta": "O₂ de cabina", "unidad": "%", "min": 10.0, "max": 35.0},
-    "dosis_pct": {"etiqueta": "Dosis acumulada", "unidad": "% del límite", "min": 0, "max": 200},
-    "sueno_horas": {"etiqueta": "Horas de sueño", "unidad": "h", "min": 0, "max": 24},
-    "ejercicio_min": {"etiqueta": "Minutos de ejercicio", "unidad": "min", "min": 0, "max": 600}
+    "temperatura": {
+      "etiqueta": "Temperatura",
+      "unidad": "°C",
+      "min": 30.0,
+      "max": 43.0
+    },
+    "presion_sistolica": {
+      "etiqueta": "Presión sistólica",
+      "unidad": "mmHg",
+      "min": 40,
+      "max": 280
+    },
+    "presion_diastolica": {
+      "etiqueta": "Presión diastólica",
+      "unidad": "mmHg",
+      "min": 20,
+      "max": 180
+    },
+    "frecuencia_cardiaca": {
+      "etiqueta": "Frecuencia cardíaca",
+      "unidad": "lpm",
+      "min": 20,
+      "max": 250
+    },
+    "frecuencia_respiratoria": {
+      "etiqueta": "Frecuencia respiratoria",
+      "unidad": "rpm",
+      "min": 4,
+      "max": 60
+    },
+    "spo2": {
+      "etiqueta": "SpO₂",
+      "unidad": "%",
+      "min": 50,
+      "max": 100
+    },
+    "avpu": {
+      "etiqueta": "Conciencia (AVPU)",
+      "unidad": "AVPU",
+      "min": 0,
+      "max": 3
+    },
+    "glucosa": {
+      "etiqueta": "Glucosa capilar",
+      "unidad": "mg/dL",
+      "min": 20,
+      "max": 600
+    },
+    "co2": {
+      "etiqueta": "CO₂ de cabina",
+      "unidad": "mmHg",
+      "min": 0,
+      "max": 20
+    },
+    "o2_cabina": {
+      "etiqueta": "O₂ de cabina",
+      "unidad": "%",
+      "min": 10.0,
+      "max": 35.0
+    },
+    "dosis_pct": {
+      "etiqueta": "Dosis acumulada",
+      "unidad": "% del límite",
+      "min": 0,
+      "max": 200
+    },
+    "sueno_horas": {
+      "etiqueta": "Horas de sueño",
+      "unidad": "h",
+      "min": 0,
+      "max": 24
+    },
+    "ejercicio_min": {
+      "etiqueta": "Minutos de ejercicio",
+      "unidad": "min",
+      "min": 0,
+      "max": 600
+    }
   }
 }

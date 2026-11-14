@@ -33,20 +33,21 @@ Los valores numéricos viven en `backend/app/datos/umbrales.json`. Para aplicar 
 | 14 | Regla combinada: pulso >90 con presión sistólica ≤110 | Nivel amarillo | `datos/umbrales.json` (`reglas_combinadas`) | ¿Es útil como aviso? ¿Debe ser rojo? | Criterio clínico |
 | 15 | Regla combinada: temperatura ≥38.1 con pulso >90 | Nivel amarillo | `datos/umbrales.json` (`reglas_combinadas`) | ¿Sensibilidad adecuada o genera ruido? | Criterio clínico |
 | 16 | Alerta colectiva de CO₂ | CO₂ >3.0 mmHg y ≥2 tripulantes en amarillo o peor, resultado rojo | `datos/umbrales.json` (`colectiva_co2`) | ¿Mínimo de tripulantes y nivel correctos? | Criterio clínico y normas de cabina |
+| 17 | Piso de variación de la línea base (variación mínima que cuenta como cambio real) | FC 4 lpm, FR 2 rpm, SpO₂ 1.5 %, PAS 6 mmHg, temperatura 0.3 °C, sueño 0.5 h, ejercicio 10 min, CO₂ 0.2 mmHg, entre otros | `datos/umbrales.json` (`linea_base.piso_desviacion`) | ¿Son valores razonables para que una serie muy estable no dé falsas alarmas? | Criterio clínico |
 
 ## 3. Salud mental: puntos que requieren decisión humana
 
-El diseño actual protege la privacidad del tripulante: el diario y el PHQ-2 nunca salen de su espacio personal. Eso es deliberado, pero deja huecos que no debemos resolver nosotros.
+El diseño actual protege la privacidad del tripulante: el diario, el PHQ-2 y el ánimo nunca salen de su espacio personal ni de la nave. La única vía hacia otra persona es un aviso que el propio tripulante decide enviar al médico o al comandante, con consentimiento explícito y revocable. Eso es deliberado, pero deja decisiones que no debemos tomar nosotros.
 
 | Tema | Situación actual | Riesgo | Opciones |
 |---|---|---|---|
 | PHQ-2 positivo (≥3) | Ofrece cápsulas y permite, solo con consentimiento explícito (`POST /api/crisis/aviso-medico`), avisar al médico de a bordo (revocable por el propio tripulante) | Un tamizaje positivo requiere seguimiento; en confinamiento no hay derivación externa | Implementada la opción B (consentimiento explícito y revocable), pendiente de validación por salud mental |
 | Riesgo de autolesión o crisis aguda + calidad de O₂ (`o2_cabina` / `calidad_oxigeno`) | Protocolo procedimental de crisis (`GET /api/crisis/protocolo` y `POST /api/tamizajes`) que cruza síntomas agudos con la calidad de oxígeno en cabina (hipoxia/hiperoxia ambiental) y da pasos de acompañamiento y entorno seguro | Los pasos y umbrales de O₂ (19.5–23.0 % nominal) son supuestos procedimentales de diseño | Revisar y firmar el protocolo con especialistas en salud mental y medicina aeroespacial antes de uso real |
 | Validez del instrumento | PHQ-2 validado en población terrestre | Su desempeño en misiones prolongadas no está respaldado por este proyecto | Verificar la literatura; declararlo como tamizaje, no diagnóstico |
-| Diario | Texto libre, sin cifrar y sin autenticación | Cualquiera con acceso al equipo puede leerlo | Autenticación por tripulante y cifrado en reposo |
+| Diario | Texto libre, sin cifrar. La autenticación por tripulante existe pero viene apagada por defecto | Con la autenticación apagada, cualquiera con acceso al equipo puede leerlo | Activar la autenticación y cifrar en reposo |
 | Contenido de cápsulas | Texto genérico redactado por nosotros | Puede ser inadecuado | Revisión de un psicólogo antes de mostrar |
 
-Recomendación: opción B como punto de partida, siempre con consentimiento explícito y decisión final de un profesional de salud mental.
+Estado: la opción B (compartir solo con consentimiento explícito y revocable) ya está implementada junto con un protocolo de apoyo procedimental. Sigue pendiente la validación de un profesional de salud mental.
 
 ## 4. IA: dónde sí aporta y dónde no
 

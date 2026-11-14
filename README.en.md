@@ -15,7 +15,7 @@ Spanish documentation is in [README.md](README.md). The material for judges is h
 - Keeps a personal rolling baseline for each crew member and explains each measurement in plain words, with links to the official sources.
 - Queues events during a blackout and sends the most urgent first when the link returns, with a simulated delay, a round-trip confirmation and a tamper-evident hash chain.
 - Links every alert to NASA's Human Research Program hazards and shows, risk by risk, what it covers. Honest count: 1 of 17 risks fully, 7 partly, 9 not covered.
-- Keeps the diary, the PHQ-2 screening and the daily mood score private to their owner; they are never queued for Earth.
+- Keeps the diary, the PHQ-2 screening and the daily mood score private to their owner; none is ever queued for Earth. Only a notice the crew member explicitly chooses to send (revocable, audited, without the diary or the score) can reach the flight surgeon or the commander.
 - Adapts its wording to each astronaut's chosen tone and level of detail, without changing any alert level.
 - Verifies and restores its own database and exports a report for Earth with an integrity fingerprint.
 
@@ -32,6 +32,6 @@ curl -X POST "localhost:3000/api/demo/escenarios/hipoxia_eclipse?reconectar=true
 ## Honest limitations
 - A prototype that supports decisions; it does not replace the flight surgeon.
 - **All clinical thresholds are design assumptions pending validation by a clinician.** The interface says so.
-- Vital signs are entered by hand or through a simulated device; there is no integration with real sensors yet.
+- Vital signs are entered by hand, through a simulated device or, for heart rate only, through a Bluetooth bridge (see [docs/BANDA_BLE.md](docs/BANDA_BLE.md)) that is tested with simulated packets, **not yet with a real band**.
 - No encryption at rest and no TLS on the cabin network yet; local PIN authentication exists but is off by default.
 - The calibration data are records of critically ill hospital patients (BIDMC dataset, PhysioNet), not of astronauts.

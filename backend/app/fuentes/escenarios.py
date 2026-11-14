@@ -45,7 +45,7 @@ def ejecutar(conn: sqlite3.Connection, nombre: str, reconectar: bool = False) ->
     for paso in ESCENARIOS[nombre]["pasos"]:
         if paso[0] == "lectura":
             _, tid, indicador, valor = paso
-            r = servicio.registrar_lectura(conn, tid, indicador, valor)
+            r = servicio.registrar_lectura(conn, tid, indicador, valor, origen="simulado")
             registro.append({"paso": f"{tid} {indicador}={valor}", "nivel": r["nivel"], "prioridad": r["prioridad"]})
         else:
             _, activo, entorno = paso

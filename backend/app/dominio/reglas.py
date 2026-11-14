@@ -139,21 +139,29 @@ def evaluar_diastolica(mmhg: float) -> tuple[str, bool]:
     return "verde", mmhg < UMBRALES["diastolica_mmhg"]["observacion_menor_que"]
 
 
-def desviacion_linea_base(valor: float, historial: Sequence[float], solo_baja: bool = False) -> dict:
+def piso_de(indicador: str) -> float:
+    """Variación mínima apreciable para ese indicador (0 si no hay piso declarado)."""
+    return float(_LB.get("piso_desviacion", {}).get(indicador, 0.0))
+
+
+def desviacion_linea_base(valor: float, historial: Sequence[float], solo_baja: bool = False, piso: float = 0.0) -> dict:
     """Compara `valor` con media y DE muestral del historial.
 
-    Con `solo_baja` solo avisa cuando el valor queda POR DEBAJO de lo habitual (sueño, ejercicio, ánimo)."""
+    Con `solo_baja` solo avisa cuando el valor queda POR DEBAJO de lo habitual (sueño, ejercicio, ánimo).
+    Con `piso` la desviación efectiva nunca es menor que esa variación mínima: una serie muy estable no convierte
+    una diferencia insignificante en un aviso."""
     n = len(historial)
     if n < MIN_MUESTRAS_BASE:
         return {"aplica": False, "n": n, "aviso": False}
     mu = statistics.fmean(historial)
     sigma = statistics.stdev(historial)
-    if sigma == 0:
+    efectiva = max(sigma, piso)
+    if efectiva == 0:
         aviso = valor != mu
         z = None
     else:
-        z = (valor - mu) / sigma
+        z = (valor - mu) / efectiva
         aviso = abs(z) > K_DESVIACIONES
     if solo_baja and valor >= mu:
         aviso = False
-    return {"aplica": True, "n": n, "media": mu, "desviacion": sigma, "z": z, "aviso": aviso}
+    return {"aplica": True, "n": n, "media": mu, "desviacion": sigma, "desviacion_efectiva": efectiva, "z": z, "aviso": aviso}

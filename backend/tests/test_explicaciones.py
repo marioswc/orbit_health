@@ -58,3 +58,63 @@ def test_endpoints_publicos(cliente):
 
 def test_son_publicas_aun_con_autenticacion(cliente_auth):
     assert cliente_auth.get("/api/explicaciones/co2").status_code == 200       # contenido educativo, sin datos de salud
+
+
+def _items(campo):
+    return [(clave, it) for clave, x in e.DATOS["explicaciones"].items() for it in x.get(campo, [])]
+
+
+def test_toda_medida_de_la_nasa_trae_cita_textual_y_enlace_oficial_conocido():
+    from app.dominio import peligros
+    oficiales = {r["url"] for r in peligros.DATOS["riesgos"]}
+    for campo in ("medidas_nasa", "senales_a_vigilar"):
+        elementos = _items(campo)
+        assert elementos, campo
+        for clave, it in elementos:
+            assert it["fuente"] in oficiales, (clave, it["fuente"])
+            assert len(it["cita"]) > 20, (clave, it["cita"])
+            assert not it["cita"].startswith(("El ", "La ", "Los ", "Las ")), "la cita debe ir en el idioma original (inglés)"
+
+
+def test_los_habitos_que_no_son_de_la_nasa_lo_declaran():
+    for clave, x in e.DATOS["explicaciones"].items():
+        if x.get("habitos_generales"):
+            assert "no es una recomendación de la NASA" in x["habitos_generales_origen"], clave
+    assert "no se atribuyen a la NASA" in e.DATOS["nota_medidas"]
+
+
+def test_donde_la_nasa_no_da_guia_se_dice_y_no_se_inventa():
+    g = e.DATOS["explicaciones"]["glucosa"]
+    assert "no da recomendaciones sobre glucosa" in g["nota_nasa"] and not g.get("medidas_nasa")
+    for clave in ("co2", "dosis_pct", "avpu"):                          # tampoco se inventan medidas donde no las leí
+        assert not e.DATOS["explicaciones"][clave].get("medidas_nasa"), clave
+
+
+def test_hipoxia_solo_ofrece_senales_a_vigilar_porque_la_pagina_no_describe_medidas():
+    for clave in ("spo2", "frecuencia_respiratoria"):
+        x = e.DATOS["explicaciones"][clave]
+        assert x.get("senales_a_vigilar") and not x.get("medidas_nasa")
+
+
+def test_el_ejercicio_cita_las_cifras_exactas_de_la_pagina():
+    x = e.DATOS["explicaciones"]["ejercicio_min"]["medidas_nasa"][0]
+    assert "6 a 7 días" in x["texto"] and "1.5 horas" in x["texto"] and "1.5 hours per day" in x["cita"]
+
+
+def test_las_medidas_nasa_pasan_por_la_api(cliente):
+    r = cliente.get("/api/explicaciones/sueno_horas").json()
+    assert len(r["medidas_nasa"]) == 2 and r["habitos_generales_origen"]
+    assert cliente.get("/api/explicaciones/glucosa").json()["nota_nasa"]
+
+
+def test_se_rechaza_una_medida_sin_cita_o_con_fuente_ajena(tmp_path):
+    base = json.loads(json.dumps(e.DATOS))
+    base["explicaciones"]["spo2"]["senales_a_vigilar"] = [{"texto": "x", "cita": "", "fuente": "https://www.nasa.gov/a"}]
+    f = tmp_path / "x.json"; f.write_text(json.dumps(base))
+    with pytest.raises(e.ExplicacionesInvalidas):
+        e.cargar(f)
+    base = json.loads(json.dumps(e.DATOS))
+    base["explicaciones"]["spo2"]["senales_a_vigilar"] = [{"texto": "x", "cita": "quote", "fuente": "https://ejemplo.com/a"}]
+    f.write_text(json.dumps(base))
+    with pytest.raises(e.ExplicacionesInvalidas):
+        e.cargar(f)
