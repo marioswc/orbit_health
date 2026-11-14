@@ -88,3 +88,32 @@ def test_la_ayuda_del_puente_explica_como_inspeccionar_una_banda():
     script = Path(__file__).resolve().parents[2] / "scripts" / "puente_ble.py"
     r = subprocess.run([sys.executable, str(script), "--help"], capture_output=True, text=True, timeout=30)
     assert r.returncode == 0 and "--inspeccionar" in r.stdout and "--escuchar" in r.stdout
+
+
+# ---------- elegir entre varios dispositivos con el mismo nombre, sin adivinar ----------
+def _c(nombre, rssi, direccion):
+    return (nombre, rssi, direccion, object())
+
+
+def test_sin_coincidencias_no_hay_dispositivo():
+    assert ble.elegir_coincidencia([]) == ("ninguna", None)
+
+
+def test_una_sola_coincidencia_se_usa():
+    estado, item = ble.elegir_coincidencia([_c("Aolon Curve", -60, "AA:05:27")])
+    assert estado == "unica" and item[2] == "AA:05:27"
+
+
+def test_con_varias_iguales_no_elige_solo_y_las_ordena_por_senal():
+    estado, lista = ble.elegir_coincidencia([_c("Aolon Curve", -72, "B"), _c("Aolon Curve", -58, "A"), _c("Aolon Curve", -90, "C")])
+    assert estado == "ambigua" and [x[2] for x in lista] == ["A", "B", "C"]
+
+
+def test_con_mas_cercana_elige_la_de_senal_mas_fuerte():
+    estado, item = ble.elegir_coincidencia([_c("Aolon Curve", -72, "B"), _c("Aolon Curve", -58, "A")], mas_cercana=True)
+    assert estado == "unica" and item[2] == "A"
+
+
+def test_una_senal_desconocida_no_gana_a_una_conocida():
+    estado, item = ble.elegir_coincidencia([_c("X", None, "N"), _c("X", -80, "K")], mas_cercana=True)
+    assert item[2] == "K"

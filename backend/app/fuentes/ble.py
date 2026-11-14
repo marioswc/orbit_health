@@ -72,3 +72,18 @@ def describir_gatt(servicios) -> dict:
                 notificables.append(str(ch.uuid).lower())
     return {"lineas": lineas, "tiene_frecuencia_estandar": tiene_fc, "notificables": notificables,
             "servicios": sum(1 for _ in lineas if _.startswith("Servicio"))}
+
+
+def elegir_coincidencia(coincidencias: list, mas_cercana: bool = False) -> tuple[str, object]:
+    """Decide qué dispositivo usar entre los que coinciden con un nombre, sin adivinar.
+
+    `coincidencias` son tuplas (nombre, señal_dbm, direccion, objeto). Devuelve ("ninguna", None), ("unica", item) o
+    ("ambigua", lista_ordenada_por_señal). Con varias coincidencias solo elige si se pide `mas_cercana` (la de señal
+    más fuerte, que suele ser la que llevas puesta); si no, devuelve la lista para que lo decida la persona.
+    """
+    ordenadas = sorted(coincidencias, key=lambda c: c[1] if c[1] is not None else -999, reverse=True)
+    if not ordenadas:
+        return "ninguna", None
+    if len(ordenadas) == 1 or mas_cercana:
+        return "unica", ordenadas[0]
+    return "ambigua", ordenadas
