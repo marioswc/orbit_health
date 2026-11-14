@@ -59,3 +59,8 @@ Conectarse a una banda ajena para descifrarla no es algo que haga esta herramien
 - Que anuncie el servicio estándar (`--escanear`). Muchas bandas de muñeca no lo hacen, o solo si se activa un modo de transmisión de frecuencia cardíaca; un pulsómetro de pecho suele hacerlo.
 - Que `puente_ble.py` conecte y mantenga la conexión durante varios minutos.
 - Que el valor que muestra la interfaz coincida con el de la pantalla del dispositivo.
+
+## Resultado con una banda real (14-nov-2026): IDW26 (app Veryfit)
+- Se encontró por Bluetooth (nombre `IDW26`, servicio propio `0xAF0`, sin el estándar de frecuencia cardíaca `0x180D`).
+- La laptop se conecta, pero la banda **no expone ningún servicio** sin el handshake de su app: no se pudo leer nada.
+- Conclusión: **no soportada**. Usarla exigiría descifrar el protocolo propio de Veryfit; queda fuera del alcance. La demo usa la misión simulada (`origen = simulado`).
