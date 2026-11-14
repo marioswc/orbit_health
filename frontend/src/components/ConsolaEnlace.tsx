@@ -1,7 +1,52 @@
-import { memo } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
+import { api, post } from "../api/client";
+import type { Cola } from "../api/tipos";
+
+const NOMBRE = { 1: "Prioridad 1 · rojo", 2: "Prioridad 2 · amarillo", 3: "Prioridad 3 · verde" } as const;
 
 function ConsolaEnlace() {
-  return <section><h2>Consola de enlace (pendiente)</h2></section>;
+  const [cola, setCola] = useState<Cola | null>(null);
+  const [verif, setVerif] = useState("");
+  const [error, setError] = useState("");
+
+  const cargar = useCallback(() => api<Cola>("/cola").then(setCola).catch((e) => setError(e.message)), []);
+  useEffect(() => { cargar(); const t = setInterval(cargar, 2000); return () => clearInterval(t); }, [cargar]);
+
+  async function enlace(activo: boolean, entorno: string) {
+    try { await post("/enlace", { activo, entorno }); cargar(); } catch (e) { setError((e as Error).message); }
+  }
+  async function verificar() {
+    const r = await api<{ valida: boolean; total: number; primer_invalido: number | null }>("/cola/verificar");
+    setVerif(r.valida ? `Cadena íntegra (${r.total} eventos)` : `Cadena rota en evento ${r.primer_invalido}`);
+  }
+
+  if (!cola) return <section className="panel"><h2>Enlace con Tierra</h2><p className="error">{error || "Cargando…"}</p></section>;
+  const { activo, entorno } = cola.enlace;
+  return (
+    <section className="panel">
+      <h2>Enlace con Tierra</h2>
+      <div className="fila">
+        <button className={entorno === "luna" ? "activo" : ""} onClick={() => enlace(activo, "luna")}>Luna (1.3 s)</button>
+        <button className={entorno === "marte" ? "activo" : ""} onClick={() => enlace(activo, "marte")}>Marte (1200 s)</button>
+        <button className={activo ? "activo" : ""} onClick={() => enlace(true, entorno)}>Enlace normal</button>
+        <button className={!activo ? "activo" : ""} onClick={() => enlace(false, entorno)}>Modo Eclipse</button>
+      </div>
+      <p>{activo ? <span className="ok">Enlace activo</span> : <span className="error">Eclipse: nada sale de la nave</span>}</p>
+      <div className="cols">
+        {([1, 2, 3] as const).map((p) => (
+          <div key={p} className="col-prio">
+            <strong>{NOMBRE[p]}</strong>
+            {cola.items.filter((i) => i.prioridad === p).slice(0, 8).map((i) => (
+              <div key={i.id} className="item">#{i.id} {i.tipo_evento} · {i.estado}</div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="fila" style={{ marginTop: 8 }}>
+        <button onClick={verificar}>Verificar cadena de hash</button><span className="suave">{verif}</span>
+      </div>
+    </section>
+  );
 }
 
 export default memo(ConsolaEnlace);

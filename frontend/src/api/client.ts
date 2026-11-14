@@ -1,10 +1,18 @@
-const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
-
 export async function api<T>(ruta: string, init?: RequestInit): Promise<T> {
-  const r = await fetch(`${BASE}${ruta}`, {
+  const r = await fetch(`/api${ruta}`, {
     headers: { "Content-Type": "application/json" },
     ...init,
   });
-  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  if (!r.ok) {
+    let detalle = `${r.status} ${r.statusText}`;
+    try {
+      const j = await r.json();
+      if (typeof j.detail === "string") detalle = j.detail;
+    } catch { /* sin cuerpo JSON */ }
+    throw new Error(detalle);
+  }
   return r.json() as Promise<T>;
 }
+
+export const post = <T,>(ruta: string, cuerpo: unknown) =>
+  api<T>(ruta, { method: "POST", body: JSON.stringify(cuerpo) });
