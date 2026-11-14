@@ -36,5 +36,6 @@
   "language.switching": "Switching to {{idioma}}…",
   "language.es": "Spanish",
   "language.en": "English",
-  "language.hint": "Translating the interface"
+  "language.hint": "Translating the interface",
+  "nav.banda": "Band"
 }
