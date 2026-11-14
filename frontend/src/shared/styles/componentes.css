@@ -30,3 +30,19 @@
 /* ---- Pequenos ajustes de tema ---- */
 .badge, .etiqueta-local, .col-prio { background: var(--color-eggshell); }
 
+
+/* ---- Menus de opciones: nunca se salen de la pantalla; entrada animada ---- */
+.selector-lista { max-width: min(420px, calc(100vw - 24px)); transform-origin: top left; }
+.selector-lista li { font-size: var(--text-body-sm); overflow: hidden; text-overflow: ellipsis; animation: opcion .26s var(--ease-out) both; }
+.selector-lista li:nth-child(1) { animation-delay: 15ms; } .selector-lista li:nth-child(2) { animation-delay: 40ms; }
+.selector-lista li:nth-child(3) { animation-delay: 65ms; } .selector-lista li:nth-child(4) { animation-delay: 90ms; }
+.selector-lista li:nth-child(5) { animation-delay: 115ms; } .selector-lista li:nth-child(n+6) { animation-delay: 135ms; }
+.selector-lista li { transition: background-color .12s ease, color .12s ease, padding-left .18s var(--ease-out); }
+.selector-lista li.activa { padding-left: calc(var(--spacing-12) + 4px); }
+.selector-lista li svg { animation: marcar .3s var(--ease-out) both; }
+@keyframes opcion { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes marcar { from { opacity: 0; transform: scale(.4) rotate(-20deg); } to { opacity: 1; transform: none; } }
+/* En la barra el menu cuelga del boton con su mismo ancho (se lee como una sola pieza, no partida) */
+.barra .selector-lista { left: 0; right: 0; min-width: 100%; max-width: none; top: calc(100% + 4px); border-radius: 18px; padding: 4px; }
+.barra .selector-lista li { padding-block: 7px; }
+.barra .selector-boton[aria-expanded="true"] { border-color: var(--color-ink); }

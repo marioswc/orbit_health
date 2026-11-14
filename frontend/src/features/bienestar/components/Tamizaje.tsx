@@ -32,7 +32,7 @@ function Tamizaje({ tripulanteId }: { tripulanteId: string }) {
       <form onSubmit={enviar} className="formulario">
         {PREGUNTAS.map((p, i) => (
           <fieldset key={p} className="pregunta">
-            <legend>{i + 1}. {p}</legend>
+            <legend><span className="pregunta-num" aria-hidden="true">{i + 1}</span>{p}</legend>
             <Segmentado
               rejilla etiqueta={p} valor={resp[i] === null ? "" : String(resp[i])}
               alCambiar={(v) => { setResp(resp.map((r, j) => (j === i ? Number(v) : r))); setError(""); }}

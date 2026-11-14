@@ -2,6 +2,7 @@ import type { LecturaEstado } from "../types/estado";
 import { CAPAS, FUENTE_EFECTOS, ZONAS, nivelZona, type Capa } from "../zonas";
 
 import { nombreIndicador } from "../utils/nombreIndicador";
+import ExplicacionIndicador from "./ExplicacionIndicador";
 import { MESES_MAX, textoPerdida } from "../utils/perdidaOsea";
 
 interface Props {
@@ -48,7 +49,7 @@ export default function DetalleZona({ id, lecturas, capa, meses, alMeses }: Prop
       {zona.indicadores.length > 0 && dentro.length === 0 && <p className="suave">Sin lecturas recientes de: {zona.indicadores.join(", ")}.</p>}
       {dentro.map((l) => (
         <div key={l.indicador} className="item">
-          <span>{nombreIndicador(l.indicador)}</span>
+          <span>{nombreIndicador(l.indicador)}<ExplicacionIndicador clave={l.indicador} /></span>
           <span className="valor"><span>{l.valor} {l.unidad}</span><span className={`badge ${l.nivel}`}>{l.nivel}</span></span>
         </div>
       ))}

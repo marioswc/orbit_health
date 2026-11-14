@@ -1,0 +1,18 @@
+/* Riesgos HRP y explicaciones por indicador. */
+.peligros-rejilla { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--spacing-16); }
+.tarjeta.pieza.peligro { display: grid; gap: var(--spacing-12); align-content: start; padding: var(--spacing-24); }
+.peligro h2, .peligro p { margin: 0; }
+.peligro-orbit { padding: var(--spacing-12) var(--spacing-16); border-radius: 16px; background: color-mix(in srgb, var(--hud) 9%, transparent); color: var(--color-graphite); }
+.peligro-orbit strong { display: block; margin-bottom: 2px; font-size: var(--text-caption); letter-spacing: .06em; text-transform: uppercase; color: var(--hud); }
+.riesgos { list-style: none; margin: var(--spacing-16) 0 0; padding: 0; display: grid; }
+.riesgos li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: var(--spacing-4) var(--spacing-16); align-items: baseline; padding: var(--spacing-12) 0; border-bottom: 1px solid var(--color-stone); }
+.riesgos li:last-child { border-bottom: 0; }
+.riesgo-ind { grid-column: 2; font-size: var(--text-caption); color: var(--color-smoke); }
+.cobertura { --c: var(--color-ash); justify-self: start; padding: 2px var(--spacing-12); border-radius: var(--radius-pill); font-size: var(--text-caption); font-weight: 500; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); border: 1px solid color-mix(in srgb, var(--c) 35%, transparent); }
+.cobertura.cubierto { --c: var(--estado-verde); } .cobertura.parcial { --c: var(--estado-amarillo); }
+.ayuda-ind { width: 24px; height: 24px; min-height: 0; padding: 0; margin-left: var(--spacing-8); font-size: var(--text-caption); border: 1px solid var(--color-border-button); color: var(--color-smoke); }
+.explicacion { display: grid; gap: var(--spacing-16); }
+.explicacion h3 { margin: 0 0 2px; font-size: var(--text-caption); letter-spacing: .08em; text-transform: uppercase; color: var(--color-smoke); font-weight: 500; }
+.explicacion p { margin: 0; line-height: 1.6; color: var(--color-graphite); }
+.fuentes { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: var(--text-caption); }
+@media (max-width: 520px) { .riesgos li { grid-template-columns: minmax(0, 1fr); } .riesgo-ind { grid-column: 1; } }

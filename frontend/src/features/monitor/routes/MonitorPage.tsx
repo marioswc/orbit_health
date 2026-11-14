@@ -1,34 +1,25 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Contador from "../../../shared/components/Contador";
 import Titular from "../../../shared/components/Titular";
-import TiraIndicadores from "../components/TiraIndicadores";
 import DetalleZona from "../components/DetalleZona";
 import FiguraHumana from "../components/FiguraHumana";
 import { useZonaSeleccionada } from "../hooks/useZonaSeleccionada";
 import type { Estado, LecturaEstado } from "../types/estado";
-import { nombreIndicador } from "../utils/nombreIndicador";
 import { CAPAS, ZONAS, nivelZona } from "../zonas";
 
 interface Props {
   estado: Estado | null;
-  /** Abre la captura manual (la compone app/ para no acoplar features). */
-  alAbrirCaptura?: () => void;
 }
 
 const SIN_LECTURAS: LecturaEstado[] = []; // referencia estable: evita recalcular niveles en cada render
 const TITULAR = { verde: "Sin alertas activas", amarillo: "Requiere vigilancia", rojo: "Atención inmediata", sin_datos: "Sin lecturas recientes" } as const;
 const LEYENDA: [string, string][] = [["verde", "Verde"], ["amarillo", "Amarillo"], ["rojo", "Rojo"], ["sin_datos", "Sin datos"]];
 
-export default function MonitorPage({ estado, alAbrirCaptura }: Props) {
+export default function MonitorPage({ estado }: Props) {
   const { zona, acercado, capa, setCapa, elegir, alejar } = useZonaSeleccionada();
   const [meses, setMeses] = useState(0);
   const nivel = estado?.nivel_general ?? "sin_datos";
   const lecturas = estado?.indicadores ?? SIN_LECTURAS;
-
-  // Tras la primera carga, las filas cuyo valor cambia destellan (la clave incluye valor y hora)
-  const cargado = useRef(false);
-  const destellar = cargado.current;
-  useEffect(() => { if (estado) cargado.current = true; }, [estado]);
 
   return (
     <div className="vista">
@@ -53,7 +44,6 @@ export default function MonitorPage({ estado, alAbrirCaptura }: Props) {
         )}
       </div>
 
-      <TiraIndicadores lecturas={lecturas} destellar={destellar} alAbrirCaptura={alAbrirCaptura} />
 
       <section className="escenario" aria-label="Estado por zona del cuerpo">
         <aside className="lado izq">

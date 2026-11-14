@@ -1,9 +1,12 @@
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, post } from "../../../shared/api/client";
 import Alerta from "../../../shared/components/Alerta";
 import EncabezadoPagina from "../../../shared/components/EncabezadoPagina";
 import Segmentado from "../../../shared/components/Segmentado";
+import { nivelActual } from "../../../shared/rendimiento";
 import type { Cola, ItemCola } from "../types/cola";
+
+const INTERVALO_MS = { alto: 2000, medio: 4000, bajo: 8000 } as const;
 
 const PRIORIDADES = [
   { p: 1, nivel: "rojo", titulo: "Prioridad 1", detalle: "Rojo · sale primero" },
@@ -43,18 +46,30 @@ function ConsolaEnlace() {
   const [verif, setVerif] = useState<{ ok: boolean; texto: string } | null>(null);
   const [error, setError] = useState("");
 
-  const cargar = useCallback(() => api<Cola>("/cola").then((c) => { setCola(c); setError(""); }).catch((e) => setError(e.message)), []);
+  // Sin re-render si la respuesta es igual a la anterior (la cola casi nunca cambia entre consultas)
+  const previa = useRef("");
+  const enVuelo = useRef(false);
+  const cargar = useCallback(async (forzar = false) => {
+    if (enVuelo.current && !forzar) return; // no apila consultas si el servidor tarda
+    enVuelo.current = true;
+    try {
+      const c = await api<Cola>("/cola");
+      const huella = JSON.stringify(c);
+      if (huella !== previa.current) { previa.current = huella; setCola(c); }
+      setError("");
+    } catch (e) { setError((e as Error).message); } finally { enVuelo.current = false; }
+  }, []);
   useEffect(() => {
     cargar();
-    // no consulta mientras la pestana esta oculta
-    const t = setInterval(() => { if (!document.hidden) cargar(); }, 2000);
+    // no consulta mientras la pestana esta oculta; en equipos modestos, mas espaciado
+    const t = setInterval(() => { if (!document.hidden) cargar(); }, INTERVALO_MS[nivelActual()]);
     const visible = () => { if (!document.hidden) cargar(); };
     document.addEventListener("visibilitychange", visible);
     return () => { clearInterval(t); document.removeEventListener("visibilitychange", visible); };
   }, [cargar]);
 
   async function enlace(activo: boolean, entorno: string) {
-    try { await post("/enlace", { activo, entorno }); cargar(); } catch (e) { setError((e as Error).message); }
+    try { await post("/enlace", { activo, entorno }); cargar(true); } catch (e) { setError((e as Error).message); }
   }
   async function verificar() {
     try {
