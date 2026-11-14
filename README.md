@@ -56,6 +56,17 @@ variabilidad realista a la demo, no como línea base clínica.
 - `GET /api/enlace/latencia` devuelve el perfil vigente, los tiempos reales y simulados y los eventos en tránsito.
 - Los retardos son supuestos de diseño y deben verificarse contra fuentes publicadas antes de citarlos.
 
+## Endpoints útiles para el frontend
+
+| Endpoint | Para qué |
+|---|---|
+| `GET /api/historial/{id}?indicador=` | Serie temporal para gráficas |
+| `GET /api/explicaciones` y `/{indicador}` | Qué es, por qué se mide, cómo medirlo y qué cambia en el espacio |
+| `GET /api/peligros` | Marco de peligros y riesgos del HRP con la cobertura real |
+| `GET/PUT /api/preferencias/{id}` | Tono, detalle y recordatorios del asistente (solo su dueño) |
+| `POST /api/animo`, `GET /api/animo/{id}` | Ánimo diario, privado |
+| `GET /api/demo/comparativa?entorno=&respuesta_tierra_min=` | Línea de tiempo con y sin ORBIT |
+
 ## Escenarios de demo
 
 ```bash
