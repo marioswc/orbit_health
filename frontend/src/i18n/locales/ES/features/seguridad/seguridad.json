@@ -1,0 +1,21 @@
+{
+  "aria": "Acceso a bordo",
+  "kicker": "Seguridad a bordo",
+  "title": "Iniciar sesión",
+  "desc": "Ingresa con tu PIN numérico (6 a 10 dígitos). Tras 5 intentos fallidos se aplica bloqueo temporal de 5 minutos.",
+  "crew": "Tripulante",
+  "pin": "PIN",
+  "pin_ph": "6 a 10 dígitos",
+  "enter": "Entrar",
+  "recover": "Recuperar PIN",
+  "code": "Código de recuperación",
+  "code_ph": "Código entregado al alta",
+  "pin_new": "PIN nuevo",
+  "change": "Cambiar PIN",
+  "back": "Volver",
+  "err.login": "Selecciona tu perfil e ingresa tu PIN",
+  "err.recover": "Completa código de recuperación y PIN nuevo",
+  "ok.updated": "PIN actualizado. Ahora puedes iniciar sesión.",
+  "alert.ok": "Listo",
+  "alert.error": "Error de acceso"
+}

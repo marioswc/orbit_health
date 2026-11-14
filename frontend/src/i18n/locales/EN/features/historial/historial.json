@@ -1,0 +1,15 @@
+{
+  "page.kicker": "History",
+  "page.title": "Your indicators over time",
+  "page.desc": "Each value against your own 14-day baseline. Open a row to see its chart.",
+  "count_one": "{{count}} indicator",
+  "count_other": "{{count}} indicators",
+  "empty": "No readings yet. Add one with \"Manual entry\".",
+  "aria.list": "Indicators",
+  "row.aria": "{{nombre}}: {{valor}} {{unidad}}, {{nivel}}. {{accion}} chart",
+  "row.open": "Show",
+  "row.close": "Hide",
+  "base": "14-day baseline: {{media}} {{unidad}}",
+  "noBase": "Not enough baseline ({{n}})",
+  "deviation": "Deviation > 2σ"
+}

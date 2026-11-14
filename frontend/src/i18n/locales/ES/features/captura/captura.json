@@ -1,0 +1,19 @@
+{
+  "intro": "Registra una medición a mano. El nivel y la prioridad se calculan al guardar.",
+  "indicator": "Indicador",
+  "value": "Valor",
+  "avpu.aria": "Nivel de conciencia",
+  "avpu.0": "A · Alerta",
+  "avpu.1": "V · Voz",
+  "avpu.2": "P · Dolor",
+  "avpu.3": "U · Sin respuesta",
+  "submit": "Registrar medición",
+  "invalid": "Ingresa un número válido",
+  "outOfRange": "Fuera de rango fisiológico ({{min}}–{{max}} {{unidad}})",
+  "range.out": "Fuera del rango fisiológico",
+  "range.ok": "Rango fisiológico aceptado",
+  "saved": "Registrado · nivel {{nivel}}",
+  "summary": "NEWS2 {{news2}} · prioridad {{prioridad}}",
+  "extra.obs": "valor en observación",
+  "extra.base": "se aleja de tu línea base"
+}

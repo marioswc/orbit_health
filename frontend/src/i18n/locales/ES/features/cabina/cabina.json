@@ -1,0 +1,17 @@
+{
+  "aria": "Monitor de cabina",
+  "titulo": "Cabina",
+  "co2": "CO₂ en cabina",
+  "co2.sinNivel": "El backend no informó el nivel de esta lectura.",
+  "co2.sinLectura": "Sin lectura reciente de CO₂.",
+  "co2.desc.verde": "Nominal",
+  "co2.desc.amarillo": "Saturación parcial de filtros",
+  "co2.desc.rojo": "Riesgo de cefalea o acidosis",
+  "dosis": "Dosis acumulada",
+  "dosis.limite": "% del límite de misión",
+  "dosis.aria": "Dosis acumulada de radiación",
+  "dosis.sinLectura": "Sin lectura reciente de dosis.",
+  "alerta.afectados_one": "{{count}} tripulante afectado · CO₂ {{co2}} mmHg",
+  "alerta.afectados_other": "{{count}} tripulantes afectados · CO₂ {{co2}} mmHg",
+  "umbrales": "Umbrales: supuestos de diseño, pendientes de validación médica."
+}

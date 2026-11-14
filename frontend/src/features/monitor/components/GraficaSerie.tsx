@@ -1,4 +1,5 @@
 import { memo, useId, useMemo, useState, type PointerEvent } from "react";
+import { useTranslation } from "../../../i18n";
 import type { SerieHistorial } from "../types/estado";
 
 interface Props {
@@ -10,8 +11,8 @@ interface Props {
 
 const W = 640, H = 250, ML = 46, MR = 16, MT = 16, MB = 30;
 const hora = (ts: string) => new Date(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(ts) ? `${ts.replace(" ", "T")}Z` : ts).getTime();
-const fechaCorta = (ms: number) => new Date(ms).toLocaleDateString("es-MX", { day: "numeric", month: "short" });
-const fechaLarga = (ms: number) => new Date(ms).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+const fechaCorta = (ms: number, locale: string) => new Date(ms).toLocaleDateString(locale, { day: "numeric", month: "short" });
+const fechaLarga = (ms: number, locale: string) => new Date(ms).toLocaleString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
 /** Escala "bonita": 4 marcas con paso redondo que cubren [min, max]. */
 function marcas(min: number, max: number): number[] {
@@ -49,6 +50,7 @@ function curva(p: { x: number; y: number }[]): string {
 
 /** Grafica SVG de la serie de un indicador: ejes con escala, curva suave con area, media, tooltip y puntos por estado. Sin librerias. */
 function GraficaSerie({ serie, cargando, error, alCerrar }: Props) {
+  const { t, locale } = useTranslation("monitor");
   const [sel, setSel] = useState<number | null>(null);
   const idGrad = useId().replace(/:/g, "");
   const puntos = serie?.puntos ?? [];
@@ -85,26 +87,26 @@ function GraficaSerie({ serie, cargando, error, alCerrar }: Props) {
   const media = serie?.resumen.media;
 
   return (
-    <section className="tarjeta grafica-serie" aria-label="Historial del indicador">
+    <section className="tarjeta grafica-serie" aria-label={t("serie.aria")}>
       <div className="grafica-cab">
         <div>
-          <h2>{serie ? `${serie.etiqueta} · últimos ${serie.dias} días` : "Historial"}</h2>
+          <h2>{serie ? t("serie.titulo", { etiqueta: serie.etiqueta, dias: serie.dias }) : t("serie.tituloVacio")}</h2>
           {serie && (
             <p className="suave">
-              {serie.resumen.n} {serie.resumen.n === 1 ? "lectura" : "lecturas"}
-              {serie.resumen.n > 0 && ` · mín ${serie.resumen.min} · media ${serie.resumen.media} · máx ${serie.resumen.max} ${serie.unidad}`}
+              {t("serie.lecturas", { count: serie.resumen.n })}
+              {serie.resumen.n > 0 && t("serie.resumen", { min: serie.resumen.min, media: serie.resumen.media, max: serie.resumen.max, unidad: serie.unidad })}
             </p>
           )}
         </div>
-        <button type="button" className="ghost" onClick={alCerrar}>Cerrar</button>
+        <button type="button" className="ghost" onClick={alCerrar}>{t("serie.cerrar")}</button>
       </div>
 
       {cargando && <span className="esqueleto" style={{ height: 200 }} aria-busy="true" />}
       {error && <p className="error">{error}</p>}
-      {!cargando && !error && serie && puntos.length === 0 && <p className="suave">Sin lecturas en este periodo.</p>}
+      {!cargando && !error && serie && puntos.length === 0 && <p className="suave">{t("serie.sinLecturas")}</p>}
       {!cargando && !error && g && (
         <div className="serie-caja">
-          <svg className="serie-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Serie de ${serie?.etiqueta ?? "indicador"} con ${puntos.length} puntos`}
+          <svg className="serie-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={t("serie.graficaAria", { nombre: serie?.etiqueta ?? t("serie.indicador"), n: puntos.length })}
             onPointerMove={mover} onPointerLeave={() => setSel(null)}>
             <defs>
               <linearGradient id={idGrad} x1="0" y1="0" x2="0" y2="1">
@@ -117,7 +119,7 @@ function GraficaSerie({ serie, cargando, error, alCerrar }: Props) {
                 <text className="serie-txt" x={ML - 8} y={g.y(v)} textAnchor="end" dominantBaseline="middle">{Number(v.toFixed(2))}</text>
               </g>
             ))}
-            {g.xs.map((t, i) => <text key={i} className="serie-txt" x={g.x(t)} y={H - 8} textAnchor={i === 0 ? "start" : i === 2 ? "end" : "middle"}>{fechaCorta(t)}</text>)}
+            {g.xs.map((tk, i) => <text key={i} className="serie-txt" x={g.x(tk)} y={H - 8} textAnchor={i === 0 ? "start" : i === 2 ? "end" : "middle"}>{fechaCorta(tk, locale)}</text>)}
             {media !== undefined && <line className="serie-media" x1={ML} x2={W - MR} y1={g.y(media)} y2={g.y(media)} />}
             {g.area && <path d={g.area} fill={`url(#${idGrad})`} />}
             {g.pts.length > 1 && <path className="serie-linea" d={g.linea} fill="none" pathLength={1} />}
@@ -129,8 +131,8 @@ function GraficaSerie({ serie, cargando, error, alCerrar }: Props) {
           {s && (
             <div className="serie-tip" style={{ left: `${(s.x / W) * 100}%`, top: `${(s.y / H) * 100}%` }} role="status">
               <strong>{s.p.valor} {serie?.unidad}</strong>
-              <span>{fechaLarga(s.t)}</span>
-              <span className={`badge ${s.p.nivel}`}>{s.p.nivel}</span>
+              <span>{fechaLarga(s.t, locale)}</span>
+              <span className={`badge ${s.p.nivel}`}>{t(`common:status.${s.p.nivel}`)}</span>
             </div>
           )}
         </div>

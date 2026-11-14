@@ -1,0 +1,19 @@
+{
+  "intro": "Log a measurement by hand. The level and priority are calculated on save.",
+  "indicator": "Indicator",
+  "value": "Value",
+  "avpu.aria": "Level of consciousness",
+  "avpu.0": "A · Alert",
+  "avpu.1": "V · Voice",
+  "avpu.2": "P · Pain",
+  "avpu.3": "U · Unresponsive",
+  "submit": "Log measurement",
+  "invalid": "Enter a valid number",
+  "outOfRange": "Outside physiological range ({{min}}–{{max}} {{unidad}})",
+  "range.out": "Outside the physiological range",
+  "range.ok": "Accepted physiological range",
+  "saved": "Logged · level {{nivel}}",
+  "summary": "NEWS2 {{news2}} · priority {{prioridad}}",
+  "extra.obs": "value under observation",
+  "extra.base": "deviates from your baseline"
+}

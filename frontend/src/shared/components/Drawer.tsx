@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useTranslation } from "../../i18n";
 
 interface Props {
   abierto: boolean;
@@ -14,6 +15,7 @@ const ENFOCABLES = 'a[href], button:not([disabled]), input:not([disabled]), text
 export default function Drawer({ abierto, alCerrar, titulo, children }: Props) {
   const panel = useRef<HTMLDivElement>(null);
   const id = useId();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!abierto) return;
@@ -41,7 +43,7 @@ export default function Drawer({ abierto, alCerrar, titulo, children }: Props) {
       <div className="drawer" role="dialog" aria-modal="true" aria-labelledby={id} ref={panel} tabIndex={-1}>
         <header className="drawer-cabecera">
           <h2 id={id}>{titulo}</h2>
-          <button type="button" className="ghost icono" onClick={alCerrar} aria-label="Cerrar">
+          <button type="button" className="ghost icono" onClick={alCerrar} aria-label={t("actions.close")}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
           </button>
         </header>

@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { useTranslation } from "../../../i18n";
 import Contador from "../../../shared/components/Contador";
 import Titular from "../../../shared/components/Titular";
 import AccionesClinicas from "../components/AccionesClinicas";
@@ -19,10 +20,10 @@ interface Props {
 }
 
 const SIN_LECTURAS: LecturaEstado[] = []; // referencia estable: evita recalcular niveles en cada render
-const TITULAR = { verde: "Sin alertas activas", amarillo: "Requiere vigilancia", rojo: "Atención inmediata", sin_datos: "Sin lecturas recientes" } as const;
-const LEYENDA: [string, string][] = [["verde", "Verde"], ["amarillo", "Amarillo"], ["rojo", "Rojo"], ["sin_datos", "Sin datos"]];
+const LEYENDA = ["verde", "amarillo", "rojo", "sin_datos"] as const;
 
 export default function MonitorPage({ tripulanteId = "", estado, cabina, ambiente = null }: Props) {
+  const { t } = useTranslation("monitor");
   const { zona, acercado, capa, setCapa, elegir, alejar } = useZonaSeleccionada();
   const [meses, setMeses] = useState(0);
   const nivel = estado?.nivel_general ?? "sin_datos";
@@ -33,18 +34,18 @@ export default function MonitorPage({ tripulanteId = "", estado, cabina, ambient
       <div className="titulo-pagina">
         {estado ? (
           <>
-            <Titular key={nivel} titulo={TITULAR[nivel]}>
-              NEWS2: <Contador valor={estado.news2.puntos} /> puntos en una ventana de {estado.ventana_min} min.
+            <Titular key={nivel} titulo={t(`page.titular.${nivel}`)}>
+              {t("page.news2Pre")} <Contador valor={estado.news2.puntos} /> {t("page.news2Post", { min: estado.ventana_min })}
             </Titular>
             <p style={{ marginTop: 16 }}>
-              <span className={`badge ${nivel}`}>{nivel === "sin_datos" ? "sin datos" : nivel}</span>
+              <span className={`badge ${nivel}`}>{t(`common:status.${nivel}`)}</span>
             </p>
             {estado.news2.faltantes.length > 0 && (
-              <p className="suave">Variables NEWS2 sin dato reciente: {estado.news2.faltantes.join(", ")}. El puntaje puede estar subestimado.</p>
+              <p className="suave">{t("page.news2Faltantes", { lista: estado.news2.faltantes.join(", ") })}</p>
             )}
           </>
         ) : (
-          <div aria-busy="true" aria-label="Cargando estado">
+          <div aria-busy="true" aria-label={t("page.cargando")}>
             <span className="esqueleto" style={{ width: "min(420px, 80%)", height: 52 }} />
             <span className="esqueleto" style={{ width: 260, height: 18, marginTop: 16 }} />
           </div>
@@ -52,30 +53,30 @@ export default function MonitorPage({ tripulanteId = "", estado, cabina, ambient
       </div>
 
 
-      <section className="escenario" aria-label="Estado por zona del cuerpo">
+      <section className="escenario" aria-label={t("page.escenario")}>
         <aside className="lado izq">
           <div className="panel">
-            <h2>Zonas</h2>
-            <div className="zonas-lista" role="group" aria-label="Zonas del cuerpo">
+            <h2>{t("page.zonas")}</h2>
+            <div className="zonas-lista" role="group" aria-label={t("page.zonasAria")}>
               {ZONAS.map((z) => (
                 <button key={z.id} type="button" className={`tab ${nivelZona(z.indicadores, lecturas)} ${zona === z.id ? "activo" : ""}`} aria-pressed={zona === z.id} onClick={() => elegir(z.id)}>
-                  {z.etiqueta}
+                  {t(`zona.${z.id}.etiqueta`)}
                 </button>
               ))}
             </div>
           </div>
           <div className="panel">
-            <h2>Capas</h2>
-            <div className="capas" role="group" aria-label="Capa del cuerpo a mostrar">
+            <h2>{t("page.capas")}</h2>
+            <div className="capas" role="group" aria-label={t("page.capasAria")}>
               {CAPAS.map((c) => (
-                <button key={c.id} type="button" className={capa === c.id ? "activo" : ""} aria-pressed={capa === c.id} onClick={() => setCapa(c.id)}>{c.etiqueta}</button>
+                <button key={c.id} type="button" className={capa === c.id ? "activo" : ""} aria-pressed={capa === c.id} onClick={() => setCapa(c.id)}>{t(`capa.${c.id}`)}</button>
               ))}
             </div>
           </div>
           <div className="panel">
-            <h2>Estados</h2>
-            <ul className="leyenda" aria-label="Leyenda de estados">
-              {LEYENDA.map(([k, t]) => <li key={k}><span className={`badge ${k}`}>{t}</span></li>)}
+            <h2>{t("page.estados")}</h2>
+            <ul className="leyenda" aria-label={t("page.leyendaAria")}>
+              {LEYENDA.map((k) => <li key={k}><span className={`badge ${k}`}>{t(`page.leyenda.${k}`)}</span></li>)}
             </ul>
           </div>
           {cabina}

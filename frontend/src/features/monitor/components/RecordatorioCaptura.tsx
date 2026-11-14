@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "../../../i18n";
 import { api } from "../../../shared/api/client";
 import Alerta from "../../../shared/components/Alerta";
 import type { Estado } from "../types/estado";
@@ -26,6 +27,7 @@ interface Props {
 
 /** Aviso de captura vencida o tiempo restante segun nivel actual y preferencias del tripulante. */
 export default function RecordatorioCaptura({ tripulanteId, estado }: Props) {
+  const { t } = useTranslation("monitor");
   const [propio, setPropio] = useState<RecordatorioTripulante | null>(null);
   const [equipo, setEquipo] = useState<RecordatoriosEquipo | null>(null);
 
@@ -44,29 +46,29 @@ export default function RecordatorioCaptura({ tripulanteId, estado }: Props) {
   if (!propio) return null;
 
   const titulo = propio.sin_capturas
-    ? "Sin capturas registradas"
+    ? t("recordatorio.sinCapturas")
     : propio.vencido
-      ? `Captura vencida hace ${propio.atrasado_min} min`
-      : `Próxima captura en ${propio.faltan_en_min} min`;
+      ? t("recordatorio.vencida", { min: propio.atrasado_min })
+      : t("recordatorio.proxima", { min: propio.faltan_en_min });
 
   const resumenEquipo = equipo && equipo.vencidos > 0
-    ? ` · Tripulación con captura vencida: ${equipo.vencidos}`
+    ? t("recordatorio.equipo", { n: equipo.vencidos })
     : "";
 
   if (propio.vencido || propio.sin_capturas) {
     return (
       <Alerta tono="aviso" titulo={titulo}>
-        Intervalo recomendado: cada {propio.intervalo_min} min.
-        {propio.faltantes_news2.length > 0 && ` Faltantes NEWS2: ${propio.faltantes_news2.join(", ")}.`}
+        {t("recordatorio.intervalo", { min: propio.intervalo_min })}
+        {propio.faltantes_news2.length > 0 && t("recordatorio.faltantes", { lista: propio.faltantes_news2.join(", ") })}
         {resumenEquipo}
       </Alerta>
     );
   }
 
   return (
-    <section className="tarjeta recordatorio-ok" aria-label="Recordatorio de captura">
+    <section className="tarjeta recordatorio-ok" aria-label={t("recordatorio.aria")}>
       <p className="suave">
-        <strong>{titulo}</strong> (intervalo cada {propio.intervalo_min} min){resumenEquipo}
+        <strong>{titulo}</strong> {t("recordatorio.intervaloOk", { min: propio.intervalo_min })}{resumenEquipo}
       </p>
     </section>
   );

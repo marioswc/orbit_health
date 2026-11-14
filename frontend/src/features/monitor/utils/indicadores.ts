@@ -13,9 +13,9 @@ const NOMBRES: Record<string, string> = {
 };
 
 /** Nombre legible de un indicador; si no esta en la lista, lo humaniza a partir de la clave. */
-export function nombreIndicador(clave: string): string {
-  if (NOMBRES[clave]) return NOMBRES[clave];
-  const t = clave.replace(/_/g, " ");
-  return t.charAt(0).toUpperCase() + t.slice(1);
+export function nombreIndicador(clave: string, t?: ((clave: string) => string) | number): string {
+  if (NOMBRES[clave]) return typeof t === "function" ? t(`monitor:ind.largo.${clave}`) : NOMBRES[clave];
+  const h = clave.replace(/_/g, " ");
+  return h.charAt(0).toUpperCase() + h.slice(1);
 }
 
