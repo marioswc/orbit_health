@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 
 from ..dominio.catalogos import INDICADORES
+from ..dominio import peligros as dominio_peligros
 from ..dominio.umbrales import UMBRALES
 from ..repositorios import tripulantes
 from ..servicios import recuperacion
@@ -30,6 +31,12 @@ def umbrales_estado() -> dict:
 def indicadores() -> list[dict]:
     return [{"clave": k, "etiqueta": v[0], "unidad": v[1], "min": v[2], "max": v[3]}
             for k, v in INDICADORES.items()]
+
+
+@router.get("/peligros")
+def peligros() -> dict:
+    """Marco de peligros y riesgos del HRP, con la cobertura real de ORBIT Health por cada riesgo."""
+    return {**dominio_peligros.DATOS, "resumen_cobertura": dominio_peligros.resumen_cobertura()}
 
 
 @router.get("/tripulantes")
