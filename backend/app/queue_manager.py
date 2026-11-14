@@ -1,28 +1,16 @@
-"""Cola store-and-forward con prioridad y hash encadenado verificable.
-
-hash = SHA-256(hash_prev | tripulante_id | tipo_evento | prioridad | payload | ts_guardado)
-Todos los campos, incluido ts_guardado, se persisten, así que la cadena se puede recomputar.
-"""
+"""Cola store-and-forward con prioridad. El hash encadenado vive en dominio/integridad.py."""
 from __future__ import annotations
 
-import hashlib
 import json
 import sqlite3
 from datetime import datetime, timedelta, timezone
 
 from . import config
-
-GENESIS = "GENESIS"
+from .dominio.integridad import GENESIS, calcular_hash, verificar_filas
 
 
 def _ahora() -> datetime:
     return datetime.now(timezone.utc)
-
-
-def calcular_hash(prev: str, tripulante_id: str, tipo_evento: str,
-                  prioridad: int, payload: str, ts_guardado: str) -> str:
-    base = "|".join([prev, tripulante_id, tipo_evento, str(prioridad), payload, ts_guardado])
-    return hashlib.sha256(base.encode("utf-8")).hexdigest()
 
 
 def encolar(conn: sqlite3.Connection, tripulante_id: str, tipo_evento: str,
@@ -86,16 +74,7 @@ def actualizar_recibidos(conn: sqlite3.Connection, ahora: datetime | None = None
 
 
 def verificar_cadena(conn: sqlite3.Connection) -> dict:
-    prev = GENESIS
-    total = 0
-    for f in conn.execute("SELECT * FROM cola_salida ORDER BY id ASC"):
-        total += 1
-        esperado = calcular_hash(prev, f["tripulante_id"], f["tipo_evento"],
-                                 f["prioridad"], f["payload"], f["ts_guardado"])
-        if f["hash_prev"] != prev or f["hash"] != esperado:
-            return {"valida": False, "total": total, "primer_invalido": f["id"]}
-        prev = f["hash"]
-    return {"valida": True, "total": total, "primer_invalido": None}
+    return verificar_filas(conn.execute("SELECT * FROM cola_salida ORDER BY id ASC"))
 
 
 def listar(conn: sqlite3.Connection) -> list[dict]:

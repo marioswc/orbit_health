@@ -13,9 +13,10 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import config, engine
+from . import config
 from .db import get_conn, init_db
-from .validacion import INDICADORES, validar
+from .dominio import reglas as engine
+from .dominio.catalogos import INDICADORES, validar
 
 COLUMNAS = {"HR": "frecuencia_cardiaca", "RESP": "frecuencia_respiratoria", "SpO2": "spo2"}
 VENTANA_S = 20          # una lectura por cada 20 s (mediana de la ventana)

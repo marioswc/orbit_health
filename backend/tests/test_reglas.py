@@ -2,7 +2,7 @@ import importlib
 
 import pytest
 
-from app import engine
+from app.dominio import reglas as engine
 
 NORMAL = dict(frecuencia_respiratoria=16, spo2=98, presion_sistolica=120,
               frecuencia_cardiaca=70, avpu="A", temperatura=36.8)

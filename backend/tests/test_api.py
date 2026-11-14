@@ -61,6 +61,11 @@ def test_eclipse_y_reconexion_prioriza_rojo(cliente):
     assert cliente.get("/api/cola/verificar").json()["valida"] is True
 
 
+def test_umbrales_expone_estado_de_validacion(cliente):
+    r = cliente.get("/api/umbrales").json()
+    assert r["estado"].startswith("pendiente") and r["version"]
+
+
 def test_estado_resumen(cliente):
     lectura(cliente, "spo2", 90)
     e = cliente.get("/api/estado/T1").json()

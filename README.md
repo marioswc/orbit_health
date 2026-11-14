@@ -54,6 +54,10 @@ y el flujo anterior pasa por API contra un servidor único.
 
 Ver `.env.example`. Umbrales marcados como *Supuesto* en el plan requieren validación médica.
 
+## Validación médica
+
+Ver [docs/VALIDACION_MEDICA.md](docs/VALIDACION_MEDICA.md) y `docs/casos_validacion.csv`.
+
 ## Estructura
 
 | Ruta | Contenido |

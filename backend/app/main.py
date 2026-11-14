@@ -8,7 +8,8 @@ from pydantic import BaseModel, Field
 from . import config, queue_manager as qm, servicio
 from .db import get_conn, init_db
 from .seed import sembrar
-from .validacion import INDICADORES
+from .dominio.catalogos import INDICADORES
+from .dominio.umbrales import UMBRALES
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -64,6 +65,12 @@ def _requerir(conn, tid: str) -> None:
 @app.get("/api/health")
 def health() -> dict:
     return {"status": "ok"}
+
+
+@app.get("/api/umbrales")
+def umbrales_estado() -> dict:
+    """Versión y estado de validación clínica de los umbrales en uso."""
+    return {"version": UMBRALES["version"], "estado": UMBRALES["estado"]}
 
 
 @app.get("/api/indicadores")

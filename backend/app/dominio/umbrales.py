@@ -1,0 +1,62 @@
+"""Carga y valida datos/umbrales.json (fuente única de umbrales clínicos).
+
+Se puede apuntar a otro archivo con ORBIT_UMBRALES (por ejemplo, el aprobado por un clínico).
+"""
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+
+RUTA_POR_DEFECTO = Path(__file__).resolve().parents[1] / "datos" / "umbrales.json"
+NEWS2_VARIABLES = ("frecuencia_respiratoria", "spo2", "presion_sistolica",
+                   "frecuencia_cardiaca", "temperatura")
+
+
+class UmbralesInvalidos(ValueError):
+    pass
+
+
+def _validar_bandas(nombre: str, bandas: list) -> None:
+    if not bandas or "hasta" in bandas[-1]:
+        raise UmbralesInvalidos(f"{nombre}: la última banda no debe tener 'hasta'")
+    previo = None
+    for b in bandas[:-1]:
+        if "hasta" not in b or "puntos" not in b:
+            raise UmbralesInvalidos(f"{nombre}: cada banda necesita 'hasta' y 'puntos'")
+        if previo is not None and b["hasta"] <= previo:
+            raise UmbralesInvalidos(f"{nombre}: los 'hasta' deben ser estrictamente crecientes")
+        previo = b["hasta"]
+    for b in bandas:
+        if b["puntos"] not in (0, 1, 2, 3):
+            raise UmbralesInvalidos(f"{nombre}: 'puntos' debe estar entre 0 y 3")
+
+
+def validar(datos: dict) -> dict:
+    for clave in ("version", "estado", "ventana_news2_min", "news2", "ambiente",
+                  "glucosa_mg_dl", "diastolica_mmhg", "linea_base", "indicadores"):
+        if clave not in datos:
+            raise UmbralesInvalidos(f"Falta la sección '{clave}'")
+    bandas = datos["news2"].get("bandas", {})
+    for variable in NEWS2_VARIABLES:
+        if variable not in bandas:
+            raise UmbralesInvalidos(f"Faltan bandas NEWS2 para '{variable}'")
+        _validar_bandas(variable, bandas[variable])
+    if datos["news2"].get("modo_parametro_extremo") not in ("conservador", "rcp"):
+        raise UmbralesInvalidos("modo_parametro_extremo debe ser 'conservador' o 'rcp'")
+    for clave, d in datos["indicadores"].items():
+        if d["min"] >= d["max"]:
+            raise UmbralesInvalidos(f"indicador '{clave}': min debe ser menor que max")
+    return datos
+
+
+def cargar(ruta: str | Path | None = None) -> dict:
+    ruta = Path(ruta or os.getenv("ORBIT_UMBRALES") or RUTA_POR_DEFECTO)
+    try:
+        datos = json.loads(ruta.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        raise UmbralesInvalidos(f"No se pudo leer {ruta}: {e}") from e
+    return validar(datos)
+
+
+UMBRALES = cargar()

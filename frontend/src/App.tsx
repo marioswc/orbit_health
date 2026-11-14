@@ -7,6 +7,8 @@ import DiarioTripulante from "./components/DiarioTripulante";
 import Tamizaje from "./components/Tamizaje";
 import ConsolaEnlace from "./components/ConsolaEnlace";
 
+interface EstadoUmbrales { version: string; estado: string }
+
 type Vista = "monitor" | "bienestar" | "enlace";
 
 export default function App() {
@@ -15,12 +17,15 @@ export default function App() {
   const [vista, setVista] = useState<Vista>("monitor");
   const [estado, setEstado] = useState<Estado | null>(null);
   const [error, setError] = useState("");
+  const [umbrales, setUmbrales] = useState<EstadoUmbrales | null>(null);
 
   useEffect(() => {
     api<Tripulante[]>("/tripulantes")
       .then((t) => { setTripulantes(t); if (t[0]) setTid(t[0].id); })
       .catch((e) => setError(e.message));
   }, []);
+
+  useEffect(() => { api<EstadoUmbrales>("/umbrales").then(setUmbrales).catch(() => setUmbrales(null)); }, []);
 
   const refrescar = useCallback(() => {
     if (tid) api<Estado>(`/estado/${tid}`).then(setEstado).catch((e) => setError(e.message));
@@ -35,6 +40,9 @@ export default function App() {
           {tripulantes.map((t) => <option key={t.id} value={t.id}>{t.nombre} · {t.rol}</option>)}
         </select>
       </header>
+      {umbrales && !umbrales.estado.startsWith("validado") && (
+        <p className="aviso">Prototipo de apoyo, no sustituye criterio médico. Umbrales v{umbrales.version}: {umbrales.estado}.</p>
+      )}
       {error && <p className="error">{error}</p>}
       <nav>
         {(["monitor", "bienestar", "enlace"] as Vista[]).map((v) => (
