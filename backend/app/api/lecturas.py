@@ -6,6 +6,7 @@ from ..servicios import estado as servicio_estado
 from ..servicios import lecturas as servicio
 from ..servicios import auditoria
 from ..servicios import preferencias as servicio_preferencias
+from ..servicios import racha as servicio_racha
 from ..servicios import recordatorios as servicio_recordatorios
 from ..servicios import historial as servicio_historial
 from .dependencias import conexion, requerir_tripulante, requiere
@@ -71,3 +72,10 @@ def recordatorio(tid: str, conn=Depends(conexion), _: dict = Depends(requiere("c
     """Indica si la medición de un tripulante está vencida o al día"""
     requerir_tripulante(conn, tid)
     return servicio_recordatorios.recordatorio_tripulante(conn, tid)
+
+
+@router.get("/racha/{tid}")
+def racha(tid: str, conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) -> dict:
+    """Racha de días con los 5 signos vitales registrados y logros ligeros, sin presión"""
+    requerir_tripulante(conn, tid)
+    return servicio_racha.racha(conn, tid)
