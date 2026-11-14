@@ -39,10 +39,13 @@ En `backend/app/dominio/flujo.py` y `backend/app/servicios/flujo.py` (`POST /api
 ### Qué problema había
 Las bandas de frecuencia cardíaca comerciales hablan por Bluetooth Low Energy (BLE) enviando paquetes de bytes en el formato estándar GATT (`0x180D` / `0x2A37`), donde los datos vienen compactados en bits (indicando si el pulso viene en 1 o 2 bytes y si el sensor está tocando la piel).
 
-### Cómo se solucionó (`commit 926a62b`)
+### Cómo se solucionó (`commits 926a62b`, `0478bd9`)
 - **Decodificador puro (`backend/app/fuentes/ble.py`):** traduce los bytes del estándar Bluetooth y extrae la frecuencia cardíaca, la energía gastada y los intervalos entre latidos (`RR-intervals`).
 - **Filtro contra lecturas falsas:** si los bits de la banda indican que **se perdió el contacto con la piel**, o si el pulso viene en `0` o fuera del rango humano válido, el paquete se descarta automáticamente para no generar una falsa alarma roja cuando el tripulante se quita la banda.
-- **Script puente (`scripts/puente_ble.py`):** se conecta por Bluetooth desde la computadora, lee los paquetes en vivo y los envía a `POST /api/sensores/flujo`. Si el servidor local no responde temporalmente, el puente guarda las muestras en una cola local y reintenta sin perderlas. *(Nota: probado con escaneo Bluetooth real de laptop y paquetes simulados; pendiente de probar con una banda física real, como se detalla en [BANDA_BLE.md](../../docs/BANDA_BLE.md)).*
+- **Script puente (`scripts/puente_ble.py`):** se conecta por Bluetooth desde la computadora, lee los paquetes en vivo y los envía a `POST /api/sensores/flujo`. Si el servidor local no responde temporalmente, el puente guarda las muestras en una cola local y reintenta sin perderlas.
+- **Inspector de bandas comerciales (`describir_gatt`, `--inspeccionar` y `--escuchar`, `commit 0478bd9`):**
+  - *Problema:* muchas bandas de consumo (como Aolon y similares) no usan el servicio estándar de frecuencia cardíaca, sino un protocolo privado de la app de su fabricante (como GloryFit o Da Fit), o no aparecen al escanear porque siguen conectadas al celular.
+  - *Solución:* se añadió `describir_gatt` en `ble.py` y las opciones `--inspeccionar` y `--escuchar <segundos>` en `scripts/puente_ble.py`. Permite conectarse únicamente al dispositivo que el usuario nombra, listar todos sus servicios Bluetooth y confirmar en segundos si **trae el servicio estándar de frecuencia cardíaca** (compatible con el puente) o si **habla un protocolo propio del fabricante**, además de poder ver en crudo qué bytes emite. *(Ver detalles en [BANDA_BLE.md](../../docs/BANDA_BLE.md)).*
 
 ---
 

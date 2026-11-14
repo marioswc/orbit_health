@@ -20,6 +20,8 @@ En lugar de concentrar todo en un solo archivo gigante, la documentación está 
    Cómo se integraron los peligros oficiales de la NASA, las citas textuales con enlaces reales y el cálculo de gravedad y pérdida ósea según el entorno (nave, estación, Luna o Marte).
 6. **[06 — Seguridad a Bordo, Simulación en Vivo y Pruebas de Calidad](06_SEGURIDAD_SIMULACION_Y_CALIDAD.md)**
    Cómo funciona el acceso con PIN sin internet, los permisos ante emergencias, la misión simulada en vivo que corre sola para demostraciones y las pruebas automáticas que vigilan la seguridad y la documentación.
+7. **[07 — IA Local Explicativa y Asistente de Voz Offline](07_IA_LOCAL_Y_VOZ.md)**
+   Cómo funciona el explicador opcional con IA local (`GET /api/estado/{tid}/explicacion`) y el chat de voz offline (`POST /api/voz/chat/{tid}`), garantizando que la IA solo explique resultados ya calculados sin alterar jamás el nivel clínico ni saturar la computadora a bordo.
 
 > Para ver el plan inicial del proyecto puedes consultar [PLAN_DE_DESARROLLO.md](PLAN_DE_DESARROLLO.md), y para el listado completo de rutas disponibles consulta [API_REFERENCIA.md](../../docs/API_REFERENCIA.md).
 

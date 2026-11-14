@@ -48,10 +48,10 @@ Durante una presentación o evaluación, teclear lecturas a mano una por una par
 ## 3. Pruebas Automáticas que Vigilan la Seguridad y la Documentación
 
 ### Qué problema había
-A medida que el proyecto creció a **58 rutas en la API**, era muy fácil que al agregar una ruta nueva se olvidara ponerle candado de sesión, o que los documentos `.md` se quedaran con rutas o cifras viejas.
+A medida que el proyecto creció a **60 rutas en la API**, era muy fácil que al agregar una ruta nueva se olvidara ponerle candado de sesión, o que los documentos `.md` se quedaran con rutas o cifras viejas.
 
 ### Cómo se solucionó (`commit 213d8c1`)
 En `backend/tests/test_documentacion.py` y `backend/app/api/referencia.py`:
-- **Candado automático de rutas públicas:** existe una lista única (`RUTAS_PUBLICAS`, 13 rutas que no contienen datos médicos personales, como el login o las explicaciones educativas). Una prueba automática recorre las **58 operaciones de la API** con la autenticación activada: si alguien crea una ruta nueva y olvida protegerla, la prueba falla inmediatamente.
+- **Candado automático de rutas públicas:** existe una lista única (`RUTAS_PUBLICAS`, 13 rutas que no contienen datos médicos personales, como el login o las explicaciones educativas). Una prueba automática recorre las **60 operaciones de la API** con la autenticación activada: si alguien crea una ruta nueva y olvida protegerla, la prueba falla inmediatamente.
 - **Referencia de la API autogenerada (`scripts/generar_api_doc.py`):** genera [API_REFERENCIA.md](../../docs/API_REFERENCIA.md) directamente desde el código real y una prueba falla si alguien cambia una ruta y no actualiza el documento.
 - **Verificación de la verdad en los documentos:** las pruebas revisan todos los archivos `.md` del proyecto para comprobar que todas las rutas `/api/...` mencionadas existan de verdad, que ningún enlace local esté roto, que todas las variables `ORBIT_*` estén en `.env.example` y que las cifras de cobertura del HRP coincidan exactamente con las del código.
