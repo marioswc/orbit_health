@@ -43,9 +43,9 @@ def latencia_s(entorno: str) -> float:
     return base / config.FACTOR_ACELERACION
 
 
-def despachar(conn: sqlite3.Connection, enlace_activo: bool, entorno: str = "marte",
-              ahora: datetime | None = None) -> list[dict]:
-    """Con enlace activo drena por prioridad (1→3) y antigüedad. En eclipse no sale nada."""
+def despachar_sin_commit(conn: sqlite3.Connection, enlace_activo: bool, entorno: str = "marte",
+                         ahora: datetime | None = None) -> list[dict]:
+    """Con enlace activo drena por prioridad (1→3) y antigüedad dentro de la transacción activa."""
     if not enlace_activo:
         return []
     ahora = ahora or _ahora()
@@ -53,6 +53,19 @@ def despachar(conn: sqlite3.Connection, enlace_activo: bool, entorno: str = "mar
     salida = repo.retenidos_ordenados(conn)
     for f in salida:
         repo.marcar_en_transito(conn, f["id"], ahora.isoformat(), llegada.isoformat())
+    return salida
+
+
+def despachar_si_activo(conn: sqlite3.Connection, ahora: datetime | None = None) -> list[dict]:
+    """Si el enlace persistido está activo, despacha los eventos retenidos sin hacer commit."""
+    enlace = repo_enlace.leer(conn)
+    return despachar_sin_commit(conn, enlace["activo"], enlace["entorno"], ahora)
+
+
+def despachar(conn: sqlite3.Connection, enlace_activo: bool, entorno: str = "marte",
+              ahora: datetime | None = None) -> list[dict]:
+    """Con enlace activo drena por prioridad (1→3) y antigüedad. En eclipse no sale nada."""
+    salida = despachar_sin_commit(conn, enlace_activo, entorno, ahora)
     conn.commit()
     return salida
 

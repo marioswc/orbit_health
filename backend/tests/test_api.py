@@ -130,6 +130,7 @@ def test_lectura_y_evento_son_atomicos(cliente, monkeypatch):
     conn.close()
 
 
+<<<<<<< HEAD
 def test_regla_combinada_sube_el_nivel_y_se_informa(cliente):
     lectura(cliente, "presion_sistolica", 108)
     r = lectura(cliente, "frecuencia_cardiaca", 95).json()
@@ -155,3 +156,22 @@ def test_alerta_colectiva_co2_con_dos_tripulantes_afectados(cliente):
     assert r["alertas"] and r["alertas"][0]["id"] == "alerta_ambiental_colectiva"
     assert r["alertas"][0]["afectados"] == 2
     assert r["alertas"][0]["nivel"] == "rojo"
+=======
+def test_enlace_activo_despacha_al_registrar_lectura(cliente):
+    lectura(cliente, "spo2", 98)
+    cola = cliente.get("/api/cola").json()
+    assert cola["items"][0]["estado"] in ("en_transito", "recibido")
+
+
+def test_lectura_normal_no_queda_contaminada_por_alerta_previa(cliente):
+    lectura(cliente, "spo2", 88)          # rojo
+    lectura(cliente, "temperatura", 36.8) # normal: debe guardarse como verde
+    estado_Durante = cliente.get("/api/estado/T1").json()
+    niveles = {i["indicador"]: i["nivel"] for i in estado_Durante["indicadores"]}
+    assert niveles["spo2"] == "rojo" and niveles["temperatura"] == "verde"
+    assert estado_Durante["nivel_general"] == "rojo"
+
+    lectura(cliente, "spo2", 98)          # se normaliza SpO2
+    estado_final = cliente.get("/api/estado/T1").json()
+    assert estado_final["nivel_general"] == "verde" and estado_final["news2"]["nivel"] == "verde"
+>>>>>>> 45012a4 (feat: implementar despachar_si_activo función y mejorar manejo de  lectura en tests)
