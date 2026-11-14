@@ -85,7 +85,7 @@ export function Capas({ capa, meses, zona, enfocar, visitadas }: Props) {
   return (
     <>
       <img className="capa-traje" src={URL_CAPA.traje} alt="Astronauta con traje y casco EMU de la NASA" draggable={false}
-        decoding="async" style={{ ...aPorcentaje(CAJAS.traje), opacity: capa === "traje" ? 1 : 0.16 }} />
+        decoding="async" {...{ fetchpriority: "high" }} style={{ ...aPorcentaje(CAJAS.traje), opacity: capa === "traje" ? 1 : 0.16 }} />
 
       {CAPAS_ANAT.filter((c) => visitadas.has(c) || c === capa).map((c) => {
         const activa = capa === c;

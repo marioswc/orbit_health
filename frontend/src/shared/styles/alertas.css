@@ -1,0 +1,83 @@
+/* Alertas de aplicación y piezas del módulo Enlace (canal Nave↔Tierra, KPIs, cola). */
+
+/* ---- Alerta: baldosa de icono + texto, tinte suave del tono ---- */
+.alerta { --t: var(--hud); display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: var(--spacing-12); padding: var(--spacing-12) var(--spacing-16) var(--spacing-12) var(--spacing-12); border-radius: 20px;
+  background: color-mix(in srgb, var(--t) 8%, var(--color-eggshell)); border: 1px solid color-mix(in srgb, var(--t) 26%, transparent); animation: entrar .3s var(--ease-out) both; }
+.alerta.aviso { --t: var(--estado-amarillo); } .alerta.error { --t: var(--estado-rojo); } .alerta.ok { --t: var(--estado-verde); }
+.alerta-icono { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 12px; color: var(--t); background: color-mix(in srgb, var(--t) 16%, transparent); }
+.alerta-texto { min-width: 0; align-self: center; display: grid; gap: 2px; }
+.alerta-texto strong { font-weight: 600; color: var(--color-ink); }
+.alerta-texto p { margin: 0; color: var(--color-graphite); overflow-wrap: anywhere; }
+.alerta-accion { align-self: center; }
+.avisos { justify-items: center; }
+.avisos .alerta { width: fit-content; max-width: 100%; align-items: center; padding-block: var(--spacing-8); border-radius: var(--radius-pill); padding-right: var(--spacing-20); }
+.avisos .alerta-icono { width: 28px; height: 28px; border-radius: 50%; }
+.avisos .alerta-icono svg { width: 15px; height: 15px; }
+/* titulo y texto en una sola linea (envuelven solo si no caben) */
+.avisos .alerta-texto { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--spacing-8); text-align: left; }
+.avisos .alerta-texto strong::after { content: " ·"; font-weight: 400; color: var(--color-smoke); }
+.avisos .alerta-texto strong:last-child::after { content: none; }
+
+/* ---- Enlace: canal Nave ↔ Tierra ---- */
+.canal { display: grid; gap: var(--spacing-24); }
+.canal-viz { display: grid; grid-template-columns: auto minmax(60px, 1fr) auto; align-items: center; gap: var(--spacing-16); padding: var(--spacing-24) var(--spacing-24) var(--spacing-20); border-radius: 22px; background: color-mix(in srgb, var(--color-eggshell) 70%, transparent); border: 1px solid var(--color-stone); }
+.nodo { display: grid; justify-items: center; gap: var(--spacing-8); color: var(--color-graphite); font-family: var(--font-geist-mono); font-size: var(--text-caption); letter-spacing: .08em; text-transform: uppercase; }
+.nodo-icono { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 18px; color: var(--color-ink); background: var(--color-warm-taupe); border: 1px solid var(--color-stone); }
+.vinculo { --c: var(--estado-verde); container-type: inline-size; position: relative; height: 44px; display: grid; align-items: center; }
+.vinculo.off { --c: var(--estado-amarillo); }
+.vinculo-linea { position: absolute; left: 0; right: 0; top: 50%; height: 0; border-top: 2px solid color-mix(in srgb, var(--c) 55%, transparent); }
+.vinculo.off .vinculo-linea { border-top-style: dashed; border-top-color: color-mix(in srgb, var(--c) 70%, transparent); }
+.vinculo-pulso { position: absolute; left: 0; top: 50%; width: 10px; height: 10px; margin-top: -5px; border-radius: 50%; background: var(--c); box-shadow: 0 0 12px var(--c); animation: viajar 2.4s linear infinite; }
+.vinculo-pulso:nth-child(3) { animation-delay: -.8s; } .vinculo-pulso:nth-child(4) { animation-delay: -1.6s; }
+.vinculo.off .vinculo-pulso { display: none; }
+.vinculo-corte { display: none; position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; place-items: center; border-radius: 50%; color: var(--c); background: var(--color-eggshell); border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); }
+.vinculo.off .vinculo-corte { display: grid; }
+.vinculo-retardo { position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); padding: 2px var(--spacing-12); border-radius: var(--radius-pill); font-family: var(--font-geist-mono); font-size: var(--text-caption); white-space: nowrap; color: var(--color-graphite); background: var(--color-eggshell); border: 1px solid var(--color-stone); }
+@keyframes viajar { 0% { transform: translateX(0); opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { transform: translateX(calc(100cqw - 10px)); opacity: 0; } }
+.controles-enlace { display: flex; flex-wrap: wrap; gap: var(--spacing-24) var(--spacing-32); }
+
+/* ---- KPIs con icono ---- */
+.kpi { position: relative; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: var(--spacing-16); row-gap: 2px; }
+.kpi-icono { grid-row: span 2; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; color: var(--color-graphite); background: var(--color-eggshell); border: 1px solid var(--color-stone); }
+.kpi.retenido.hay .kpi-icono { color: var(--estado-amarillo); background: color-mix(in srgb, var(--estado-amarillo) 14%, transparent); border-color: color-mix(in srgb, var(--estado-amarillo) 35%, transparent); }
+.kpi.en_transito.hay .kpi-icono { color: var(--hud); background: color-mix(in srgb, var(--hud) 12%, transparent); border-color: color-mix(in srgb, var(--hud) 32%, transparent); }
+.kpi.recibido.hay .kpi-icono { color: var(--estado-verde); background: color-mix(in srgb, var(--estado-verde) 12%, transparent); border-color: color-mix(in srgb, var(--estado-verde) 32%, transparent); }
+
+/* ---- Cola por prioridad: columnas tipo tablero ---- */
+.col-prioridad { border-top-width: 1px; border-top-color: var(--color-stone); gap: var(--spacing-16); }
+.col-prioridad header { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--spacing-12); }
+.col-icono { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 12px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
+.col-titulo { display: grid; line-height: 1.25; min-width: 0; }
+.col-titulo strong { font-weight: 600; }
+.col-titulo .suave { font-size: var(--text-caption); }
+.col-prioridad .conteo { min-width: 30px; padding: 2px var(--spacing-8); text-align: center; border-radius: var(--radius-pill); font-size: var(--text-body-sm); font-weight: 600; color: var(--c); background: color-mix(in srgb, var(--c) 12%, transparent); }
+.col-prioridad li { position: relative; padding: var(--spacing-12) var(--spacing-12) var(--spacing-12) var(--spacing-16); border-radius: 16px; border: 1px solid var(--color-stone); background: color-mix(in srgb, var(--color-eggshell) 85%, transparent); transition: border-color .15s ease, transform .15s var(--ease-out); }
+.col-prioridad li::before { content: ""; position: absolute; left: 0; top: 22%; bottom: 22%; width: 3px; border-radius: 0 3px 3px 0; background: var(--c); }
+.col-prioridad li:hover { border-color: color-mix(in srgb, var(--c) 45%, var(--color-stone)); transform: translateY(-1px); }
+.col-prioridad .vacio { display: grid; justify-items: center; gap: var(--spacing-8); padding: var(--spacing-24) var(--spacing-16); }
+.estado-cola { display: inline-flex; align-items: center; gap: 6px; }
+.estado-cola::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--color-ash); }
+.estado-cola.en_transito::before { background: var(--hud); } .estado-cola.recibido::before { background: var(--estado-verde); }
+.estado-cola.retenido::before { background: var(--estado-amarillo); }
+
+/* ---- Integridad de la cola ---- */
+.verificacion { display: grid; gap: var(--spacing-16); }
+.verificacion-fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--spacing-16) var(--spacing-24); }
+.verificacion-info { display: flex; align-items: center; gap: var(--spacing-16); min-width: 0; }
+.verificacion-info .alerta-icono { width: 44px; height: 44px; border-radius: 14px; --t: var(--color-graphite); }
+
+/* ---- Bienestar ---- */
+.resultado-tamizaje { display: grid; gap: var(--spacing-12); }
+.resultado-tamizaje .medidor { margin-bottom: 0; }
+.resultado-tamizaje .capsula { margin-top: 0; border: 1px solid var(--color-stone); background: color-mix(in srgb, var(--color-warm-taupe) 80%, transparent); }
+.resultado-tamizaje .capsula strong { display: block; }
+.formulario .alerta { padding-block: var(--spacing-8); }
+.formulario .alerta-icono { width: 28px; height: 28px; border-radius: 10px; }
+.formulario .alerta-icono svg { width: 15px; height: 15px; }
+
+@media (max-width: 700px) {
+  .canal-viz { grid-template-columns: auto minmax(40px, 1fr) auto; padding: var(--spacing-16); gap: var(--spacing-8); }
+  .nodo-icono { width: 46px; height: 46px; border-radius: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .vinculo-pulso { animation: none; left: 50%; } }
+

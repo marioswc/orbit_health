@@ -32,25 +32,28 @@ function PanelMedicion({ tripulanteId, alGuardar }: { tripulanteId: string; alGu
   }
 
   return (
-    <section className="tarjeta">
-      <h2>Captura manual</h2>
-      <form onSubmit={enviar}>
-        <div className="fila">
-          <Selector
-            etiqueta="Indicador" valor={clave} alCambiar={(v) => { setClave(v); setValor(""); }}
-            opciones={defs.map((d) => ({ valor: d.clave, etiqueta: `${d.etiqueta} (${d.unidad})` }))}
-          />
-          {clave === "avpu" ? (
-            <Selector etiqueta="Nivel de conciencia" valor={valor} alCambiar={setValor} opciones={AVPU.map((t, i) => ({ valor: String(i), etiqueta: t }))} />
-          ) : (
-            <input type="number" step="any" value={valor} onChange={(e) => setValor(e.target.value)}
-              placeholder={def ? `${def.min}–${def.max}` : ""} aria-label="Valor" />
-          )}
-        </div>
-        <button type="submit" className="btn-primario">Registrar</button>
-      </form>
-      {msg && <p className={msg.ok ? "ok" : "error"} style={{ marginTop: 16 }} role="status">{msg.texto}</p>}
-    </section>
+    <form onSubmit={enviar} className="formulario">
+      <p className="suave">Registra una medición a mano. El nivel y la prioridad se calculan al guardar.</p>
+      <div className="campo">
+        <span className="campo-etiqueta">Indicador</span>
+        <Selector
+          etiqueta="Indicador" valor={clave} alCambiar={(v) => { setClave(v); setValor(""); setMsg(null); }}
+          opciones={defs.map((d) => ({ valor: d.clave, etiqueta: `${d.etiqueta} (${d.unidad})` }))}
+        />
+      </div>
+      <div className="campo">
+        <label className="campo-etiqueta" htmlFor="captura-valor">Valor{def ? ` (${def.unidad})` : ""}</label>
+        {clave === "avpu" ? (
+          <Selector etiqueta="Nivel de conciencia" valor={valor} alCambiar={setValor} opciones={AVPU.map((t, i) => ({ valor: String(i), etiqueta: t }))} />
+        ) : (
+          <input id="captura-valor" type="number" step="any" value={valor} onChange={(e) => setValor(e.target.value)}
+            placeholder={def ? `${def.min}–${def.max}` : ""} />
+        )}
+        {def && clave !== "avpu" && <span className="ayuda">Rango fisiológico aceptado: {def.min}–{def.max} {def.unidad}</span>}
+      </div>
+      <button type="submit" className="btn-primario">Registrar</button>
+      {msg && <p className={`resultado ${msg.ok ? "ok" : "error"}`} role="status">{msg.texto}</p>}
+    </form>
   );
 }
 

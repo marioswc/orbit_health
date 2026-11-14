@@ -53,7 +53,7 @@ Escala: 12 · 14 · 16 · 18 · 20 · 32 · 36 · 48 px.
 
 ### Espaciado, radios, anchos
 - Espaciado: 4 · 8 · 12 · 16 · 20 · 24 · 32 · 48 · 64 px (`--spacing-*`).
-- Radios: input 4 px · card 20 px · card grande 24 px · píldora 9999 px.
+- Radios: input y selector 14–16 px · lista del selector 20 px (opciones 12 px) · segmentado 22 px · card 20 px · card grande 24 px · píldora 9999 px. Los controles son redondeados, no cuadrados.
 - Ancho máximo de página: 1280 px.
 
 ### Movimiento
@@ -82,12 +82,25 @@ Reglas: máximo 4 superficies con `backdrop-filter` a la vez; **no** aplicarlo a
 |---|---|
 | Botón | Píldora, borde `--color-border-button`, 40 px de alto mínimo; activo = fondo `--color-ink` con texto invertido |
 | `.tab` (zona) | Botón con punto de estado; activo invertido |
-| Selector | Combobox/listbox propio ([Selector.tsx](../src/shared/components/Selector.tsx)): teclado completo (flechas, Home/End, Enter, Escape) |
+| Selector | Combobox/listbox propio ([Selector.tsx](../src/shared/components/Selector.tsx)): bordes redondeados, teclado completo (flechas, Home/End, Enter, Escape) |
+| Segmentado | Radiogroup de opciones excluyentes ([Segmentado.tsx](../src/shared/components/Segmentado.tsx)): entorno y canal del enlace, respuestas del tamizaje (variante `rejilla`) |
+| Drawer | Panel deslizante modal ([Drawer.tsx](../src/shared/components/Drawer.tsx)): foco atrapado, Escape y clic fuera cierran, devuelve el foco. Aloja la **captura manual** |
+| Encabezado de página | Rótulo mono + título + descripción + estado a la derecha ([EncabezadoPagina.tsx](../src/shared/components/EncabezadoPagina.tsx)) |
+| Chip de indicador | Tira bajo el titular del Monitor: nombre mono, valor grande, badge de nivel y acento de color a la izquierda |
 | `.badge` | Píldora con punto de color + texto en mayúsculas |
 | Tarjeta | `--color-warm-taupe`, radio 20 px, sin borde ni sombra |
 | Panel de cristal | Ver sección 4 |
 | Contador | Número que cuenta en 600 ms (salta con reduced-motion) |
 | Esqueleto | Bloque con brillo desplazándose mientras carga |
+
+## 5b. Estructura de la aplicación
+- **Cabecera de ancho completo** (vidrio, pegada arriba): marca a la izquierda, **vistas al centro** (Monitor · Bienestar · Enlace, control segmentado oscuro), a la derecha **Captura manual** (botón primario), selector de tripulante y tema. Con menos de 800 px las vistas pasan a una segunda fila centrada; con menos de 480 px quedan solo los iconos.
+- **Captura manual** vive en el Drawer (se abre desde la cabecera o desde el aviso "Registrar una medición" cuando no hay lecturas), no en una tarjeta al final.
+- **Indicadores** son una tira de chips arriba del escenario.
+- **Tierra:** foto real (fotografía "Blue Marble" del Apollo 17, NASA, dominio público; ver [ATRIBUCION.md](../src/shared/assets/ATRIBUCION.md)) fija en la parte baja de la pantalla, **estática**, media esfera visible, detrás del contenido y sin recortes (el brillo no se corta). Las tarjetas sobre ella usan 93 % de opacidad para conservar contraste.
+- **Bienestar:** diario con línea de tiempo y estado vacío; tamizaje con respuestas segmentadas y medidor 0–6.
+- **Enlace:** estado del canal, tres contadores (retenidos / en tránsito / recibidos), controles segmentados, columnas por prioridad con acento rojo/amarillo/verde e integridad de la cola.
+- **URL de ensayo:** `?vista=enlace`, `?captura=1`, `?tema=light|dark`, `?zona=…&capa=…&zoom=0`.
 
 ## 6. Escenario del astronauta
 Layout de tres columnas: zonas/capas/estados · astronauta · detalle (una columna bajo 1100 px, astronauta primero).
@@ -121,7 +134,7 @@ Layout de tres columnas: zonas/capas/estados · astronauta · detalle (una colum
 - **Pendiente de verificar:** contraste medido con herramienta en modo claro sobre cristal.
 
 ## 9. Rendimiento (decisiones de estilo)
-SVG optimizados con svgo (de ≈1.3 MB a ≈0.5 MB; presupuesto verificado por test), capas como `<img>`, sin `drop-shadow` en zonas, transiciones de tema acotadas, carga perezosa de vistas (Bienestar, Enlace), consultas del enlace en pausa con la pestaña oculta. Detalle en los tests de [presupuesto.test.ts](../src/features/monitor/__tests__/presupuesto.test.ts).
+SVG optimizados con svgo (de ≈1.3 MB a ≈0.5 MB; presupuesto verificado por test), capas como `<img>`, sin `drop-shadow` en zonas, transiciones de tema acotadas, carga perezosa de vistas (Bienestar, Enlace), consultas del enlace en pausa con la pestaña oculta, estrellas de fondo a ~30 fps (170 máx.), Tierra como imagen estática (cero animación), CSS muerto eliminado. Detalle en los tests de [presupuesto.test.ts](../src/features/monitor/__tests__/presupuesto.test.ts).
 
 ## 10. Licencias del arte
 | Archivo | Licencia |

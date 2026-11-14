@@ -6,14 +6,14 @@
 /* ---- Selector personalizado (listbox) ---- */
 .selector { position: relative; display: inline-block; min-width: 200px; max-width: 100%; }
 .fila > .selector { flex: 1 1 200px; }
-.selector-boton { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-12); min-height: 40px; padding: var(--spacing-8) var(--spacing-12); border-radius: var(--radius-input); text-align: left; font-weight: 400; background: var(--color-eggshell); border: 1px solid var(--color-border-button); color: var(--color-ink); }
+.selector-boton { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-12); min-height: 40px; padding: var(--spacing-8) var(--spacing-12); border-radius: 16px; text-align: left; font-weight: 400; background: var(--color-eggshell); border: 1px solid var(--color-border-button); color: var(--color-ink); }
 .selector-boton:hover { border-color: var(--color-ash); }
 .selector-boton[aria-expanded="true"] { border-color: var(--color-ink); }
 .selector-boton .marcador { color: var(--color-ash); }
 .selector-flecha { flex: none; color: var(--color-smoke); transition: transform .2s var(--ease-out); }
 .selector-boton[aria-expanded="true"] .selector-flecha { transform: rotate(180deg); }
-.selector-lista { position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; min-width: 100%; max-height: 280px; overflow: auto; margin: 0; padding: var(--spacing-4); list-style: none; background: var(--color-eggshell); border: 1px solid var(--color-stone); border-radius: 12px; box-shadow: var(--shadow-subtle), 0 12px 32px rgba(0, 0, 0, .12); animation: abrir .16s var(--ease-out) both; transform-origin: top; }
-.selector-lista li { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-12); padding: var(--spacing-8) var(--spacing-12); border-radius: 8px; cursor: pointer; white-space: nowrap; color: var(--color-graphite); }
+.selector-lista { position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; min-width: 100%; max-height: 280px; overflow: auto; margin: 0; list-style: none; background: var(--color-eggshell); border: 1px solid var(--color-stone); border-radius: 20px; padding: 6px; box-shadow: var(--shadow-subtle), 0 12px 32px rgba(0, 0, 0, .12); animation: abrir .16s var(--ease-out) both; transform-origin: top; }
+.selector-lista li { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-12); padding: var(--spacing-8) var(--spacing-12); border-radius: 12px; cursor: pointer; white-space: nowrap; color: var(--color-graphite); }
 .selector-lista li.activa { background: var(--color-warm-taupe); color: var(--color-ink); }
 .selector-lista li.elegida { color: var(--color-ink); font-weight: 500; }
 @keyframes abrir { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }
