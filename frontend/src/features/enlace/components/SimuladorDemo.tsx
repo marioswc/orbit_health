@@ -5,6 +5,16 @@ import Alerta from "../../../shared/components/Alerta";
 import Segmentado from "../../../shared/components/Segmentado";
 import type { ComparativaOrbit, EscenarioDemo } from "../types/cola";
 
+interface EstadoSimulacionViva {
+  activa: boolean;
+  finalizada: boolean;
+  minuto_mision: number;
+  duracion_min: number;
+  progreso_pct: number;
+  eventos: { minuto?: number; texto?: string; tipo?: string }[];
+  hitos: Record<string, unknown>;
+}
+
 const PERFILES = ["luna", "marte_cercano", "marte_medio", "marte"] as const;
 
 function formatoTiempo(s: number): string {
@@ -23,11 +33,21 @@ function SimuladorDemo() {
   const [comp, setComp] = useState<ComparativaOrbit | null>(null);
   const [resultado, setResultado] = useState<{ escenario: string; pasos: { paso: string; nivel?: string; prioridad?: number; despachados?: number }[] } | null>(null);
   const [sensorRes, setSensorRes] = useState<{ perfil: string; rondas: { ronda: number; nivel: string; puntos_news2: number }[]; primera_ronda_amarillo: number | null; primera_ronda_rojo: number | null } | null>(null);
+  const [simViva, setSimViva] = useState<EstadoSimulacionViva | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     api<EscenarioDemo[]>("/demo/escenarios").then(setEscenarios).catch(() => {});
+    api<EstadoSimulacionViva>("/demo/simulacion/estado").then(setSimViva).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!simViva?.activa) return;
+    const t = setInterval(() => {
+      api<EstadoSimulacionViva>("/demo/simulacion/estado").then(setSimViva).catch(() => {});
+    }, 1500);
+    return () => clearInterval(t);
+  }, [simViva?.activa]);
 
   useEffect(() => {
     api<ComparativaOrbit>(`/demo/comparativa?entorno=${encodeURIComponent(entorno)}`)
@@ -50,6 +70,28 @@ function SimuladorDemo() {
     try {
       const r = await post<NonNullable<typeof sensorRes>>(`/demo/sensor/T1?perfil=${encodeURIComponent(perfil)}`, {});
       setSensorRes(r);
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
+  async function iniciarMisionViva() {
+    setError("");
+    try {
+      await post("/demo/simulacion/iniciar", {});
+      const s = await api<EstadoSimulacionViva>("/demo/simulacion/estado");
+      setSimViva(s);
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
+  async function detenerMisionViva() {
+    setError("");
+    try {
+      await post("/demo/simulacion/detener", {});
+      const s = await api<EstadoSimulacionViva>("/demo/simulacion/estado");
+      setSimViva(s);
     } catch (e) {
       setError((e as Error).message);
     }
@@ -151,6 +193,42 @@ function SimuladorDemo() {
             <span className="suave" style={{ marginLeft: 8 }}>
               {t("demo.sensor.first", { y: sensorRes.primera_ronda_amarillo ?? "—", r: sensorRes.primera_ronda_rojo ?? "—" })}
             </span>
+          </div>
+        )}
+      </section>
+
+      <section className="tarjeta pieza escenarios" aria-label="Misión simulada en vivo">
+        <div className="tierra-cab">
+          <div>
+            <h2>Misión simulada en vivo</h2>
+            <p className="suave">Las bandas envían solas, el enlace se corta en eclipse y vuelve con prioridad.</p>
+          </div>
+          <div className="fila">
+            {!simViva?.activa ? (
+              <button type="button" onClick={iniciarMisionViva}>Iniciar misión en vivo</button>
+            ) : (
+              <button type="button" className="ghost" onClick={detenerMisionViva}>Detener simulación</button>
+            )}
+          </div>
+        </div>
+        {simViva && (simViva.activa || simViva.finalizada || (simViva.eventos?.length ?? 0) > 0) && (
+          <div className="escenario-res">
+            <div className="tierra-cab">
+              <strong>Minuto {simViva.minuto_mision} / {simViva.duracion_min} min ({simViva.progreso_pct}%)</strong>
+              <span className={`badge ${simViva.activa ? "amarillo" : "verde"}`}>
+                {simViva.activa ? "En curso" : simViva.finalizada ? "Finalizada" : "Detenida"}
+              </span>
+            </div>
+            {(simViva.eventos?.length ?? 0) > 0 && (
+              <ul>
+                {(simViva.eventos ?? []).slice(-6).reverse().map((ev, idx) => (
+                  <li key={idx}>
+                    {ev.minuto !== undefined && <span className="t-mono">T+{ev.minuto}m</span>}
+                    <span>{ev.texto ?? JSON.stringify(ev)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
       </section>

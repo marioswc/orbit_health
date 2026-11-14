@@ -25,6 +25,47 @@ export default function ExplicacionIndicador({ clave }: { clave: string }) {
         {datos && e && (
           <div className="explicacion">
             {SECCIONES.map((k) => <section key={k}><h3>{t(`expl.sec.${k}`)}</h3><p>{e[k]}</p></section>)}
+            {e.senales_a_vigilar && e.senales_a_vigilar.length > 0 && (
+              <section>
+                <h3>Señales a vigilar (NASA)</h3>
+                <ul className="citas-nasa">
+                  {e.senales_a_vigilar.map((s) => (
+                    <li key={s.cita}>
+                      <p>{s.texto}</p>
+                      <blockquote className="cita-textual">“{s.cita}”</blockquote>
+                      <a className="enlace" href={s.fuente} target="_blank" rel="noopener noreferrer">{s.fuente.replace("https://www.nasa.gov/", "nasa.gov/")}</a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            {e.medidas_nasa && e.medidas_nasa.length > 0 && (
+              <section>
+                <h3>Medidas con fuente NASA</h3>
+                <ul className="citas-nasa">
+                  {e.medidas_nasa.map((m) => (
+                    <li key={m.cita}>
+                      <p>{m.texto}</p>
+                      <blockquote className="cita-textual">“{m.cita}”</blockquote>
+                      <a className="enlace" href={m.fuente} target="_blank" rel="noopener noreferrer">{m.fuente.replace("https://www.nasa.gov/", "nasa.gov/")}</a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            {e.nota_nasa && (
+              <section>
+                <h3>Guía de la NASA</h3>
+                <p className="suave">{e.nota_nasa}</p>
+              </section>
+            )}
+            {e.habitos_generales && e.habitos_generales.length > 0 && (
+              <section>
+                <h3>Hábitos generales (equipo)</h3>
+                <ul>{e.habitos_generales.map((h) => <li key={h}>{h}</li>)}</ul>
+                {e.habitos_generales_origen && <p className="fuente">{e.habitos_generales_origen}</p>}
+              </section>
+            )}
             <p className="fuente">{datos.aviso} {t("expl.estado", { estado: datos.estado })}</p>
             <ul className="fuentes">{e.fuentes.map((u) => <li key={u}><a className="enlace" href={u} target="_blank" rel="noopener noreferrer">{u.replace("https://www.nasa.gov/", "nasa.gov/")}</a></li>)}</ul>
           </div>

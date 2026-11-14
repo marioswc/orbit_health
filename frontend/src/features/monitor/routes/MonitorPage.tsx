@@ -5,7 +5,9 @@ import Titular from "../../../shared/components/Titular";
 import AccionesClinicas from "../components/AccionesClinicas";
 import DetalleZona from "../components/DetalleZona";
 import FiguraHumana from "../components/FiguraHumana";
+import RachaMediciones from "../components/RachaMediciones";
 import RecordatorioCaptura from "../components/RecordatorioCaptura";
+import { useEntornos } from "../hooks/useEntornos";
 import { useZonaSeleccionada } from "../hooks/useZonaSeleccionada";
 import type { Estado, LecturaEstado } from "../types/estado";
 import { CAPAS, ZONAS, nivelZona, type NivelZona } from "../zonas";
@@ -26,6 +28,9 @@ export default function MonitorPage({ tripulanteId = "", estado, cabina, ambient
   const { t } = useTranslation("monitor");
   const { zona, acercado, capa, setCapa, elegir, alejar } = useZonaSeleccionada();
   const [meses, setMeses] = useState(0);
+  const [entornoId, setEntornoId] = useState("nave_en_transito");
+  const entornos = useEntornos();
+  const entornoActual = entornos?.entornos[entornoId] ?? null;
   const nivel = estado?.nivel_general ?? "sin_datos";
   const lecturas = estado?.indicadores ?? SIN_LECTURAS;
 
@@ -79,6 +84,24 @@ export default function MonitorPage({ tripulanteId = "", estado, cabina, ambient
               {LEYENDA.map((k) => <li key={k}><span className={`badge ${k}`}>{t(`page.leyenda.${k}`)}</span></li>)}
             </ul>
           </div>
+          {entornos && (
+            <div className="panel">
+              <h2>Entorno</h2>
+              <div className="capas" role="group" aria-label="Entorno de la misión">
+                {Object.entries(entornos.entornos).map(([clave, ent]) => (
+                  <button
+                    key={clave}
+                    type="button"
+                    className={entornoId === clave ? "activo" : ""}
+                    aria-pressed={entornoId === clave}
+                    onClick={() => setEntornoId(clave)}
+                  >
+                    {ent.nombre}{ent.gravedad_g !== null ? ` (${ent.gravedad_g} g)` : ""}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {cabina}
         </aside>
 
@@ -87,7 +110,7 @@ export default function MonitorPage({ tripulanteId = "", estado, cabina, ambient
         </div>
 
         <aside className="lado der">
-          <DetalleZona id={zona} lecturas={lecturas} capa={capa} meses={meses} alMeses={setMeses} />
+          <DetalleZona id={zona} lecturas={lecturas} capa={capa} meses={meses} alMeses={setMeses} entorno={entornoActual} />
         </aside>
       </section>
 
@@ -100,6 +123,7 @@ export default function MonitorPage({ tripulanteId = "", estado, cabina, ambient
         />
       )}
       {tripulanteId && <RecordatorioCaptura tripulanteId={tripulanteId} estado={estado} />}
+      {tripulanteId && <RachaMediciones tripulanteId={tripulanteId} estado={estado} />}
     </div>
   );
 }
