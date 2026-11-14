@@ -86,7 +86,11 @@ Para que la demo no sea manual: `POST /api/demo/simulacion/iniciar` pone a una t
 
 ## Banda o pulsómetro por Bluetooth
 
-La frecuencia cardíaca puede llegar sola desde un dispositivo BLE que anuncie el servicio estándar; ver [docs/BANDA_BLE.md](docs/BANDA_BLE.md). El puente está probado con una banda simulada, **no con una real**.
+La frecuencia cardíaca puede llegar sola desde un dispositivo BLE que anuncie el servicio estándar; ver [docs/BANDA_BLE.md](docs/BANDA_BLE.md). El puente está probado con una banda simulada. Con una banda real de consumo (IDW26, app Veryfit) se conectó, pero habla un protocolo propio y **no está soportada**; solo funcionarían dispositivos con el servicio estándar.
+
+## IA local (opcional)
+
+Un modelo local sin internet puede explicar una alerta o responder por voz, pero nunca decide el nivel: una crisis la atiende siempre el protocolo escrito y todo texto del modelo se valida y se marca como IA. Ver [docs/IA_LOCAL.md](docs/IA_LOCAL.md).
 
 ## Escenarios de demo
 
