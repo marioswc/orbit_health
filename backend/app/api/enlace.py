@@ -45,3 +45,11 @@ def cola(conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) ->
 @router.get("/cola/verificar")
 def verificar(conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) -> dict:
     return servicio.verificar_cadena(conn)
+
+
+@router.get("/tierra/mensajes")
+def mensajes_en_tierra(limite: int = 200, conn=Depends(conexion),
+                       _: dict = Depends(requiere("clinico:leer"))) -> dict:
+    """Vista del centro de control: solo lo que ya llegó por la hora estimada, lo urgente primero.
+    Solo lectura: no consume mensajes. (Tierra no tiene rol propio; en la demo lo ve cualquier sesión.)"""
+    return servicio.vista_tierra(conn, limite=limite)

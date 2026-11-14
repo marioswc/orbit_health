@@ -56,6 +56,12 @@ def recientes(conn: sqlite3.Connection, tid: str, limite: int) -> list[dict]:
         (tid, limite))]
 
 
+def ultima_captura(conn: sqlite3.Connection, tid: str) -> str | None:
+    """Hora de la última captura real. Las series de calibración son historia y no cuentan como medición."""
+    f = conn.execute("SELECT MAX(ts) FROM lecturas WHERE tripulante_id=? AND origen!='calibracion'", (tid,)).fetchone()
+    return f[0]
+
+
 def historial_previo(conn: sqlite3.Connection, tid: str, indicador: str, desde: str, antes_de: str) -> list[float]:
     """Valores del indicador entre `desde` y antes de `antes_de` (excluye la propia lectura)."""
     return [f["valor"] for f in conn.execute(

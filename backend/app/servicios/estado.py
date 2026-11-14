@@ -6,7 +6,7 @@ from .. import config
 from ..dominio import acciones, combinadas, peligros, reglas
 from ..dominio.catalogos import INDICADORES
 from ..repositorios import lecturas as repo
-from .lecturas import signos_recientes
+from .lecturas import SOLO_BAJA, signos_recientes
 
 
 def _redondear(base: dict) -> dict:
@@ -19,7 +19,7 @@ def estado_tripulante(conn: sqlite3.Connection, tid: str, estilo: dict | None = 
     desde_base = (datetime.now(timezone.utc) - timedelta(days=config.DIAS_LINEA_BASE)).isoformat()
     for v in ultimos:
         previo = repo.historial_previo(conn, tid, v["indicador"], desde_base, v["ts"])
-        v["linea_base"] = _redondear(reglas.desviacion_linea_base(v["valor"], previo))
+        v["linea_base"] = _redondear(reglas.desviacion_linea_base(v["valor"], previo, solo_baja=v["indicador"] in SOLO_BAJA))
     news2 = reglas.evaluar_news2(signos_recientes(conn, tid, ventana))
     valores = repo.valores_recientes(conn, tid, combinadas.INDICADORES_USADOS, ventana)
     activas = combinadas.evaluar_individuales(valores)

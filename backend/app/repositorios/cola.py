@@ -62,3 +62,22 @@ def recientes(conn: sqlite3.Connection, limite: int = 200) -> list[dict]:
 def conteo_por_estado(conn: sqlite3.Connection, tid: str) -> dict:
     return {f["estado"]: f["n"] for f in conn.execute(
         "SELECT estado, COUNT(*) AS n FROM cola_salida WHERE tripulante_id=? GROUP BY estado", (tid,))}
+
+
+def llegados(conn: sqlite3.Connection, ahora_iso: str, limite: int) -> list[dict]:
+    """Eventos que, por la hora estimada, ya llegaron a Tierra. Solo lectura: no cambia ningún estado."""
+    return [dict(f) for f in conn.execute(
+        """SELECT id, tripulante_id, tipo_evento, prioridad, payload, hash, transmitido_ts, llegada_estimada_ts,
+                  ack_estimado_ts
+           FROM cola_salida WHERE llegada_estimada_ts IS NOT NULL AND llegada_estimada_ts<=?
+           ORDER BY prioridad ASC, id ASC LIMIT ?""", (ahora_iso, limite))]
+
+
+def en_camino(conn: sqlite3.Connection, ahora_iso: str) -> int:
+    return conn.execute(
+        "SELECT COUNT(*) FROM cola_salida WHERE llegada_estimada_ts IS NOT NULL AND llegada_estimada_ts>?",
+        (ahora_iso,)).fetchone()[0]
+
+
+def retenidos(conn: sqlite3.Connection) -> int:
+    return conn.execute("SELECT COUNT(*) FROM cola_salida WHERE estado='retenido'").fetchone()[0]
