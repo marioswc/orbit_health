@@ -21,6 +21,14 @@ def init_db(db_path: str | None = None) -> None:
     conn = get_conn(db_path)
     try:
         conn.executescript(SCHEMA.read_text(encoding="utf-8"))
+        _migrar(conn)
         conn.commit()
     finally:
         conn.close()
+
+
+def _migrar(conn: sqlite3.Connection) -> None:
+    """Bases creadas antes de agregar columnas: las añade sin perder datos."""
+    columnas = {f["name"] for f in conn.execute("PRAGMA table_info(cola_salida)")}
+    if "ack_estimado_ts" not in columnas:
+        conn.execute("ALTER TABLE cola_salida ADD COLUMN ack_estimado_ts TEXT")

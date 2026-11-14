@@ -39,6 +39,30 @@ def ultimo_global(conn: sqlite3.Connection, indicador: str, desde: str) -> float
     return f["valor"] if f else None
 
 
+def serie(conn: sqlite3.Connection, tid: str, indicador: str, desde: str, limite: int) -> list[dict]:
+    """Serie temporal de un indicador, de la más antigua a la más reciente, para graficar."""
+    filas = conn.execute(
+        """SELECT ts, valor, nivel, origen FROM (
+               SELECT id, ts, valor, nivel, origen FROM lecturas
+               WHERE tripulante_id=? AND indicador=? AND ts>=? ORDER BY id DESC LIMIT ?)
+           ORDER BY id ASC""", (tid, indicador, desde, limite)).fetchall()
+    return [dict(f) for f in filas]
+
+
+def recientes(conn: sqlite3.Connection, tid: str, limite: int) -> list[dict]:
+    """Últimas lecturas de un tripulante (más reciente primero)."""
+    return [dict(f) for f in conn.execute(
+        "SELECT ts, indicador, valor, unidad, nivel, origen FROM lecturas WHERE tripulante_id=? ORDER BY id DESC LIMIT ?",
+        (tid, limite))]
+
+
+def historial_previo(conn: sqlite3.Connection, tid: str, indicador: str, desde: str, antes_de: str) -> list[float]:
+    """Valores del indicador entre `desde` y antes de `antes_de` (excluye la propia lectura)."""
+    return [f["valor"] for f in conn.execute(
+        "SELECT valor FROM lecturas WHERE tripulante_id=? AND indicador=? AND ts>=? AND ts<?",
+        (tid, indicador, desde, antes_de))]
+
+
 def historial(conn: sqlite3.Connection, tid: str, indicador: str, desde: str) -> list[float]:
     return [f["valor"] for f in conn.execute(
         "SELECT valor FROM lecturas WHERE tripulante_id=? AND indicador=? AND ts>=?",

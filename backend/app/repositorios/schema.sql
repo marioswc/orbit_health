@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS cola_salida (
     hash TEXT NOT NULL UNIQUE,
     estado TEXT NOT NULL DEFAULT 'retenido' CHECK (estado IN ('retenido','en_transito','recibido')),
     transmitido_ts TEXT,
-    llegada_estimada_ts TEXT
+    llegada_estimada_ts TEXT,
+    ack_estimado_ts TEXT
 );
 
 -- Sin relación con cola_salida por diseño.
@@ -62,6 +63,7 @@ CREATE TABLE IF NOT EXISTS capsulas (
 
 CREATE INDEX IF NOT EXISTS idx_lecturas_trip_ts ON lecturas (tripulante_id, ts DESC);
 CREATE INDEX IF NOT EXISTS idx_cola_despacho ON cola_salida (estado, prioridad ASC, id ASC);
+CREATE INDEX IF NOT EXISTS idx_cola_llegada ON cola_salida (estado, llegada_estimada_ts);
 CREATE INDEX IF NOT EXISTS idx_diario_trip ON diario_privado (tripulante_id, ts DESC);
 
 -- Estado del enlace persistente: sobrevive a reinicios del servidor.
@@ -71,3 +73,54 @@ CREATE TABLE IF NOT EXISTS estado_enlace (
     entorno TEXT NOT NULL
 );
 INSERT OR IGNORE INTO estado_enlace (id, activo, entorno) VALUES (1, 1, 'marte');
+
+-- Seguridad local: credenciales por tripulante, sesiones persistentes y auditoría encadenada.
+CREATE TABLE IF NOT EXISTS credenciales (
+    tripulante_id TEXT PRIMARY KEY REFERENCES tripulantes(id) ON DELETE CASCADE,
+    rol TEXT NOT NULL CHECK (rol IN ('tripulante','medico','comandante')),
+    pin_salt TEXT NOT NULL,
+    pin_hash TEXT NOT NULL,
+    recup_salt TEXT NOT NULL,
+    recup_hash TEXT NOT NULL,
+    intentos_fallidos INTEGER NOT NULL DEFAULT 0,
+    bloqueado_hasta TEXT,
+    actualizado_ts TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sesiones (
+    token_hash TEXT PRIMARY KEY,
+    tripulante_id TEXT NOT NULL REFERENCES tripulantes(id) ON DELETE CASCADE,
+    creada_ts TEXT NOT NULL,
+    expira_ts TEXT NOT NULL,
+    revocada INTEGER NOT NULL DEFAULT 0
+);
+
+-- Mismas columnas que la cola para reutilizar la verificación de la cadena de hash.
+CREATE TABLE IF NOT EXISTS auditoria (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tripulante_id TEXT NOT NULL,        -- quién actuó ('sistema' si no hay autenticación)
+    tipo_evento TEXT NOT NULL,          -- acción
+    prioridad INTEGER NOT NULL DEFAULT 0,
+    payload TEXT NOT NULL,              -- JSON con objetivo y detalle
+    ts_guardado TEXT NOT NULL,
+    hash_prev TEXT NOT NULL,
+    hash TEXT NOT NULL UNIQUE
+);
+
+-- Ánimo diario (1 a 5): privado como el PHQ-2; nunca entra a la cola de salida.
+CREATE TABLE IF NOT EXISTS animo_diario (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tripulante_id TEXT NOT NULL REFERENCES tripulantes(id) ON DELETE CASCADE,
+    valor INTEGER NOT NULL CHECK (valor BETWEEN 1 AND 5),
+    ts TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_animo_trip_ts ON animo_diario (tripulante_id, ts DESC);
+
+-- Preferencias que el propio astronauta elige para adaptar el asistente (no se deduce nada de su diario ni de su ánimo).
+CREATE TABLE IF NOT EXISTS preferencias (
+    tripulante_id TEXT PRIMARY KEY REFERENCES tripulantes(id) ON DELETE CASCADE,
+    tono TEXT NOT NULL DEFAULT 'directo' CHECK (tono IN ('directo','calido')),
+    detalle TEXT NOT NULL DEFAULT 'completo' CHECK (detalle IN ('breve','completo')),
+    recordatorios TEXT NOT NULL DEFAULT 'normal' CHECK (recordatorios IN ('minimo','normal','frecuente')),
+    actualizado_ts TEXT NOT NULL
+);

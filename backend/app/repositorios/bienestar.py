@@ -30,3 +30,13 @@ def contar_capsulas(conn: sqlite3.Connection) -> int:
 
 def insertar_capsulas(conn: sqlite3.Connection, filas: list[tuple]) -> None:
     conn.executemany("INSERT INTO capsulas (id,categoria,titulo,contenido_markdown) VALUES (?,?,?,?)", filas)
+
+
+def insertar_animo(conn: sqlite3.Connection, tid: str, valor: int, ts: str) -> int:
+    return conn.execute("INSERT INTO animo_diario (tripulante_id, valor, ts) VALUES (?,?,?)", (tid, valor, ts)).lastrowid
+
+
+def animo_desde(conn: sqlite3.Connection, tid: str, desde: str, antes_de: str | None = None) -> list[dict]:
+    filtro, params = ("AND ts<?", (tid, desde, antes_de)) if antes_de else ("", (tid, desde))
+    return [dict(f) for f in conn.execute(
+        f"SELECT ts, valor FROM animo_diario WHERE tripulante_id=? AND ts>=? {filtro} ORDER BY id ASC", params)]

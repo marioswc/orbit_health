@@ -1,0 +1,77 @@
+{
+  "estado": "asociaciones de diseño del equipo; NASA no clasifica los indicadores de esta manera",
+  "fuentes": {
+    "peligros": "https://www.nasa.gov/hrp/hazards",
+    "riesgos": "https://www.nasa.gov/hrp/risks/"
+  },
+  "peligros": {
+    "radiacion": {
+      "nombre": "Radiación espacial",
+      "nombre_oficial": "Space Radiation",
+      "url": "https://www.nasa.gov/hrp/hazard-space-radiation/",
+      "resumen": "La radiación es invisible y la propia NASA la considera uno de los aspectos más peligrosos del vuelo espacial.",
+      "como_responde_orbit": "Registra la dosis acumulada como porcentaje del límite fijado para la misión y avisa al acercarse a él."
+    },
+    "aislamiento_confinamiento": {
+      "nombre": "Aislamiento y confinamiento",
+      "nombre_oficial": "Isolation and Confinement",
+      "url": "https://www.nasa.gov/hrp/hazard-isolation-and-confinement/",
+      "resumen": "Los grupos aislados en un espacio pequeño durante mucho tiempo muestran respuestas de conducta; por eso las tripulaciones se seleccionan, entrenan y apoyan con cuidado.",
+      "como_responde_orbit": "Sigue las horas de sueño y el ánimo diario, ofrece un tamizaje privado y un diario personal que nunca sale de la nave."
+    },
+    "distancia_tierra": {
+      "nombre": "Distancia a la Tierra",
+      "nombre_oficial": "Distance from Earth",
+      "url": "https://www.nasa.gov/hrp/hazard-distance-from-earth/",
+      "resumen": "Cuanto más lejos viaja la tripulación, más difícil es recibir instrucciones, suministros y atención médica desde la Tierra. La NASA afirma que la planificación y la autosuficiencia serán clave.",
+      "como_responde_orbit": "Decide a bordo sin esperar a Tierra, retiene los mensajes durante un apagón y envía primero lo más urgente cuando vuelve el enlace."
+    },
+    "campos_gravedad": {
+      "nombre": "Campos de gravedad",
+      "nombre_oficial": "Gravity Fields",
+      "url": "https://www.nasa.gov/hrp/hazard-gravity-fields/",
+      "resumen": "El cuerpo debe adaptarse a distintos niveles de gravedad: la nave, la Luna o Marte, y de nuevo la Tierra al volver.",
+      "como_responde_orbit": "Compara a cada persona con su propia línea base móvil, porque lo normal en un nivel de gravedad no lo es en otro."
+    },
+    "entornos_hostiles_cerrados": {
+      "nombre": "Entornos hostiles y cerrados",
+      "nombre_oficial": "Hostile/Closed Environments",
+      "url": "https://www.nasa.gov/hrp/hazard-hostile-closed-environments/",
+      "resumen": "Mantener un ecosistema seguro dentro de la nave es difícil: influyen la temperatura, la presión, la luz, el ruido, los microbios y las respuestas inmunitarias.",
+      "como_responde_orbit": "Vigila el CO₂ de la cabina, la temperatura y la oxigenación, y cruza el aire con el estado de varios tripulantes a la vez."
+    }
+  },
+  "indicadores_por_peligro": {
+    "dosis_pct": ["radiacion"],
+    "sueno_horas": ["aislamiento_confinamiento"],
+    "animo": ["aislamiento_confinamiento"],
+    "presion_sistolica": ["campos_gravedad"],
+    "presion_diastolica": ["campos_gravedad"],
+    "frecuencia_cardiaca": ["campos_gravedad"],
+    "spo2": ["entornos_hostiles_cerrados"],
+    "frecuencia_respiratoria": ["entornos_hostiles_cerrados"],
+    "co2": ["entornos_hostiles_cerrados"],
+    "temperatura": ["entornos_hostiles_cerrados"],
+    "glucosa": ["entornos_hostiles_cerrados"],
+    "avpu": []
+  },
+  "riesgos": [
+    {"nombre_oficial": "Risk of Altered Immune System Responses", "url": "https://www.nasa.gov/reference/risk-of-altered-immune-system-responses/", "cobertura": "parcial", "indicadores": ["temperatura"], "nota": "La temperatura es solo una señal indirecta."},
+    {"nombre_oficial": "Risk of Altered Sensorimotor and Vestibular Function", "url": "https://www.nasa.gov/reference/risk-of-altered-sensorimotor-and-vestibular-function/", "cobertura": "no_cubierto", "indicadores": [], "nota": "Requeriría pruebas de coordinación y equilibrio."},
+    {"nombre_oficial": "Risk of Cardiovascular Adaptations", "url": "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/", "cobertura": "parcial", "indicadores": ["presion_sistolica", "presion_diastolica", "frecuencia_cardiaca"], "nota": "Mide presión y pulso con línea base personal; no hay estudios cardiovasculares."},
+    {"nombre_oficial": "Risk of Decompression Sickness", "url": "https://www.nasa.gov/reference/risk-of-decompression-sickness/", "cobertura": "no_cubierto", "indicadores": [], "nota": ""},
+    {"nombre_oficial": "Risk of Host-Microorganism Interactions", "url": "https://www.nasa.gov/reference/risk-of-host-microorganism-interactions/", "cobertura": "no_cubierto", "indicadores": [], "nota": "Requeriría monitoreo microbiológico."},
+    {"nombre_oficial": "Risk of Hypoxia", "url": "https://www.nasa.gov/reference/risk-of-hypoxia/", "cobertura": "cubierto", "indicadores": ["spo2", "frecuencia_respiratoria"], "nota": "Vigilancia directa de la oxigenación."},
+    {"nombre_oficial": "Risk of Inadequate Food and Nutrition", "url": "https://www.nasa.gov/reference/risk-of-inadequate-food-and-nutrition/", "cobertura": "parcial", "indicadores": ["glucosa"], "nota": "La glucosa no mide la nutrición completa."},
+    {"nombre_oficial": "Risk of Injury and Compromised Performance from Spacewalks", "url": "https://www.nasa.gov/reference/risk-of-injury-and-compromised-performance-from-extravehicular-activity-eva/", "cobertura": "no_cubierto", "indicadores": [], "nota": ""},
+    {"nombre_oficial": "Risk of Reduced Cardiorespiratory and Musculoskeletal Fitness", "url": "https://www.nasa.gov/reference/risk-of-reduced-cardiorespiratory-and-musculoskeletal-fitness/", "cobertura": "no_cubierto", "indicadores": [], "nota": "No hay registro de ejercicio."},
+    {"nombre_oficial": "Risk of Spaceflight Associated Neuro-ocular Syndrome (SANS)", "url": "https://www.nasa.gov/reference/risk-of-spaceflight-associated-neuro-ocular-syndrome-sans/", "cobertura": "no_cubierto", "indicadores": [], "nota": ""},
+    {"nombre_oficial": "Risk of Spaceflight-Induced Bone Changes", "url": "https://www.nasa.gov/reference/risk-of-spaceflight-induced-bone-changes/", "cobertura": "no_cubierto", "indicadores": [], "nota": "Requeriría densitometría u otros biomarcadores."},
+    {"nombre_oficial": "Risk of Behavioral Changes and Psychiatric Disorders", "url": "https://www.nasa.gov/reference/risk-of-behavioral-conditions-and-psychiatric-disorders/", "cobertura": "parcial", "indicadores": ["animo"], "nota": "Tamizaje PHQ-2 y ánimo diario, ambos privados. Es tamizaje, no diagnóstico."},
+    {"nombre_oficial": "Risk of Inadequate Teamwork", "url": "https://www.nasa.gov/reference/risk-of-inadequate-teamwork/", "cobertura": "no_cubierto", "indicadores": [], "nota": ""},
+    {"nombre_oficial": "Risk of Inadequate Sleep and Irregular Schedules", "url": "https://www.nasa.gov/reference/risk-from-inadequate-sleep-and-irregular-schedules/", "cobertura": "parcial", "indicadores": ["sueno_horas"], "nota": "Solo cuenta horas dormidas; no mide calidad ni horarios."},
+    {"nombre_oficial": "Risk of Inadequate Systems Operations Support", "url": "https://www.nasa.gov/reference/risk-of-inadequate-systems-operations-support/", "cobertura": "no_cubierto", "indicadores": [], "nota": ""},
+    {"nombre_oficial": "Risk of Injury from Dynamic Loads", "url": "https://www.nasa.gov/reference/risk-of-injury-from-dynamic-loads/", "cobertura": "no_cubierto", "indicadores": [], "nota": ""},
+    {"nombre_oficial": "Risk of Radiation-Induced Cancers", "url": "https://www.nasa.gov/reference/risk-of-radiation-induced-cancers/", "cobertura": "parcial", "indicadores": ["dosis_pct"], "nota": "Sigue la dosis acumulada; no estima el riesgo de cáncer."}
+  ]
+}

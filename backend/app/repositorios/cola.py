@@ -23,10 +23,23 @@ def retenidos_ordenados(conn: sqlite3.Connection) -> list[dict]:
            WHERE estado='retenido' ORDER BY prioridad ASC, id ASC""")]
 
 
-def marcar_en_transito(conn: sqlite3.Connection, evento_id: int, transmitido: str, llegada: str) -> None:
+def en_transito_ordenados(conn: sqlite3.Connection) -> list[dict]:
+    return [dict(f) for f in conn.execute(
+        """SELECT id, tripulante_id, tipo_evento, prioridad, transmitido_ts, llegada_estimada_ts
+           FROM cola_salida WHERE estado='en_transito' ORDER BY prioridad ASC, id ASC""")]
+
+
+def conteo_por_estado_y_prioridad(conn: sqlite3.Connection) -> list[dict]:
+    return [dict(f) for f in conn.execute(
+        "SELECT estado, prioridad, COUNT(*) AS total FROM cola_salida GROUP BY estado, prioridad")]
+
+
+def marcar_en_transito(conn: sqlite3.Connection, evento_id: int, transmitido: str, llegada: str,
+                       ack: str | None = None) -> None:
     conn.execute(
-        "UPDATE cola_salida SET estado='en_transito', transmitido_ts=?, llegada_estimada_ts=? WHERE id=?",
-        (transmitido, llegada, evento_id))
+        """UPDATE cola_salida SET estado='en_transito', transmitido_ts=?, llegada_estimada_ts=?,
+           ack_estimado_ts=? WHERE id=?""",
+        (transmitido, llegada, ack, evento_id))
 
 
 def marcar_recibidos(conn: sqlite3.Connection, ahora_iso: str) -> int:
@@ -42,5 +55,29 @@ def todos_en_orden(conn: sqlite3.Connection):
 def recientes(conn: sqlite3.Connection, limite: int = 200) -> list[dict]:
     return [dict(f) for f in conn.execute(
         """SELECT id, tripulante_id, tipo_evento, prioridad, estado, hash, ts_guardado,
-                  transmitido_ts, llegada_estimada_ts
+                  transmitido_ts, llegada_estimada_ts, ack_estimado_ts
            FROM cola_salida ORDER BY id DESC LIMIT ?""", (limite,))]
+
+
+def conteo_por_estado(conn: sqlite3.Connection, tid: str) -> dict:
+    return {f["estado"]: f["n"] for f in conn.execute(
+        "SELECT estado, COUNT(*) AS n FROM cola_salida WHERE tripulante_id=? GROUP BY estado", (tid,))}
+
+
+def llegados(conn: sqlite3.Connection, ahora_iso: str, limite: int) -> list[dict]:
+    """Eventos que, por la hora estimada, ya llegaron a Tierra. Solo lectura: no cambia ningún estado."""
+    return [dict(f) for f in conn.execute(
+        """SELECT id, tripulante_id, tipo_evento, prioridad, payload, hash, transmitido_ts, llegada_estimada_ts,
+                  ack_estimado_ts
+           FROM cola_salida WHERE llegada_estimada_ts IS NOT NULL AND llegada_estimada_ts<=?
+           ORDER BY prioridad ASC, id ASC LIMIT ?""", (ahora_iso, limite))]
+
+
+def en_camino(conn: sqlite3.Connection, ahora_iso: str) -> int:
+    return conn.execute(
+        "SELECT COUNT(*) FROM cola_salida WHERE llegada_estimada_ts IS NOT NULL AND llegada_estimada_ts>?",
+        (ahora_iso,)).fetchone()[0]
+
+
+def retenidos(conn: sqlite3.Connection) -> int:
+    return conn.execute("SELECT COUNT(*) FROM cola_salida WHERE estado='retenido'").fetchone()[0]

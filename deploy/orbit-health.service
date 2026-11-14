@@ -1,0 +1,20 @@
+# Ejemplo de servicio systemd: arranca solo al encender el equipo y se reinicia si falla.
+# Instalar: copiar a /etc/systemd/system/, ajustar rutas y usuario, y ejecutar:
+#   systemctl daemon-reload && systemctl enable --now orbit-health
+[Unit]
+Description=ORBIT Health (apoyo a la decisión clínica, 100 % local)
+After=local-fs.target
+
+[Service]
+Type=simple
+User=orbit
+WorkingDirectory=/opt/orbit_health
+ExecStart=/opt/orbit_health/run.sh
+Restart=always
+RestartSec=3
+# Para atender otros dispositivos de la cabina (solo en red aislada y confiable):
+# Environment=ORBIT_HOST=0.0.0.0
+# Environment=ORBIT_PERMITIR_RED=1
+
+[Install]
+WantedBy=multi-user.target

@@ -24,3 +24,21 @@
 |---|---|---|
 | Vigencia de lecturas por nivel (60/15/15) | Evita arrastrar puntajes viejos | Más reglas que validar |
 | Marcar los primeros N días como adaptación y no emitir avisos de línea base | Menos falsas alarmas al inicio | Puede ocultar un deterioro real; N lo define el clínico |
+
+## Pensado para quien está a bordo (decisiones de diseño, 14/11)
+
+| Necesidad de la tripulación | Qué hace el sistema | Límite |
+|---|---|---|
+| Nadie puede reparar el sistema | Verifica la base al arrancar, restaura el último respaldo válido y respalda solo; conserva la base dañada como evidencia. `GET /api/salud` informa el estado | Los respaldos viven en el mismo equipo: si falla el disco completo, se pierden |
+| Una alerta roja sin instrucciones genera pánico | Cada alerta devuelve `acciones_sugeridas`: repetir la medición, avisar, volver a medir en N min | Son pasos de procedimiento. **No hay indicaciones de tratamiento**; las debe definir un clínico |
+| Alguien puede quedar incapacitado | Cualquier tripulante autenticado registra y ve los signos de un compañero | Queda en la auditoría |
+
+## Para el reto (revisado contra las reglas oficiales, 14/11)
+
+| Tema | Decisión | Nota |
+|---|---|---|
+| Criterio "Relevancia" pide integrar datos de NASA como componente central | Se integró el marco de peligros y riesgos del HRP (`GET /api/peligros`) y cada alerta indica su peligro | La asociación indicador-peligro es de diseño nuestro, no oficial. Cobertura honesta: 1 de 17 riesgos cubierto, 6 parciales, 10 no |
+| Uso de IA | Se permite, con declaración obligatoria y sin usarla para idear la solución | Ver `SI_DISCLOSURE.md`; el equipo debe completar los puntos marcados |
+| "IA adaptada a la personalidad" | Se implementó como preferencias elegidas por cada tripulante (tono, detalle, recordatorios) | Solo cambia la redacción, nunca el nivel de alerta. No se infiere nada del diario ni del ánimo. Un modelo local es trabajo futuro |
+| Contenido educativo | `GET /api/explicaciones` por indicador, con fuentes oficiales | Pendiente de validación clínica; sin consejo médico ni de medicación |
+| Sueño y ánimo | Indicadores nuevos; el ánimo es privado como el PHQ-2 | Umbrales son supuestos |

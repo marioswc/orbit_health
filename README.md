@@ -1,6 +1,8 @@
 # ORBIT Health
 
 Apoyo a la decisión clínica para tripulaciones con comunicación degradada. Funciona 100 % local.
+**English:** [README.en.md](README.en.md). English summary for judges: [docs/PROJECT_SUMMARY_EN.md](docs/PROJECT_SUMMARY_EN.md). Use of SI tools (required by the challenge): [docs/SI_DISCLOSURE.md](docs/SI_DISCLOSURE.md).
+
 Plan completo: [PLAN_DE_DESARROLLO.md](backend/docs/PLAN_DE_DESARROLLO.md).
 
 ## Producción local (un solo servidor, sin internet)
@@ -29,6 +31,54 @@ scripts/cargar_calibracion.sh     # sin red: carga series BIDMC como historial d
 
 Los registros son de pacientes críticos hospitalizados (ver `data/physionet/ATRIBUCION.md`): sirven para dar
 variabilidad realista a la demo, no como línea base clínica.
+
+## Despliegue a bordo (más allá de `localhost`)
+
+`localhost` es el modo de una sola estación. Para atender a toda la tripulación:
+
+| Necesidad | Qué hay hoy | Qué falta |
+|---|---|---|
+| Arranque automático y reinicio si falla | `deploy/orbit-health.service` (systemd) | Probarlo en el equipo de destino |
+| Atender otros dispositivos de la cabina | `ORBIT_HOST=0.0.0.0` exige `ORBIT_AUTH=1` (autenticación por tripulante con PIN, roles y auditoría; ver [docs/SEGURIDAD_A_BORDO.md](docs/SEGURIDAD_A_BORDO.md)) | TLS y cifrado de la base |
+| Respaldo de datos | `scripts/respaldar_db.sh` (consistente, con rotación) | Programarlo (cron o systemd timer) y definir dónde se guarda |
+| Sin Node ni internet en el destino | El build del frontend es estático y lo sirve el backend | Paquete de instalación con las dependencias de Python precargadas |
+
+## Simular la latencia del enlace
+
+| Modo | Configuración | Retardo de ida (Marte, peor caso) |
+|---|---|---|
+| Demo acelerada (por defecto) | `ORBIT_FACTOR_ACELERACION=30` | 40 s |
+| Tiempo real | `ORBIT_FACTOR_ACELERACION=1` | 1200 s (20 min) |
+| Con variación | `ORBIT_JITTER_PCT=15` y, para repetirlo, `ORBIT_JITTER_SEMILLA=42` | ±15 % |
+
+- Perfiles en `backend/app/datos/enlace.json`: `luna`, `marte_cercano`, `marte_medio` y `marte`. Cambian con `POST /api/enlace`.
+- Cada evento pasa por `retenido` → `en_transito` → `recibido` (llegó a Tierra) y queda `confirmado` cuando vuelve la confirmación (ida y vuelta).
+- `GET /api/enlace/latencia` devuelve el perfil vigente, los tiempos reales y simulados y los eventos en tránsito.
+- Los retardos son supuestos de diseño y deben verificarse contra fuentes publicadas antes de citarlos.
+
+## Endpoints útiles para el frontend
+
+| Endpoint | Para qué |
+|---|---|
+| `GET /api/historial/{id}?indicador=` | Serie temporal para gráficas |
+| `GET /api/explicaciones` y `/{indicador}` | Qué es, por qué se mide, cómo medirlo y qué cambia en el espacio |
+| `GET /api/peligros` | Marco de peligros y riesgos del HRP con la cobertura real |
+| `GET/PUT /api/preferencias/{id}` | Tono, detalle y recordatorios del asistente (solo su dueño) |
+| `POST /api/animo`, `GET /api/animo/{id}` | Ánimo diario, privado |
+| `GET /api/demo/comparativa?entorno=&respuesta_tierra_min=` | Línea de tiempo con y sin ORBIT |
+| `GET /api/tierra/mensajes` | Vista del centro de control: solo lo que ya llegó, lo urgente primero. Solo lectura, no consume mensajes |
+| `GET /api/informe` y `/api/informe/{id}` | Informe exportable (JSON o CSV) con huella de integridad |
+
+## Escenarios de demo
+
+```bash
+curl -X POST localhost:3000/api/demo/escenarios/hipoxia_eclipse                 # deja el enlace en eclipse
+curl -X POST "localhost:3000/api/demo/escenarios/hipoxia_eclipse?reconectar=true"  # y reconecta en el mismo paso
+curl -X POST localhost:3000/api/demo/escenarios/co2_colectivo
+curl localhost:3000/api/demo/escenarios                                         # lista de guiones
+```
+
+Escriben datos de demostración: en cualquier otro entorno, desactivar con `ORBIT_DEMO_API=0`.
 
 ## Desarrollo
 

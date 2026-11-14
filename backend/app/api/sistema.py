@@ -1,8 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from ..dominio.catalogos import INDICADORES
+from ..dominio import peligros as dominio_peligros
+from ..dominio.explicaciones import DATOS as EXPLICACIONES
 from ..dominio.umbrales import UMBRALES
 from ..repositorios import tripulantes
+from ..servicios import recuperacion
 from .dependencias import conexion
 
 router = APIRouter(prefix="/api", tags=["sistema"])
@@ -11,6 +14,12 @@ router = APIRouter(prefix="/api", tags=["sistema"])
 @router.get("/health")
 def health() -> dict:
     return {"status": "ok"}
+
+
+@router.get("/salud")
+def salud(request: Request) -> dict:
+    """Estado de la base y de los respaldos. Pensado para que un tripulante no técnico sepa si todo está bien."""
+    return recuperacion.estado_salud(arranque=getattr(request.app.state, "arranque", None))
 
 
 @router.get("/umbrales")
@@ -23,6 +32,26 @@ def umbrales_estado() -> dict:
 def indicadores() -> list[dict]:
     return [{"clave": k, "etiqueta": v[0], "unidad": v[1], "min": v[2], "max": v[3]}
             for k, v in INDICADORES.items()]
+
+
+@router.get("/explicaciones")
+def explicaciones() -> dict:
+    """Qué es cada medición, por qué se mide, cómo medirla y qué cambia en el espacio."""
+    return EXPLICACIONES
+
+
+@router.get("/explicaciones/{clave}")
+def explicacion(clave: str) -> dict:
+    if clave not in EXPLICACIONES["explicaciones"]:
+        raise HTTPException(404, "No hay explicación para ese indicador")
+    return {"clave": clave, "estado": EXPLICACIONES["estado"], "aviso": EXPLICACIONES["aviso"],
+            **EXPLICACIONES["explicaciones"][clave]}
+
+
+@router.get("/peligros")
+def peligros() -> dict:
+    """Marco de peligros y riesgos del HRP, con la cobertura real de ORBIT Health por cada riesgo."""
+    return {**dominio_peligros.DATOS, "resumen_cobertura": dominio_peligros.resumen_cobertura()}
 
 
 @router.get("/tripulantes")

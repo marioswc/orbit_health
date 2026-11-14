@@ -1,0 +1,104 @@
+{
+  "estado": "pendiente de validación clínica",
+  "aviso": "Información general de apoyo. No sustituye el criterio del médico de a bordo ni de los cirujanos de vuelo.",
+  "explicaciones": {
+    "temperatura": {
+      "que_es": "La temperatura aproximada de tu cuerpo.",
+      "por_que_se_mide": "Una temperatura muy alta o muy baja puede indicar infección, inflamación o que el cuerpo no regula bien el calor.",
+      "como_medirlo": "Usa el termómetro del equipo, en reposo, siempre en la misma zona y sin ejercicio reciente.",
+      "en_el_espacio": "En una nave cerrada, el estrés y el aislamiento pueden afectar las defensas del cuerpo, y la temperatura de la cabina o el ejercicio pueden alterar la lectura.",
+      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al médico de a bordo.",
+      "fuentes": ["https://www.nasa.gov/reference/risk-of-altered-immune-system-responses/"]
+    },
+    "presion_sistolica": {
+      "que_es": "La presión cuando el corazón late y empuja la sangre (el número más alto).",
+      "por_que_se_mide": "Valores muy bajos o muy altos pueden señalar problemas del corazón, de los vasos o de hidratación.",
+      "como_medirlo": "Mide sentado y en reposo unos minutos antes, con el brazalete a la altura del corazón.",
+      "en_el_espacio": "El cuerpo debe adaptarse a otros niveles de gravedad, y eso puede cambiar la presión. Por eso se compara con tu propio historial.",
+      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al médico de a bordo.",
+      "fuentes": ["https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/", "https://www.nasa.gov/hrp/hazard-gravity-fields/"]
+    },
+    "presion_diastolica": {
+      "que_es": "La presión entre un latido y otro (el número más bajo).",
+      "por_que_se_mide": "Junto con la sistólica, ayuda a ver cómo está funcionando el sistema circulatorio.",
+      "como_medirlo": "Sale en la misma medición que la sistólica, en reposo.",
+      "en_el_espacio": "La adaptación del cuerpo a otros niveles de gravedad también puede influir en este valor.",
+      "cuando_avisar": "Un valor bajo se marca solo como observación; si te sientes mal, avisa al médico de a bordo.",
+      "fuentes": ["https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/"]
+    },
+    "frecuencia_cardiaca": {
+      "que_es": "Cuántas veces late tu corazón por minuto.",
+      "por_que_se_mide": "Un pulso muy alto o muy bajo en reposo puede indicar estrés, fiebre, deshidratación o problemas del corazón.",
+      "como_medirlo": "Mide en reposo, contando durante un minuto o con el sensor del equipo.",
+      "en_el_espacio": "El ejercicio, el estrés y la adaptación a otra gravedad pueden modificarla; por eso importa más cómo cambia respecto a tu rango habitual.",
+      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al médico de a bordo.",
+      "fuentes": ["https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/"]
+    },
+    "frecuencia_respiratoria": {
+      "que_es": "Cuántas veces respiras por minuto.",
+      "por_que_se_mide": "Respirar más rápido de lo normal es una de las primeras señales de que algo no va bien, por ejemplo con fiebre o poco oxígeno.",
+      "como_medirlo": "Cuenta las respiraciones durante un minuto, en reposo y sin que la persona lo note, porque se altera al pensar en ello.",
+      "en_el_espacio": "En un ambiente cerrado, un aire con más dióxido de carbono puede hacerte respirar más rápido. Por eso el sistema cruza esta medida con el aire de la cabina.",
+      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al médico de a bordo.",
+      "fuentes": ["https://www.nasa.gov/reference/risk-of-hypoxia/"]
+    },
+    "spo2": {
+      "que_es": "El porcentaje de oxígeno que lleva tu sangre.",
+      "por_que_se_mide": "Un valor bajo significa que al cuerpo le llega menos oxígeno y es una señal importante a vigilar.",
+      "como_medirlo": "Usa el oxímetro en el dedo, con la mano tibia, quieta y sin esmalte. Las manos frías o el movimiento dan lecturas falsas.",
+      "en_el_espacio": "Un fallo en la depuración del aire o un exceso de dióxido de carbono en la cabina puede afectar la respiración.",
+      "cuando_avisar": "Si baja, repite la medición enseguida para descartar un error y avisa al médico de a bordo o al comandante.",
+      "fuentes": ["https://www.nasa.gov/reference/risk-of-hypoxia/"]
+    },
+    "avpu": {
+      "que_es": "Una escala rápida del nivel de conciencia: Alerta, responde a la Voz, responde al Dolor, Sin respuesta.",
+      "por_que_se_mide": "Un cambio en el nivel de conciencia es una señal grave que requiere atención inmediata.",
+      "como_medirlo": "La suele evaluar otra persona: ¿está alerta y responde con normalidad? Si no, regístralo.",
+      "en_el_espacio": "Si un tripulante no puede registrarse a sí mismo, cualquier compañero con acceso puede registrar su estado.",
+      "cuando_avisar": "Cualquier valor distinto de Alerta se marca como rojo: avisa de inmediato.",
+      "fuentes": ["https://www.nasa.gov/hrp/hazard-distance-from-earth/"]
+    },
+    "glucosa": {
+      "que_es": "La cantidad de azúcar en sangre, en mg/dL.",
+      "por_que_se_mide": "Valores muy bajos o muy altos afectan al cerebro y al cuerpo y pueden señalar problemas del metabolismo.",
+      "como_medirlo": "Con el glucómetro, de preferencia en ayunas, para que las mediciones sean comparables entre días.",
+      "en_el_espacio": "Los cambios de dieta, el estrés y la actividad en misión pueden alterar la glucosa.",
+      "cuando_avisar": "Los valores un poco elevados se marcan como observación; los extremos, como alerta.",
+      "fuentes": ["https://www.nasa.gov/reference/risk-of-inadequate-food-and-nutrition/"]
+    },
+    "co2": {
+      "que_es": "La cantidad de dióxido de carbono en el aire de la cabina.",
+      "por_que_se_mide": "En un sistema cerrado donde el aire se recicla, el CO₂ se acumula si falla la depuración y puede causar dolor de cabeza y cansancio.",
+      "como_medirlo": "Lo mide el sensor de la cabina; aquí puedes registrar la lectura del panel.",
+      "en_el_espacio": "En la nave no se puede abrir una ventana: el aire depende por completo de los equipos de soporte vital.",
+      "cuando_avisar": "Si sube, revisa los equipos de depuración y observa si varias personas tienen síntomas a la vez; el sistema cruza ambos datos.",
+      "fuentes": ["https://www.nasa.gov/hrp/hazard-hostile-closed-environments/"]
+    },
+    "dosis_pct": {
+      "que_es": "La radiación acumulada, expresada como porcentaje del límite de la misión.",
+      "por_que_se_mide": "Fuera de la protección de la Tierra, la tripulación recibe más radiación, y su efecto se acumula con el tiempo.",
+      "como_medirlo": "Se obtiene de los dosímetros de la nave o de la tripulación.",
+      "en_el_espacio": "La radiación es uno de los cinco grandes peligros de las misiones largas.",
+      "cuando_avisar": "Se marca amarillo y rojo al acercarse al límite fijado para la misión.",
+      "fuentes": ["https://www.nasa.gov/hrp/hazard-space-radiation/", "https://www.canada.ca/en/space-agency/news/2026/02/canadian-space-radiation-technology-to-support-health-and-safety.html"]
+    },
+    "sueno_horas": {
+      "que_es": "Las horas que dormiste en el último ciclo.",
+      "por_que_se_mide": "Dormir poco afecta la atención, el ánimo y las defensas del cuerpo, y es una de las primeras señales de desgaste.",
+      "como_medirlo": "Anota las horas dormidas al despertar, o usa el dato de un reloj de actividad.",
+      "en_el_espacio": "El aislamiento, la carga de trabajo y los cambios de luz pueden reducir y desordenar el sueño en misión.",
+      "cuando_avisar": "Dormir pocas horas se marca como aviso, nunca como emergencia por sí solo.",
+      "habitos_generales": ["Mantén horarios regulares de descanso.", "Reduce la luz intensa antes de dormir."],
+      "fuentes": ["https://www.nasa.gov/reference/risk-from-inadequate-sleep-and-irregular-schedules/", "https://www.nasa.gov/reference/archer"]
+    },
+    "animo": {
+      "que_es": "Cómo te sientes hoy, de 1 (muy mal) a 5 (muy bien).",
+      "por_que_se_mide": "Los cambios sostenidos en el ánimo pueden ser una señal temprana de desgaste por el aislamiento y el confinamiento.",
+      "como_medirlo": "Elige el número que mejor describa tu día. Es rápido y es solo para ti.",
+      "en_el_espacio": "Vivir en un espacio pequeño y cerrado con poca variedad pone a prueba el ánimo de cualquier persona.",
+      "cuando_avisar": "Es privado: nadie lo ve ni se envía a Tierra. Si baja, el sistema te ofrece apoyo y siempre decides tú.",
+      "habitos_generales": ["Habla con un compañero o con el médico de a bordo cuando lo necesites."],
+      "fuentes": ["https://www.nasa.gov/reference/risk-of-behavioral-conditions-and-psychiatric-disorders/", "https://www.nasa.gov/hrp/hazard-isolation-and-confinement/"]
+    }
+  }
+}
