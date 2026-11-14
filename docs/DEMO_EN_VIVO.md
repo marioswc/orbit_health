@@ -21,6 +21,21 @@ Con `ritmo=15` y `tick_s=1`, la misión dura unos 2 minutos y medio. Para una de
 
 Para empezar de cero, arranca con una base nueva: `ORBIT_DB_PATH=/tmp/demo.db ./run.sh`. La simulación **no borra nada**.
 
+## Exposición a radiación con el sensor simulado
+
+El dispositivo simulado incluye el perfil `exposicion_radiacion`. Genera una dosis acumulada
+monotónica desde 68 % hasta 95 % del límite de misión, por lo que atraviesa el umbral amarillo
+de 70 % y termina en rojo al alcanzar 90 %. Se procesa por el mismo servicio de lecturas,
+se guarda con `origen = simulado`, aparece en el historial y genera eventos en la cola.
+
+```bash
+curl -X POST "localhost:3000/api/demo/sensor/T1?perfil=exposicion_radiacion&ticks=12"
+curl "localhost:3000/api/historial/T1?indicador=dosis_pct"
+```
+
+Los valores son hipotéticos para demostración y no representan una medición física ni una
+calibración de radiación real.
+
 ## La historia (minutos de misión)
 
 | Min | Qué pasa | Qué se ve |
