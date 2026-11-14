@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from . import bienestar, enlace, lecturas, sistema
+from . import auth, bienestar, enlace, lecturas, sistema
 
 router = APIRouter()
-for modulo in (sistema, lecturas, bienestar, enlace):
+for modulo in (sistema, auth, lecturas, bienestar, enlace):
     router.include_router(modulo.router)
