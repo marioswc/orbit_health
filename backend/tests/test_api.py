@@ -174,3 +174,19 @@ def test_lectura_normal_no_queda_contaminada_por_alerta_previa(cliente):
     lectura(cliente, "spo2", 98)          # se normaliza SpO2
     estado_final = cliente.get("/api/estado/T1").json()
     assert estado_final["nivel_general"] == "verde" and estado_final["news2"]["nivel"] == "verde"
+
+
+def test_estado_expone_linea_base_por_indicador(cliente):
+    for v in (70, 72, 68, 71, 69, 70):
+        lectura(cliente, "frecuencia_cardiaca", v)
+    lectura(cliente, "frecuencia_cardiaca", 120)
+    ind = {i["indicador"]: i for i in cliente.get("/api/estado/T1").json()["indicadores"]}
+    lb = ind["frecuencia_cardiaca"]["linea_base"]
+    assert lb["aplica"] is True and lb["n"] == 6
+    assert 69 <= lb["media"] <= 71 and lb["aviso"] is True and lb["z"] > 2
+
+
+def test_linea_base_sin_historial_suficiente_no_aplica(cliente):
+    lectura(cliente, "spo2", 97)
+    ind = cliente.get("/api/estado/T1").json()["indicadores"][0]
+    assert ind["linea_base"]["aplica"] is False and ind["linea_base"]["aviso"] is False

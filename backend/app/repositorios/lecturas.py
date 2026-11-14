@@ -39,6 +39,13 @@ def ultimo_global(conn: sqlite3.Connection, indicador: str, desde: str) -> float
     return f["valor"] if f else None
 
 
+def historial_previo(conn: sqlite3.Connection, tid: str, indicador: str, desde: str, antes_de: str) -> list[float]:
+    """Valores del indicador entre `desde` y antes de `antes_de` (excluye la propia lectura)."""
+    return [f["valor"] for f in conn.execute(
+        "SELECT valor FROM lecturas WHERE tripulante_id=? AND indicador=? AND ts>=? AND ts<?",
+        (tid, indicador, desde, antes_de))]
+
+
 def historial(conn: sqlite3.Connection, tid: str, indicador: str, desde: str) -> list[float]:
     return [f["valor"] for f in conn.execute(
         "SELECT valor FROM lecturas WHERE tripulante_id=? AND indicador=? AND ts>=?",
