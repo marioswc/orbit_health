@@ -22,7 +22,7 @@ export default function FondoEstrellas() {
       ancho = window.innerWidth; alto = window.innerHeight;
       canvas.width = ancho * dpr; canvas.height = alto * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const n = Math.min(260, Math.round((ancho * alto) / 7000));
+      const n = Math.min(170, Math.round((ancho * alto) / 9000));
       estrellas = Array.from({ length: n }, () => {
         const prof = Math.random(); // 0 lejana, 1 cercana
         return {
@@ -77,11 +77,13 @@ export default function FondoEstrellas() {
       }
     };
 
+    // Parpadeo a ~30 fps (suficiente y mitad de trabajo); a 60 fps solo mientras cruza una estrella fugaz
     let previo = performance.now();
     const ciclo = (t: number) => {
+      raf = requestAnimationFrame(ciclo);
+      if (fugaces.length === 0 && t - previo < 33) return;
       const dt = Math.min((t - previo) / 1000, 0.1); previo = t;
       pintar(t, dt);
-      raf = requestAnimationFrame(ciclo);
     };
 
     const alScroll = () => { scrollY = window.scrollY; if (reducir) pintar(0, 0); };

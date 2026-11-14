@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Contador from "../../../shared/components/Contador";
 import Titular from "../../../shared/components/Titular";
+import TiraIndicadores from "../components/TiraIndicadores";
 import DetalleZona from "../components/DetalleZona";
 import FiguraHumana from "../components/FiguraHumana";
 import TarjetaSignoVital from "../components/TarjetaSignoVital";
@@ -10,8 +11,8 @@ import { CAPAS, ZONAS, nivelZona, type NivelZona } from "../zonas";
 
 interface Props {
   estado: Estado | null;
-  /** Espacio para acciones de otras features (p. ej. captura de mediciones), compuesto desde app/. */
-  children?: ReactNode;
+  /** Abre la captura manual (la compone app/ para no acoplar features). */
+  alAbrirCaptura?: () => void;
   /** Monitor de cabina (feature cabina), compuesto desde app/: se muestra en la columna izquierda. */
   cabina?: ReactNode;
   /** Peor nivel del aire/radiacion de cabina, para marcar Cabeza y Respiratorio en la figura. */
@@ -22,7 +23,7 @@ const SIN_LECTURAS: LecturaEstado[] = []; // referencia estable: evita recalcula
 const TITULAR = { verde: "Sin alertas activas", amarillo: "Requiere vigilancia", rojo: "Atención inmediata", sin_datos: "Sin lecturas recientes" } as const;
 const LEYENDA: [string, string][] = [["verde", "Verde"], ["amarillo", "Amarillo"], ["rojo", "Rojo"], ["sin_datos", "Sin datos"]];
 
-export default function MonitorPage({ estado, children, cabina, ambiente = null }: Props) {
+export default function MonitorPage({ estado, alAbrirCaptura, cabina, ambiente = null }: Props) {
   const { zona, acercado, capa, setCapa, elegir, alejar } = useZonaSeleccionada();
   const [meses, setMeses] = useState(0);
   const nivel = estado?.nivel_general ?? "sin_datos";
@@ -55,6 +56,8 @@ export default function MonitorPage({ estado, children, cabina, ambiente = null 
           </div>
         )}
       </div>
+
+      <TiraIndicadores lecturas={lecturas} destellar={destellar} alAbrirCaptura={alAbrirCaptura} />
 
       <section className="escenario" aria-label="Estado por zona del cuerpo">
         <aside className="lado izq">
@@ -94,17 +97,14 @@ export default function MonitorPage({ estado, children, cabina, ambiente = null 
         </aside>
       </section>
 
-      <div className="fila-2">
-        {children}
-        {lecturas.length > 0 && (
-          <section className="tarjeta">
-            <h2>Indicadores</h2>
-            <div className="signos">
-              {lecturas.map((i) => <TarjetaSignoVital key={`${i.indicador}-${i.valor}-${i.ts}`} lectura={i} destello={destellar} />)}
-            </div>
-          </section>
-        )}
-      </div>
+      {lecturas.length > 0 && (
+        <section className="tarjeta" aria-label="Comparación con línea base">
+          <h2>Línea base personal</h2>
+          <div className="signos">
+            {lecturas.map((i) => <TarjetaSignoVital key={`${i.indicador}-${i.valor}-${i.ts}`} lectura={i} destello={destellar} />)}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

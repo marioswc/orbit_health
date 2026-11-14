@@ -7,6 +7,9 @@ import "./shared/styles/styles.css";
 import "./shared/styles/componentes.css";
 import "./shared/styles/animaciones.css";
 import "./shared/styles/escenario.css";
+import "./shared/styles/layout.css";
+import "./shared/styles/paginas.css";
+import "./shared/styles/alertas.css";
 import "./shared/styles/complementos.css";
 
 createRoot(document.getElementById("root")!).render(

@@ -40,6 +40,14 @@ Registro del trabajo de interfaz en curso. Rama creada desde `frontend` (2026-11
 - Estilo común: fondo semitransparente (82 %), `backdrop-filter`, borde 1 px `--color-stone`, radio 20 px. Las estrellas se ven a través.
 - ≤ 1100 px el escenario sigue apilándose en una columna.
 
+## Rediseño de pestañas y alertas (2026-11-14)
+
+- **`Alerta`** (`shared/components/Alerta.tsx`, estilos en `alertas.css`): alerta de aplicación con baldosa de icono, título y cuerpo; tonos `info`, `aviso`, `error`, `ok`. Sustituye avisos sueltos (prototipo/umbrales, errores, Eclipse, verificación de hash, mensajes del diario y del tamizaje).
+- **Enlace:** visual del canal Nave ↔ Tierra (pulsos cuando hay enlace, línea cortada en Eclipse, retardo según entorno), KPIs con icono, cola por prioridad como tablero (icono, conteo, filas con acento y estado con punto) y tarjeta de integridad con resultado en `Alerta`.
+- **Bienestar:** resultado del tamizaje en `Alerta` (aviso si positivo, ok si negativo).
+- **Captura manual:** el botón sale del header y pasa a un botón flotante abajo a la derecha (`app/BotonCaptura.tsx`, `.fab`); en móvil queda solo con icono. Se oculta mientras el drawer está abierto.
+- `pnpm test` (57) y `tsc --noEmit` pasan. Falta revisión visual en navegador.
+
 ## Pendiente / siguientes pasos
 
 | # | Tarea | Nota |
