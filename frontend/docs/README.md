@@ -5,6 +5,7 @@
 | Documento | Contenido |
 |---|---|
 | [ARQUITECTURA.md](./ARQUITECTURA.md) | Screaming architecture por features, reglas de dependencia, mapa de migración desde el código actual |
+| [ESTILO_PLATAFORMA.md](./ESTILO_PLATAFORMA.md) | Sistema de diseño **vigente**: tokens, modo oscuro, liquid glass, componentes, escenario del astronauta, movimiento, accesibilidad, licencias |
 | [DISENO.md](./DISENO.md) | Sistema de diseño (referencia Dala): tokens, tipografía, componentes, adaptaciones para ORBIT |
 | [FIGURA_HUMANA.md](./FIGURA_HUMANA.md) | Especificación del SVG clicable: zonas, indicadores, estados, accesibilidad |
 | [API.md](./API.md) | Endpoints del backend que consume el frontend y sus tipos |
