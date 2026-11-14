@@ -3,6 +3,8 @@
 Apoyo a la decisión clínica para tripulaciones con comunicación degradada. Funciona 100 % local.
 **English:** [README.en.md](README.en.md). English summary for judges: [docs/PROJECT_SUMMARY_EN.md](docs/PROJECT_SUMMARY_EN.md). Use of SI tools (required by the challenge): [docs/SI_DISCLOSURE.md](docs/SI_DISCLOSURE.md).
 
+Estado y pendientes del equipo: [docs/PENDIENTES.md](docs/PENDIENTES.md).
+
 Plan completo: [PLAN_DE_DESARROLLO.md](backend/docs/PLAN_DE_DESARROLLO.md).
 
 ## Producción local (un solo servidor, sin internet)
