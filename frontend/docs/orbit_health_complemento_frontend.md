@@ -1,3 +1,6 @@
+> **Nota de estilo (acordada 14/11/2026):** todos los componentes de este documento se construyen con el estilo vigente de [ESTILO_PLATAFORMA.md](./ESTILO_PLATAFORMA.md) (tokens de `src/shared/styles/`, paneles liquid glass, semáforo con texto, modo claro y oscuro). Estructura por features (`src/features/<nombre>/`, ver [ARQUITECTURA.md](./ARQUITECTURA.md)).
+> Rutas actuales: `FiguraHumana.tsx` está en `src/features/monitor/components/`; `PanelMedicion.tsx` en `src/features/mediciones/`; `DiarioTripulante.tsx` y `Tamizaje.tsx` en `src/features/bienestar/`; `ConsolaEnlace.tsx` en `src/features/enlace/`. **Decisión (14/11/2026): nos quedamos con el layout y el diseño de Santi.** Se eliminó la propuesta de layout de consola (`DashboardNave`); lo que sigue son solo ideas que se suman sin cambiar su diseño. Los componentes nuevos (`HeaderMision`, `MonitorCabina`, `TarjetaSignoVital`) aún **no existen**; el checklist de la sección 4 describe la intención, no verifica el código.
+
 # ORBIT Health: Complementos de Interfaz (Alineación NASA HRP & CSA)
 
 Este documento complementa la guía maestra (`orbit-health-guia-desarrollo-v2.md`) incorporando los elementos visuales y de experiencia de usuario (UX) derivados de las investigaciones oficiales de la NASA (*Human Research Program*) y la Agencia Espacial Canadiense (                                                                            CSA).
@@ -12,7 +15,7 @@ En Marte, el día solar (*Sol*) dura aproximadamente **24 horas y 39 minutos**, 
 
 ### Especificación Visual en Frontend
 
-* **Ubicación:** Barra superior fija (`Header`).
+* **Ubicación:** Barra superior fija existente (`.barra`, la de Santi); se suma el reloj sin cambiar su estructura.
 
 * **Elementos:**
 
@@ -28,7 +31,7 @@ Los peligros espaciales no actúan de forma aislada: se potencian entre sí. Un 
 
 ### Especificación Visual en Frontend
 
-* **Ubicación:** Panel lateral integrado junto a `FiguraHumana.tsx`.
+* **Ubicación:** Una tarjeta más (`.panel`) en la columna izquierda del escenario, junto a Zonas, Capas y Estados.
 
 * **Elementos:**
 
@@ -58,7 +61,7 @@ Bajo el enfoque de *Standard Measures* de la NASA (aplicado en la ISS y *Artemis
 
 ### Especificación Visual en Frontend
 
-* **Ubicación:** Lista o cuadrícula de métricas dentro del panel principal tras registrar o consultar lecturas.
+* **Ubicación:** Dentro del panel de detalle de zona (columna derecha del escenario) y en el resumen del Monitor.
 
 * **Elementos por cada signo vital:**
 
@@ -68,31 +71,7 @@ Bajo el enfoque de *Standard Measures* de la NASA (aplicado en la ISS y *Artemis
 
   * **Indicador de Tendencia:** Flecha sutil (`↑`, `↓`, `→`) y etiqueta de estado (`Normal`, `Desvío > 2σ`, `Alerta NEWS2`).
 
-## 4. Estructura Sugerida de Vista Principal (`DashboardNave.tsx`)
-
-Para mantener una lectura rápida en pantalla tipo consola médica de cabina (sin saturar al usuario), la distribución recomendada es:
-
-```
-+-----------------------------------------------------------------------+
-| [ORBIT Health]  Tripulante: Cmdt. Vega  |  Tierra: 14:20  | Sol: 14:59 |
-+-----------------------------------+-----------------------------------+
-|                                   |  [ Monitor Cabina & CANS ]        |
-|                                   |   • CO2 Cabina: 2.8 mmHg (Verde)  |
-|        [ FiguraHumana.tsx ]       |   • Radiación CANS: 42% (Verde)   |
-|       (Silueta SVG 5 Zonas)       +-----------------------------------+
-|                                   |  [ Signos Vitales vs Base 14d ]   |
-|    • Cabeza / SNC                 |   • SpO2: 97% (Base 14d: 98%)     |
-|    • Cardiovascular               |   • Pulso: 74 lpm (Base 14d: 70)  |
-|    • Respiratorio                 |   • Temp: 36.7 °C (Base 14d: 36.6)|
-|    • Tronco / Metabólico          |   • Sueño: 7.2 hrs                |
-|    • Extremidades / Locomoción    |                                   |
-+-----------------------------------+-----------------------------------+
-| [Pestañas]:  1. Captura Manual  |  2. Diario Privado  |  3. Enlace Tierra |
-+-----------------------------------------------------------------------+
-
-```
-
-## 5. Checklist Rápido de Integración Frontend (Offline-Ready)
+## 4. Checklist Rápido de Integración Frontend (Offline-Ready)
 
 * \[ \] **Cero fuentes o iconos externos por CDN:** Todos los iconos (SVG inline o paquete local como `lucide-react`) y tipografías deben empaquetarse en el build local para pasar el *Wi-Fi Off Test*.
 

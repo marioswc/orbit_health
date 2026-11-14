@@ -10,6 +10,7 @@
 | [FIGURA_HUMANA.md](./FIGURA_HUMANA.md) | Especificación del SVG clicable: zonas, indicadores, estados, accesibilidad |
 | [API.md](./API.md) | Endpoints del backend que consume el frontend y sus tipos |
 | [AVANCE_FRONTEND_SANTI.md](./AVANCE_FRONTEND_SANTI.md) | Registro del trabajo en curso en la rama `frontend-santi`: cambios, supuestos y pendientes |
+| [`../AGENTS.md`](../AGENTS.md) | Reglas persistentes del frontend para el agente: estilo vigente, diseño, estructura y offline |
 
 ## Cómo correr el frontend
 
