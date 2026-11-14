@@ -44,7 +44,7 @@ Las bandas baratas casi siempre hablan **un protocolo propio con su app** (por e
 
 1. **Desconéctala de la app del teléfono** (muchas bandas aceptan una sola conexión) y mantenla despierta y cerca.
 2. `backend/.venv/bin/python scripts/puente_ble.py --escanear --mostrar` y mira si aparece entre los que anuncian frecuencia cardíaca.
-3. Si no aparece, **inspecciónala**: `backend/.venv/bin/python scripts/puente_ble.py --inspeccionar --nombre "<parte del nombre>"`. Lista sus servicios y dice si trae el estándar de frecuencia cardíaca. Con `--escuchar 20` muestra además, en crudo, lo que emite (son datos de tu dispositivo: no los compartas si no quieres).
+3. Si no aparece, **inspecciónala**: `backend/.venv/bin/python scripts/puente_ble.py --inspeccionar --nombre "<parte del nombre>" --mas-cercana`. Si hay varios dispositivos con el mismo nombre (pasa en lugares con más bandas iguales), sin `--mas-cercana` el puente no elige: los lista y pide `--direccion`. Para ver solo los de un nombre sin listar dispositivos ajenos: `--escanear --filtrar <nombre>`. Lista sus servicios y dice si trae el estándar de frecuencia cardíaca. Con `--escuchar 20` muestra además, en crudo, lo que emite (son datos de tu dispositivo: no los compartas si no quieres).
 4. Según el resultado:
 
 | Resultado | Qué significa | Qué hacer |
