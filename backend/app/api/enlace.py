@@ -26,6 +26,12 @@ def cambiar_enlace(datos: EnlaceIn, conn=Depends(conexion)) -> dict:
         raise HTTPException(422, str(e))
 
 
+@router.get("/enlace/latencia")
+def latencia(conn=Depends(conexion)) -> dict:
+    """Perfil de retardo en uso, factor de aceleración y eventos en tránsito."""
+    return servicio.info_latencia(conn)
+
+
 @router.get("/cola")
 def cola(conn=Depends(conexion)) -> dict:
     return servicio.estado_cola(conn)

@@ -1,0 +1,10 @@
+{
+  "estado": "supuestos de diseño; verificar contra fuentes publicadas antes de citarlos",
+  "nota": "Retardo unidireccional en segundos de tiempo real. El factor de aceleración lo reduce para la demo.",
+  "perfiles": {
+    "luna": {"nombre": "Luna", "retardo_s": 1.3},
+    "marte_cercano": {"nombre": "Marte, acercamiento mínimo", "retardo_s": 180},
+    "marte_medio": {"nombre": "Marte, distancia media", "retardo_s": 750},
+    "marte": {"nombre": "Marte, peor caso (20 min)", "retardo_s": 1200}
+  }
+}

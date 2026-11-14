@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS cola_salida (
     hash TEXT NOT NULL UNIQUE,
     estado TEXT NOT NULL DEFAULT 'retenido' CHECK (estado IN ('retenido','en_transito','recibido')),
     transmitido_ts TEXT,
-    llegada_estimada_ts TEXT
+    llegada_estimada_ts TEXT,
+    ack_estimado_ts TEXT
 );
 
 -- Sin relación con cola_salida por diseño.

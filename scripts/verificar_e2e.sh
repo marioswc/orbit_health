@@ -14,7 +14,7 @@ j /api/enlace '{"activo":false,"entorno":"marte"}' >/dev/null
 j /api/lecturas '{"tripulante_id":"T1","indicador":"temperatura","valor":36.8}' >/dev/null
 j /api/lecturas '{"tripulante_id":"T1","indicador":"spo2","valor":88}' | grep -q '"prioridad":1' || fallo "hipoxia no es prioridad 1"
 j /api/diario '{"tripulante_id":"T1","contenido":"x"}' | grep -q '"transmitido_tierra":false' || fallo "diario"
-[ "$(curl -sf $B/api/cola | grep -o '"estado":"retenido"' | wc -l)" = 2 ] || fallo "eclipse no retuvo (o diario entró a cola)"
+[ "$(curl -sf $B/api/cola | grep -o '"estado":"retenido"' | wc -l)" -eq 2 ] || fallo "eclipse no retuvo (o diario entró a cola)"
 j /api/enlace '{"activo":true,"entorno":"marte"}' | grep -Eq '"prioridad":1.*"prioridad":3' || fallo "orden de despacho"
 curl -sf "$B/api/cola/verificar" | grep -q '"valida":true' || fallo "cadena de hash"
 echo "E2E OK"

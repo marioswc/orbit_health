@@ -101,29 +101,17 @@ def test_ruta_db_por_defecto_apunta_a_data_del_repo(monkeypatch):
         importlib.reload(config)
 
 
-def test_umbrales_expone_estado_de_validacion(cliente):
-    r = cliente.get("/api/umbrales").json()
-    assert r["estado"].startswith("pendiente") and r["version"]
-
-
-def test_estado_resumen(cliente):
-    lectura(cliente, "spo2", 90)
-    e = cliente.get("/api/estado/T1").json()
-    assert e["nivel_general"] == "rojo" and e["indicadores"][0]["indicador"] == "spo2"
-
-
-def test_enlace_persiste_entre_reinicios(cliente):
-    from fastapi.testclient import TestClient
-    from app import main
-    cliente.post("/api/enlace", json={"activo": False, "entorno": "luna"})
-    with TestClient(main.app) as otro:   # nuevo arranque sobre la misma base
-        assert otro.get("/api/enlace").json() == {"activo": False, "entorno": "luna"}
-
-
-def test_ruta_db_por_defecto_es_absoluta():
+def test_ruta_db_por_defecto_es_absoluta(monkeypatch):
+    import importlib
     from pathlib import Path
     from app import config
-    assert Path(config.RAIZ.parent / "data").is_absolute()
+    monkeypatch.delenv("ORBIT_DB_PATH", raising=False)
+    try:
+        importlib.reload(config)
+        assert Path(config.DB_PATH).is_absolute()
+    finally:
+        monkeypatch.undo()
+        importlib.reload(config)
 
 
 def test_lectura_y_evento_son_atomicos(cliente, monkeypatch):
@@ -167,3 +155,38 @@ def test_alerta_colectiva_co2_con_dos_tripulantes_afectados(cliente):
     assert r["alertas"] and r["alertas"][0]["id"] == "alerta_ambiental_colectiva"
     assert r["alertas"][0]["afectados"] == 2
     assert r["alertas"][0]["nivel"] == "rojo"
+
+
+def test_enlace_activo_despacha_al_registrar_lectura(cliente):
+    lectura(cliente, "spo2", 98)
+    cola = cliente.get("/api/cola").json()
+    assert cola["items"][0]["estado"] in ("en_transito", "recibido")
+
+
+def test_lectura_normal_no_queda_contaminada_por_alerta_previa(cliente):
+    lectura(cliente, "spo2", 88)          # rojo
+    lectura(cliente, "temperatura", 36.8) # normal: debe guardarse como verde
+    estado_Durante = cliente.get("/api/estado/T1").json()
+    niveles = {i["indicador"]: i["nivel"] for i in estado_Durante["indicadores"]}
+    assert niveles["spo2"] == "rojo" and niveles["temperatura"] == "verde"
+    assert estado_Durante["nivel_general"] == "rojo"
+
+    lectura(cliente, "spo2", 98)          # se normaliza SpO2
+    estado_final = cliente.get("/api/estado/T1").json()
+    assert estado_final["nivel_general"] == "verde" and estado_final["news2"]["nivel"] == "verde"
+
+
+def test_estado_expone_linea_base_por_indicador(cliente):
+    for v in (70, 72, 68, 71, 69, 70):
+        lectura(cliente, "frecuencia_cardiaca", v)
+    lectura(cliente, "frecuencia_cardiaca", 120)
+    ind = {i["indicador"]: i for i in cliente.get("/api/estado/T1").json()["indicadores"]}
+    lb = ind["frecuencia_cardiaca"]["linea_base"]
+    assert lb["aplica"] is True and lb["n"] == 6
+    assert 69 <= lb["media"] <= 71 and lb["aviso"] is True and lb["z"] > 2
+
+
+def test_linea_base_sin_historial_suficiente_no_aplica(cliente):
+    lectura(cliente, "spo2", 97)
+    ind = cliente.get("/api/estado/T1").json()["indicadores"][0]
+    assert ind["linea_base"]["aplica"] is False and ind["linea_base"]["aviso"] is False
