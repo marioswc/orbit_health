@@ -26,3 +26,8 @@ PBKDF2_ITER = int(os.getenv("ORBIT_PBKDF2_ITER", "200000"))
 SESION_HORAS = float(os.getenv("ORBIT_SESION_HORAS", "12"))
 MAX_INTENTOS = int(os.getenv("ORBIT_MAX_INTENTOS", "5"))
 BLOQUEO_MIN = float(os.getenv("ORBIT_BLOQUEO_MIN", "5"))   # temporal: nunca permanente
+
+# --- Autorrecuperación: a bordo nadie puede reparar el sistema ---
+DIR_RESPALDOS = os.getenv("ORBIT_DIR_RESPALDOS") or str(RAIZ / "data" / "respaldos")
+RESPALDO_CADA_MIN = float(os.getenv("ORBIT_RESPALDO_CADA_MIN", "30"))   # 0 = sin respaldos automáticos
+RESPALDOS_CONSERVAR = int(os.getenv("ORBIT_RESPALDOS_CONSERVAR", "24"))

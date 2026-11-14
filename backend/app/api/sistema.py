@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 
 from ..dominio.catalogos import INDICADORES
 from ..dominio.umbrales import UMBRALES
 from ..repositorios import tripulantes
+from ..servicios import recuperacion
 from .dependencias import conexion
 
 router = APIRouter(prefix="/api", tags=["sistema"])
@@ -11,6 +12,12 @@ router = APIRouter(prefix="/api", tags=["sistema"])
 @router.get("/health")
 def health() -> dict:
     return {"status": "ok"}
+
+
+@router.get("/salud")
+def salud(request: Request) -> dict:
+    """Estado de la base y de los respaldos. Pensado para que un tripulante no técnico sepa si todo está bien."""
+    return recuperacion.estado_salud(arranque=getattr(request.app.state, "arranque", None))
 
 
 @router.get("/umbrales")
