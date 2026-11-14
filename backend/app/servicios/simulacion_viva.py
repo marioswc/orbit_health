@@ -101,16 +101,16 @@ class SimulacionViva:
             if tick == 0:
                 cola.cambiar_enlace(conn, True, guion.ENTORNO_INICIAL)
                 for tid, horas in guion.SUENO_INICIAL.items():           # el resumen de sueño que entrega la banda
-                    lecturas.registrar_lectura(conn, tid, "sueno_horas", horas, origen="sensor")
+                    lecturas.registrar_lectura(conn, tid, "sueno_horas", horas, origen="simulado")
             for _, activo, _ in guion.eventos_enlace_entre(previo, minuto):
                 if tick > 0 or not activo:
                     cola.cambiar_enlace(conn, activo, guion.ENTORNO_INICIAL)
             for tid, indicador, valor in guion.muestras_en(minuto, tick, semilla):
-                flujo.ingresar(conn, tid, indicador, valor, ahora=t_sim)
+                flujo.ingresar(conn, tid, indicador, valor, ahora=t_sim, origen="simulado")
             terminado = minuto >= guion.DURACION_MIN
             if terminado:
                 for tid, minutos in guion.EJERCICIO_FINAL.items():
-                    lecturas.registrar_lectura(conn, tid, "ejercicio_min", minutos, origen="sensor")
+                    lecturas.registrar_lectura(conn, tid, "ejercicio_min", minutos, origen="simulado")
             self._registrar_hitos(conn, tick, minuto, terminado)
             return terminado
         finally:

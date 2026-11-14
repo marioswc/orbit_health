@@ -74,7 +74,7 @@
   "demo.sc.last": "Last scenario run: {{nombre}}",
   "demo.sc.dispatched": "{{n}} dispatched",
   "demo.sensor.title": "Simulated wearable device",
-  "demo.sensor.desc": "Sends 12 rounds of continuous vital signs on T1 with sensor origin.",
+  "demo.sensor.desc": "Sends 12 rounds of continuous vital signs on T1 with simulated origin.",
   "demo.sensor.worsen": "Simulate deterioration",
   "demo.sensor.stable": "Simulate stable",
   "demo.sensor.rounds": "{{n}} rounds ({{perfil}})",

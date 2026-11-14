@@ -20,6 +20,7 @@ from . import lecturas
 @dataclass
 class _Ventana:
     inicio: datetime
+    origen: str = "sensor"
     valores: list[float] = field(default_factory=list)
 
 
@@ -39,21 +40,26 @@ def _ahora() -> datetime:
     return datetime.now(timezone.utc)
 
 
-def _registrar(conn, tid: str, indicador: str, valor: float) -> dict:
-    return lecturas.registrar_lectura(conn, tid, indicador, valor, origen="sensor")
+ORIGENES = ("sensor", "simulado")
+
+
+def _registrar(conn, tid: str, indicador: str, valor: float, origen: str = "sensor") -> dict:
+    return lecturas.registrar_lectura(conn, tid, indicador, valor, origen=origen)
 
 
 def ingresar(conn: sqlite3.Connection, tid: str, indicador: str, valor: float,
-             ahora: datetime | None = None) -> dict:
+             ahora: datetime | None = None, origen: str = "sensor") -> dict:
     """Recibe una muestra. Devuelve si se registró una lectura y por qué (extremo, ventana o solo acumulada)."""
     error = validar(indicador, valor)
     if error:
         raise ValueError(error)
+    if origen not in ORIGENES:
+        raise ValueError(f"origen debe ser uno de: {', '.join(ORIGENES)}")
     ahora = ahora or _ahora()
     clave = (tid, indicador)
     ventana_s, enfriamiento_s = config.FLUJO_VENTANA_S, config.FLUJO_ENFRIAMIENTO_S
 
-    accion, a_registrar = "acumular", None
+    accion, a_registrar, origen_reg = "acumular", None, origen
     with _cerrojo:
         if ventana_s <= 0:
             accion, a_registrar = "sin_agrupar", valor
@@ -62,16 +68,16 @@ def ingresar(conn: sqlite3.Connection, tid: str, indicador: str, valor: float,
             _ultimo_extremo[clave] = ahora
             accion, a_registrar = "extremo", valor
         else:
-            v = _ventanas.setdefault(clave, _Ventana(inicio=ahora))
+            v = _ventanas.setdefault(clave, _Ventana(inicio=ahora, origen=origen))
             v.valores.append(valor)
             if (ahora - v.inicio).total_seconds() >= ventana_s:
-                accion, a_registrar = "ventana", reglas_flujo.resumir(v.valores)
+                accion, a_registrar, origen_reg = "ventana", reglas_flujo.resumir(v.valores), v.origen
                 _ventanas.pop(clave, None)
     if a_registrar is None:
         n = len(_ventanas.get(clave, _Ventana(ahora)).valores)
         return {"registrada": False, "motivo": "acumulada", "muestras_en_ventana": n, "lectura": None}
     return {"registrada": True, "motivo": accion, "valor_registrado": a_registrar,
-            "lectura": _registrar(conn, tid, indicador, a_registrar)}
+            "lectura": _registrar(conn, tid, indicador, a_registrar, origen_reg)}
 
 
 def vaciar(conn: sqlite3.Connection, tid: str | None = None) -> dict:
@@ -80,17 +86,17 @@ def vaciar(conn: sqlite3.Connection, tid: str | None = None) -> dict:
         claves = [c for c in _ventanas if tid is None or c[0] == tid]
         pendientes = [(c, _ventanas.pop(c)) for c in claves]
     resultados = [{"tripulante_id": c[0], "indicador": c[1], "muestras": len(v.valores),
-                   "lectura": _registrar(conn, c[0], c[1], reglas_flujo.resumir(v.valores))} for c, v in pendientes if v.valores]
+                   "lectura": _registrar(conn, c[0], c[1], reglas_flujo.resumir(v.valores), v.origen)} for c, v in pendientes if v.valores]
     return {"cerradas": len(resultados), "resultados": resultados}
 
 
 def ingresar_lote(conn: sqlite3.Connection, tid: str, muestras: list[tuple[str, float]],
-                  ahora: datetime | None = None) -> dict:
+                  ahora: datetime | None = None, origen: str = "sensor") -> dict:
     for indicador, valor in muestras:                       # todo o nada: se valida antes de procesar
         error = validar(indicador, valor)
         if error:
             raise ValueError(f"{indicador}: {error}")
-    resultados = [ingresar(conn, tid, i, v, ahora) for i, v in muestras]
+    resultados = [ingresar(conn, tid, i, v, ahora, origen) for i, v in muestras]
     registradas = [r for r in resultados if r["registrada"]]
     return {"recibidas": len(resultados), "registradas": len(registradas),
             "motivos": sorted({r["motivo"] for r in registradas}),

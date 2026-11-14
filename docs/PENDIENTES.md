@@ -39,6 +39,7 @@
 - `frontend/docs/FIGURA_HUMANA.md` cita un script `preparar_musculos.py` que no existe en el repo.
 
 ## Cerrado en la última ronda
+- **Datos simulados etiquetados como simulados:** la misión en vivo, las ráfagas de `/demo/sensor` y los escenarios se guardaban como `sensor` o `manual`. Ahora son `simulado` (se ve en el historial, el informe y el evento a Tierra). Una fuente simulada del frontend debe declarar `"origen": "simulado"`.
 - **Medidas de salud con fuente:** `explicaciones` trae `medidas_nasa` y `senales_a_vigilar` con cita textual y enlace de la NASA; donde la NASA no da guía (glucosa, contramedidas de hipoxia) se dice. Los consejos generales nuestros ya no se atribuyen a la NASA.
 - **Entornos con gravedad:** `GET /api/entornos`. La estimación de pérdida ósea solo aplica en microgravedad; para gravedad parcial la NASA no da cifra. **El frontend aún no lo usa**: hoy calcula pérdida ósea sin distinguir entorno.
 - **Racha de mediciones:** `GET /api/racha/{id}`. El frontend aún no la usa.

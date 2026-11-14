@@ -39,6 +39,9 @@ T3 y T4 se mantienen sanos todo el tiempo, para que se vea que el sistema no da 
 ## Qué devuelve `/api/demo/simulacion/estado`
 `activa`, `finalizada`, `minuto_mision`, `progreso_pct`, `eventos` (la historia, con `ocurrido: true` según avanza), `hitos` (niveles actuales, primer rojo, alerta colectiva y máximo de eventos retenidos a bordo) y `aviso`. Para el frontend basta con consultarlo cada segundo.
 
+## Cómo se etiqueta
+Todo lo que fabrica la simulación (la misión, las ráfagas de `/demo/sensor` y los escenarios guionizados) se guarda con **`origen = simulado`**, nunca como `sensor` ni como `manual`. Se ve igual en el historial, en el informe y en el evento que viaja a Tierra, para que un dato inventado no pase por real.
+
 ## Qué NO es
 - No es una banda real: los valores salen de un guion. La conexión con una banda real está en [BANDA_BLE.md](BANDA_BLE.md).
 - No es una predicción: el guion es ilustrativo y los umbrales son supuestos pendientes de validación médica.

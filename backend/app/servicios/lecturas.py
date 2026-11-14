@@ -86,7 +86,7 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
             conn, tid, f"LECTURA_{indicador.upper()}", PRIORIDAD[nivel_evento],
             {"lectura_id": lectura_id, "indicador": indicador, "valor": valor,
              "nivel": nivel_evento, "news2": c["puntos"], "reglas": [a["id"] for a in activas],
-             "reglas_version": UMBRALES["version"], "reglas_estado": UMBRALES["estado"]})
+             "reglas_version": UMBRALES["version"], "reglas_estado": UMBRALES["estado"], "origen": origen})
         cola.despachar_si_activo(conn, ahora)
         conn.commit()
     except Exception:

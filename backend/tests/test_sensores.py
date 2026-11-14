@@ -38,7 +38,7 @@ def test_el_deterioro_pasa_por_amarillo_antes_de_rojo(cliente):
     assert r["primera_ronda_rojo"] is not None
     assert r["primera_ronda_amarillo"] is None or r["primera_ronda_amarillo"] <= r["primera_ronda_rojo"]
     assert r["rondas"][0]["nivel"] == "verde" and r["rondas"][-1]["nivel"] == "rojo"
-    assert origenes() == {"sensor"}
+    assert origenes() == {"simulado"}                                          # lo inventado se declara simulado, nunca sensor
 
 
 def test_la_lectura_de_sensor_usa_la_misma_clasificacion_y_cola_con_origen_sensor(cliente):
