@@ -20,6 +20,16 @@ uvicorn app.main:app --port 3000      # sirve API y frontend en http://localhost
 scripts/verificar_e2e.sh      # E2E automático contra una base temporal
 ```
 
+## Datos de calibración (opcional)
+
+```bash
+scripts/descargar_physionet.sh    # con red, una vez (ya versionado en data/physionet)
+scripts/cargar_calibracion.sh     # sin red: carga series BIDMC como historial de los tripulantes demo
+```
+
+Los registros son de pacientes críticos hospitalizados (ver `data/physionet/ATRIBUCION.md`): sirven para dar
+variabilidad realista a la demo, no como línea base clínica.
+
 ## Desarrollo
 
 ```bash

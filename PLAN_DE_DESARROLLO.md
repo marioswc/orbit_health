@@ -163,8 +163,17 @@ Supuesto: bloques ordenados por dependencia; ajustar tiempos al equipo.
 
 ## 12. Datos de calibración
 
-- Series fisiológicas de acceso abierto (PhysioNet) para dar variabilidad realista a la demo y a las pruebas. Citar el conjunto y la licencia exactos que se usen.
-- Redacción permitida: "calibrado con series públicas". No afirmar "validado clínicamente".
+| Aspecto | Detalle |
+|---|---|
+| Conjunto | BIDMC PPG and Respiration Dataset v1.0.0 (PhysioNet), DOI 10.13026/C2208R, licencia ODC-By 1.0 |
+| Variables usadas | Frecuencia cardíaca, frecuencia respiratoria y SpO₂ (1 Hz) |
+| Procesamiento | Mediana por ventana de 20 s; lecturas con `origen='calibracion'`, fuera de la cola de salida |
+| Operación | Descarga con red una sola vez (`scripts/descargar_physionet.sh`, verifica SHA-256); carga sin red (`scripts/cargar_calibracion.sh`) |
+| Limitación | Los registros son de **pacientes críticos hospitalizados**, no de personas sanas ni de tripulantes |
+
+Redacción permitida: "series públicas de PhysioNet usadas para dar variabilidad realista a la demo y a las pruebas".
+No decir: "validado clínicamente", "línea base de astronautas" ni "calibrado para población sana".
+Para uso real habría que reemplazar la calibración por mediciones propias de cada tripulante.
 
 ## 13. Guion de demo (3 min)
 
