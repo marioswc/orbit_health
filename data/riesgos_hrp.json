@@ -1,0 +1,207 @@
+{
+  "_meta": {
+    "fuente": "https://www.nasa.gov/hrp/risks/",
+    "extraido": "2026-11-14",
+    "cobertura_orbit": "8 de 17 riesgos cubiertos con indicadores registrables de forma autonoma por el astronauta.",
+    "nota": "Titulos y descripciones resumidas de NASA HRP. El campo 'zona' y 'cubierto' representan el mapeo de arquitectura del equipo ORBIT Health."
+  },
+  "riesgos": [
+    {
+      "id": "inmune",
+      "titulo": "Risk of Altered Immune System Responses",
+      "categoria": "fisiologia",
+      "resumen": "El estres del vuelo, el confinamiento y la radiacion pueden alterar la medula osea, reducir globulos blancos y reactivar virus latentes.",
+      "zona": "metabolico_inmune",
+      "cubierto": true,
+      "indicadores_orbit": [
+        "temperatura",
+        "frecuencia_cardiaca",
+        "radiacion_acumulada_msv"
+      ],
+      "url": "https://www.nasa.gov/reference/risk-of-altered-immune-system-responses/"
+    },
+    {
+      "id": "vestibular",
+      "titulo": "Risk of Altered Sensorimotor and Vestibular Function",
+      "categoria": "fisiologia",
+      "resumen": "Mareo espacial, vertigo y confusion en el sentido de percepcion, direccion y velocidad de movimiento al cambiar de gravedad.",
+      "zona": null,
+      "cubierto": false,
+      "indicadores_orbit": [],
+      "url": "https://www.nasa.gov/reference/risk-of-altered-sensorimotor-and-vestibular-function/"
+    },
+    {
+      "id": "cardiovascular",
+      "titulo": "Risk of Cardiovascular Adaptations",
+      "categoria": "fisiologia",
+      "resumen": "La ingravidez redistribuye fluidos hacia la cabeza, endurece y envejece mas rapido los vasos sanguineos y provoca intolerancia ortostatica.",
+      "zona": "cardiovascular",
+      "cubierto": true,
+      "indicadores_orbit": [
+        "frecuencia_cardiaca",
+        "presion_sistolica",
+        "presion_diastolica"
+      ],
+      "url": "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/"
+    },
+    {
+      "id": "descompresion",
+      "titulo": "Risk of Decompression Sickness",
+      "categoria": "fisiologia",
+      "resumen": "Burbujas de nitrogeno en tejidos al pasar a trajes espaciales de menor presion.",
+      "zona": null,
+      "cubierto": false,
+      "indicadores_orbit": [],
+      "url": "https://www.nasa.gov/reference/risk-of-decompression-sickness/"
+    },
+    {
+      "id": "microbioma",
+      "titulo": "Risk of Host-Microorganism Interactions",
+      "categoria": "fisiologia",
+      "resumen": "Cambios en microbiomas de piel e intestino y mayor transmision microbiana en ambientes cerrados.",
+      "zona": null,
+      "cubierto": false,
+      "indicadores_orbit": [],
+      "url": "https://www.nasa.gov/reference/risk-of-host-microorganism-interactions/"
+    },
+    {
+      "id": "hipoxia",
+      "titulo": "Risk of Hypoxia",
+      "categoria": "fisiologia",
+      "resumen": "Reduccion de oxigeno disponible o alteraciones atmosféricas en cabina y caminatas espaciales.",
+      "zona": "respiratorio",
+      "cubierto": true,
+      "indicadores_orbit": [
+        "oxigenacion",
+        "co2_cabina"
+      ],
+      "url": "https://www.nasa.gov/reference/risk-of-hypoxia/"
+    },
+    {
+      "id": "nutricion",
+      "titulo": "Risk of Inadequate Food and Nutrition",
+      "categoria": "fisiologia",
+      "resumen": "Alteraciones metabolicas y resistencia a la insulina en microgravedad (riesgo de diabetes tipo 2 segun CSA) junto con retos nutricionales.",
+      "zona": "metabolico_inmune",
+      "cubierto": true,
+      "indicadores_orbit": [
+        "glucosa"
+      ],
+      "url": "https://www.nasa.gov/reference/risk-of-inadequate-food-and-nutrition/"
+    },
+    {
+      "id": "eva",
+      "titulo": "Risk of Injury and Compromised Performance from Spacewalks",
+      "categoria": "fisiologia",
+      "resumen": "Fatiga y lesiones en traje presurizado durante actividad extravehicular (EVA).",
+      "zona": null,
+      "cubierto": false,
+      "indicadores_orbit": [],
+      "url": "https://www.nasa.gov/reference/risk-of-injury-and-compromised-performance-from-extravehicular-activity-eva/"
+    },
+    {
+      "id": "condicion_fisica",
+      "titulo": "Risk of Reduced Cardiorespiratory and Musculoskeletal Fitness",
+      "categoria": "fisiologia",
+      "resumen": "Perdida de masa muscular, fuerza y desempeno cardiorrespiratorio; el ejercicio tiende a ser menos efectivo en el espacio.",
+      "zona": "musculoesqueletico",
+      "cubierto": true,
+      "indicadores_orbit": [
+        "ejercicio_minutos",
+        "frecuencia_cardiaca"
+      ],
+      "url": "https://www.nasa.gov/reference/risk-of-reduced-cardiorespiratory-and-musculoskeletal-fitness/"
+    },
+    {
+      "id": "sans",
+      "titulo": "Risk of Spaceflight Associated Neuro-ocular Syndrome (SANS)",
+      "categoria": "fisiologia",
+      "resumen": "Cambios en estructura ocular y nervio optico por desplazamiento cefalico de fluidos.",
+      "zona": null,
+      "cubierto": false,
+      "indicadores_orbit": [],
+      "url": "https://www.nasa.gov/reference/risk-of-spaceflight-associated-neuro-ocular-syndrome-sans/"
+    },
+    {
+      "id": "hueso",
+      "titulo": "Risk of Spaceflight-Induced Bone Changes",
+      "categoria": "fisiologia",
+      "resumen": "Perdida de 1 a 1.5% de densidad mineral osea por mes en huesos de carga (comparado con ~1% anual en adultos >50 anos en la Tierra).",
+      "zona": "musculoesqueletico",
+      "cubierto": true,
+      "indicadores_orbit": [
+        "ejercicio_minutos"
+      ],
+      "url": "https://www.nasa.gov/reference/risk-of-spaceflight-induced-bone-changes/"
+    },
+    {
+      "id": "conductual",
+      "titulo": "Risk of Behavioral Changes and Psychiatric Disorders",
+      "categoria": "conductual",
+      "resumen": "El aislamiento, confinamiento, radiacion y distancia de la Tierra afectan el estado de animo y bienestar psicologico.",
+      "zona": "neuro_conductual",
+      "cubierto": true,
+      "indicadores_orbit": [
+        "animo",
+        "phq2_puntaje",
+        "gad2_puntaje"
+      ],
+      "url": "https://www.nasa.gov/reference/risk-of-behavioral-conditions-and-psychiatric-disorders/"
+    },
+    {
+      "id": "equipo",
+      "titulo": "Risk of Inadequate Teamwork",
+      "categoria": "conductual",
+      "resumen": "Tensiones de comunicacion y cohesion en equipos aislados.",
+      "zona": null,
+      "cubierto": false,
+      "indicadores_orbit": [],
+      "url": "https://www.nasa.gov/reference/risk-of-inadequate-teamwork/"
+    },
+    {
+      "id": "sueno",
+      "titulo": "Risk of Inadequate Sleep and Irregular Schedules",
+      "categoria": "conductual",
+      "resumen": "Perdida cronica de sueno (~6 h promedio en ISS), desincronizacion circadiana y enlentecimiento de reflejos.",
+      "zona": "neuro_conductual",
+      "cubierto": true,
+      "indicadores_orbit": [
+        "sueno_horas",
+        "pvt_lapsos"
+      ],
+      "url": "https://www.nasa.gov/reference/risk-from-inadequate-sleep-and-irregular-schedules/"
+    },
+    {
+      "id": "sistemas",
+      "titulo": "Risk of Inadequate Systems Operations Support",
+      "categoria": "conductual",
+      "resumen": "Dependencia de soporte de software, interfaces claras y entrenamiento autonomo para operar sin apoyo en vivo de Tierra.",
+      "zona": null,
+      "cubierto": false,
+      "indicadores_orbit": [],
+      "url": "https://www.nasa.gov/reference/risk-of-inadequate-systems-operations-support/"
+    },
+    {
+      "id": "cargas",
+      "titulo": "Risk of Injury from Dynamic Loads",
+      "categoria": "conductual",
+      "resumen": "Riesgo de lesion fisica durante las cargas dinamicas de lanzamiento y aterrizaje.",
+      "zona": null,
+      "cubierto": false,
+      "indicadores_orbit": [],
+      "url": "https://www.nasa.gov/reference/risk-of-injury-from-dynamic-loads/"
+    },
+    {
+      "id": "cancer_radiacion",
+      "titulo": "Risk of Radiation-Induced Cancers",
+      "categoria": "radiacion",
+      "resumen": "Dano al ADN, cataratas, mayor sensibilidad hematologica e incremento del riesgo de cancer por exposicion acumulada a radiacion espacial.",
+      "zona": "metabolico_inmune",
+      "cubierto": true,
+      "indicadores_orbit": [
+        "radiacion_acumulada_msv"
+      ],
+      "url": "https://www.nasa.gov/reference/risk-of-radiation-induced-cancers/"
+    }
+  ]
+}
