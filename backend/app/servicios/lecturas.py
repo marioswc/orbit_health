@@ -42,6 +42,9 @@ def _clasificar(conn, tid: str, indicador: str, valor: float, ventana: str) -> d
     if indicador == "co2":
         nivel = reglas.evaluar_ambiente(co2_mmhg=valor)
         return {**base, "nivel": nivel, "nivel_global": nivel}
+    if indicador == "o2_cabina":
+        nivel = reglas.evaluar_ambiente(o2_pct=valor)
+        return {**base, "nivel": nivel, "nivel_global": nivel}
     if indicador == "dosis_pct":
         nivel = reglas.evaluar_ambiente(dosis_pct=valor)
         return {**base, "nivel": nivel, "nivel_global": nivel}

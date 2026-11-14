@@ -52,6 +52,13 @@ def validar(datos: dict) -> dict:
     for clave, d in datos["indicadores"].items():
         if d["min"] >= d["max"]:
             raise UmbralesInvalidos(f"indicador '{clave}': min debe ser menor que max")
+    o2 = datos["ambiente"].get("o2_pct")
+    if o2 is not None:
+        req = ("rojo_bajo", "amarillo_bajo", "amarillo_alto", "rojo_alto")
+        if any(k not in o2 or not isinstance(o2[k], (int, float)) for k in req) or not (
+            o2["rojo_bajo"] < o2["amarillo_bajo"] < o2["amarillo_alto"] < o2["rojo_alto"]
+        ):
+            raise UmbralesInvalidos("o2_pct requiere rojo_bajo < amarillo_bajo < amarillo_alto < rojo_alto")
     _validar_combinadas(datos)
     return datos
 

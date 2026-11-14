@@ -72,9 +72,16 @@
 .nota-lectura-texto { margin: 0; max-height: min(52vh, 460px); overflow: auto; font-size: var(--text-body); line-height: 1.7; letter-spacing: var(--tracking-body); color: var(--color-ink); white-space: pre-wrap; overflow-wrap: anywhere; }
 .nota-lectura-privada { display: inline-flex; align-items: center; gap: var(--spacing-8); margin: 0; justify-self: start; padding: var(--spacing-4) var(--spacing-12); border-radius: var(--radius-pill); font-size: var(--text-caption); color: var(--color-graphite); background: color-mix(in srgb, var(--color-ink) 6%, transparent); }
 
-/* ---- Tamizaje: preguntas numeradas ---- */
+/* ---- Tamizaje: preguntas numeradas, protocolo de crisis y consentimiento ---- */
 .pregunta legend { display: flex; align-items: flex-start; gap: var(--spacing-12); }
 .pregunta-num { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-size: var(--text-caption); font-weight: 600; color: var(--color-eggshell); background: var(--color-ink); }
+.protocolo-crisis { display: grid; gap: var(--spacing-8); padding: var(--spacing-16); border-radius: 18px; border: 1px solid var(--color-stone); background: color-mix(in srgb, var(--color-eggshell) 85%, transparent); }
+.protocolo-crisis.urgente { border-color: var(--estado-rojo); background: color-mix(in srgb, var(--estado-rojo) 8%, var(--color-eggshell)); }
+.protocolo-pasos { margin: 0; padding-left: var(--spacing-20); display: grid; gap: var(--spacing-8); line-height: 1.5; color: var(--color-ink); }
+.consentimiento-medico { display: grid; gap: var(--spacing-12); padding: var(--spacing-16); border-radius: 18px; border: 1px solid var(--color-stone); background: color-mix(in srgb, var(--color-eggshell) 80%, transparent); }
+.consentimiento-controles { display: grid; gap: var(--spacing-12); }
+.consentimiento-check { display: flex; align-items: center; gap: var(--spacing-8); min-height: 40px; cursor: pointer; font-size: var(--text-body-sm); color: var(--color-ink); }
+.consentimiento-check input { width: 18px; height: 18px; margin: 0; flex: none; }
 
 /* ---- Modal de captura manual ---- */
 .captura { display: flex; flex-direction: column; gap: var(--spacing-32); }

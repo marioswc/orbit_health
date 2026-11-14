@@ -6,6 +6,7 @@ const NOMBRES: Record<string, string> = {
   presion_diastolica: "Presión diastólica",
   temperatura: "Temperatura",
   avpu: "Conciencia (AVPU)",
+  o2_cabina: "O₂ de cabina",
 };
 
 /** Nombre legible de un indicador del backend (clave en snake_case). */

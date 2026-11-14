@@ -41,3 +41,16 @@ def evaluar_colectiva(niveles_tripulantes: Sequence[str], co2_mmhg: float | None
         return None
     return {"id": cfg["id"], "nombre": cfg["nombre"], "nivel": cfg["nivel"],
             "afectados": afectados, "co2_mmhg": co2_mmhg}
+
+
+def evaluar_colectiva_o2(niveles_tripulantes: Sequence[str], o2_pct: float | None,
+                         cfg: Mapping | None = None) -> dict | None:
+    """Alerta si el O2 de cabina cae bajo el umbral seguro y hay suficientes tripulantes afectados."""
+    cfg = cfg or _RC.get("colectiva_o2")
+    if not cfg or o2_pct is None or o2_pct >= cfg["o2_bajo"]:
+        return None
+    afectados = sum(1 for n in niveles_tripulantes if ORDEN[n] >= ORDEN[cfg["nivel_minimo"]])
+    if afectados < cfg["min_tripulantes"]:
+        return None
+    return {"id": cfg["id"], "nombre": cfg["nombre"], "nivel": cfg["nivel"],
+            "afectados": afectados, "o2_pct": o2_pct}

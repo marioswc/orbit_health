@@ -93,6 +93,17 @@
         "https://www.nasa.gov/hrp/hazard-hostile-closed-environments/"
       ]
     },
+    "o2_cabina": {
+      "que_es": "El porcentaje de oxígeno presente en el aire respirable de la cabina.",
+      "por_que_se_mide": "Si baja demasiado provoca hipoxia en toda la tripulación; si sube en exceso dentro de un módulo cerrado aumenta el riesgo de incendio.",
+      "como_medirlo": "Se registra desde el panel ambiental del sistema de soporte vital de la nave.",
+      "en_el_espacio": "La atmósfera de la cabina es artificial y cerrada: cualquier fuga o fallo en la generación de oxígeno altera la calidad del aire.",
+      "cuando_avisar": "Cuando sale del rango normal (bajo o alto), revisa el soporte vital, verifica la SpO₂ de la tripulación y avisa al comandante y al médico.",
+      "fuentes": [
+        "https://www.nasa.gov/reference/risk-of-hypoxia/",
+        "https://www.nasa.gov/hrp/hazard-hostile-closed-environments/"
+      ]
+    },
     "dosis_pct": {
       "que_es": "La radiación acumulada, expresada como porcentaje del límite de la misión.",
       "por_que_se_mide": "Fuera de la protección de la Tierra, la tripulación recibe más radiación, y su efecto se acumula con el tiempo.",

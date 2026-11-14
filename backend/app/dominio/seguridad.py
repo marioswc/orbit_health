@@ -25,6 +25,7 @@ PERMISOS = {
     "pin:reiniciar": {"medico", "comandante"},
     "auditoria:leer": {"medico", "comandante"},
     "demo:ejecutar": {"medico", "comandante"},
+    "salud_mental:avisos": {"medico", "comandante"},
 }
 
 

@@ -87,13 +87,26 @@ def captura_recomendada_min(nivel: str) -> float:
     return UMBRALES["captura_recomendada_min"][nivel]
 
 
-def evaluar_ambiente(co2_mmhg: float | None = None, dosis_pct: float | None = None) -> str:
-    """Peor nivel entre CO2 y dosis acumulada (% del límite de misión)."""
+def evaluar_o2_cabina(o2_pct: float) -> str:
+    """Evalúa la concentración de O2 en cabina (%). Avisa tanto por hipoxia ambiental (bajo) como por riesgo de incendio/hiperoxia (alto)."""
+    o = _AMB["o2_pct"]
+    if o2_pct < o["rojo_bajo"] or o2_pct > o["rojo_alto"]:
+        return "rojo"
+    if o2_pct < o["amarillo_bajo"] or o2_pct > o["amarillo_alto"]:
+        return "amarillo"
+    return "verde"
+
+
+def evaluar_ambiente(co2_mmhg: float | None = None, dosis_pct: float | None = None,
+                     o2_pct: float | None = None) -> str:
+    """Peor nivel entre CO2, O2 de cabina y dosis acumulada (% del límite de misión)."""
     niveles = ["verde"]
     if co2_mmhg is not None:
         c = _AMB["co2_mmhg"]
         niveles.append("rojo" if co2_mmhg > c["rojo_sobre"]
                        else "amarillo" if co2_mmhg > c["amarillo_sobre"] else "verde")
+    if o2_pct is not None:
+        niveles.append(evaluar_o2_cabina(o2_pct))
     if dosis_pct is not None:
         d = _AMB["dosis_pct"]
         niveles.append("rojo" if dosis_pct >= d["rojo_desde"]

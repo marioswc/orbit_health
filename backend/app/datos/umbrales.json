@@ -32,6 +32,7 @@
   },
   "ambiente": {
     "co2_mmhg": {"amarillo_sobre": 3.0, "rojo_sobre": 4.0},
+    "o2_pct": {"rojo_bajo": 19.0, "amarillo_bajo": 19.5, "amarillo_alto": 23.0, "rojo_alto": 23.5},
     "dosis_pct": {"amarillo_desde": 70, "rojo_desde": 90}
   },
   "glucosa_mg_dl": {
@@ -72,6 +73,14 @@
       "nivel_minimo": "amarillo",
       "co2_sobre": 3.0,
       "nivel": "rojo"
+    },
+    "colectiva_o2": {
+      "id": "alerta_hipoxia_ambiental_colectiva",
+      "nombre": "Calidad de oxígeno en cabina deficiente con varios tripulantes afectados",
+      "min_tripulantes": 2,
+      "nivel_minimo": "amarillo",
+      "o2_bajo": 19.5,
+      "nivel": "rojo"
     }
   },
   "indicadores": {
@@ -84,6 +93,7 @@
     "avpu": {"etiqueta": "Conciencia (AVPU)", "unidad": "AVPU", "min": 0, "max": 3},
     "glucosa": {"etiqueta": "Glucosa capilar", "unidad": "mg/dL", "min": 20, "max": 600},
     "co2": {"etiqueta": "CO₂ de cabina", "unidad": "mmHg", "min": 0, "max": 20},
+    "o2_cabina": {"etiqueta": "O₂ de cabina", "unidad": "%", "min": 10.0, "max": 35.0},
     "dosis_pct": {"etiqueta": "Dosis acumulada", "unidad": "% del límite", "min": 0, "max": 200},
     "sueno_horas": {"etiqueta": "Horas de sueño", "unidad": "h", "min": 0, "max": 24},
     "ejercicio_min": {"etiqueta": "Minutos de ejercicio", "unidad": "min", "min": 0, "max": 600}

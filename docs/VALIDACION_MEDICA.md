@@ -40,8 +40,8 @@ El diseño actual protege la privacidad del tripulante: el diario y el PHQ-2 nun
 
 | Tema | Situación actual | Riesgo | Opciones |
 |---|---|---|---|
-| PHQ-2 positivo (≥3) | Muestra cápsulas y no avisa a nadie | Un tamizaje positivo suele requerir una evaluación de seguimiento; en confinamiento no hay a quién derivar | A. Mantener privado total. B. Ofrecer al tripulante, con su consentimiento, compartir con el médico de a bordo. C. Escalar automáticamente en riesgo alto |
-| Riesgo de autolesión | No hay vía de seguridad | PHQ-2 no mide ideación suicida; no hay protocolo si aparece | Definir con un profesional un protocolo explícito antes de cualquier uso real |
+| PHQ-2 positivo (≥3) | Ofrece cápsulas y permite, solo con consentimiento explícito (`POST /api/crisis/aviso-medico`), avisar al médico de a bordo (revocable por el propio tripulante) | Un tamizaje positivo requiere seguimiento; en confinamiento no hay derivación externa | Implementada la opción B (consentimiento explícito y revocable), pendiente de validación por salud mental |
+| Riesgo de autolesión o crisis aguda + calidad de O₂ (`o2_cabina` / `calidad_oxigeno`) | Protocolo procedimental de crisis (`GET /api/crisis/protocolo` y `POST /api/tamizajes`) que cruza síntomas agudos con la calidad de oxígeno en cabina (hipoxia/hiperoxia ambiental) y da pasos de acompañamiento y entorno seguro | Los pasos y umbrales de O₂ (19.5–23.0 % nominal) son supuestos procedimentales de diseño | Revisar y firmar el protocolo con especialistas en salud mental y medicina aeroespacial antes de uso real |
 | Validez del instrumento | PHQ-2 validado en población terrestre | Su desempeño en misiones prolongadas no está respaldado por este proyecto | Verificar la literatura; declararlo como tamizaje, no diagnóstico |
 | Diario | Texto libre, sin cifrar y sin autenticación | Cualquiera con acceso al equipo puede leerlo | Autenticación por tripulante y cifrado en reposo |
 | Contenido de cápsulas | Texto genérico redactado por nosotros | Puede ser inadecuado | Revisión de un psicólogo antes de mostrar |

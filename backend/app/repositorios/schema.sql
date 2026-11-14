@@ -51,6 +51,9 @@ CREATE TABLE IF NOT EXISTS tamizajes (
     item1 INTEGER NOT NULL CHECK (item1 BETWEEN 0 AND 3),
     item2 INTEGER NOT NULL CHECK (item2 BETWEEN 0 AND 3),
     total INTEGER NOT NULL,
+    riesgo_autolesion INTEGER NOT NULL DEFAULT 0 CHECK (riesgo_autolesion IN (0, 1)),
+    calidad_oxigeno REAL,
+    nivel_protocolo TEXT NOT NULL DEFAULT 'ninguno' CHECK (nivel_protocolo IN ('ninguno', 'seguimiento', 'crisis')),
     ts TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -124,3 +127,20 @@ CREATE TABLE IF NOT EXISTS preferencias (
     recordatorios TEXT NOT NULL DEFAULT 'normal' CHECK (recordatorios IN ('minimo','normal','frecuente')),
     actualizado_ts TEXT NOT NULL
 );
+
+-- Avisos internos al médico de a bordo con consentimiento explícito del propio tripulante.
+-- Sin relación con cola_salida: nunca se transmiten a Tierra ni forman parte del informe exportable.
+CREATE TABLE IF NOT EXISTS avisos_salud_mental (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tripulante_id TEXT NOT NULL REFERENCES tripulantes(id) ON DELETE CASCADE,
+    tipo TEXT NOT NULL CHECK (tipo IN ('crisis', 'tamizaje_positivo')),
+    nivel_protocolo TEXT NOT NULL CHECK (nivel_protocolo IN ('seguimiento', 'crisis')),
+    tamizaje_id INTEGER REFERENCES tamizajes(id) ON DELETE SET NULL,
+    mensaje_opcional TEXT,
+    consentimiento INTEGER NOT NULL DEFAULT 1 CHECK (consentimiento = 1),
+    estado TEXT NOT NULL DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'atendido', 'revocado')),
+    atendido_por TEXT REFERENCES tripulantes(id),
+    creado_ts TEXT NOT NULL,
+    actualizado_ts TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_avisos_sm_estado ON avisos_salud_mental (estado, creado_ts DESC);

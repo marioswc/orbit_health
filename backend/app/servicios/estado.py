@@ -23,7 +23,7 @@ def estado_tripulante(conn: sqlite3.Connection, tid: str, estilo: dict | None = 
     news2 = reglas.evaluar_news2(signos_recientes(conn, tid, ventana))
     valores = repo.valores_recientes(conn, tid, combinadas.INDICADORES_USADOS, ventana)
     activas = combinadas.evaluar_individuales(valores)
-    ambientales = ("co2", "dosis_pct")
+    ambientales = ("co2", "o2_cabina", "dosis_pct")
     fisiologico = combinadas.peor_nivel(
         [news2.nivel]
         + [v["nivel"] for v in ultimos if v["indicador"] not in ambientales]

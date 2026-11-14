@@ -73,6 +73,7 @@ variabilidad realista a la demo, no como línea base clínica.
 | `POST /api/demo/sensor/{id}?perfil=` | Un dispositivo portátil simulado (estable o deterioro respiratorio) |
 | `GET /api/tierra/mensajes` | Vista del centro de control: solo lo que ya llegó, lo urgente primero. Solo lectura, no consume mensajes |
 | `GET /api/informe` y `/api/informe/{id}` | Informe exportable (JSON o CSV) con huella de integridad |
+| `GET /api/crisis/protocolo`, `POST /api/crisis/aviso-medico` | Protocolo de crisis psicológica / riesgo de autolesión con evaluación de calidad de oxígeno en cabina (`o2_cabina`) y aviso al médico solo con consentimiento explícito |
 
 ## Escenarios de demo
 
