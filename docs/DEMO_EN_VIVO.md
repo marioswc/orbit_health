@@ -62,4 +62,4 @@ Todo lo que fabrica la simulación (la misión, las ráfagas de `/demo/sensor` y
 ## Qué NO es
 - No es una banda real: los valores salen de un guion. La conexión con una banda real está en [BANDA_BLE.md](BANDA_BLE.md).
 - No es una predicción: el guion es ilustrativo y los umbrales son supuestos pendientes de validación médica.
-- Un detalle de diseño que sale a la vista: **durante un apagón largo se acumulan muchos eventos de rutina**. Hoy salen todos al volver el enlace, ordenados por urgencia. Resumir lo rutinario antes de enviar sigue pendiente.
+- Un detalle de diseño que sale a la vista: **durante un apagón largo se acumulan muchos eventos de rutina**. Al volver el enlace, si hay `ORBIT_COMPACTAR_RUTINA_DESDE` (20 por defecto) o más, salen **resumidos en un evento por tripulante** (`resumen_rutina`) y lo urgente sale primero. Los eventos originales **no se borran**: siguen a bordo y en la cadena de integridad (`/api/cola/verificar`), solo dejan de enviarse uno por uno. Los amarillos y rojos nunca se resumen. `ORBIT_COMPACTAR_RUTINA_DESDE=0` lo desactiva.

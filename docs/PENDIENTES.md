@@ -65,7 +65,7 @@
 - **Menciones a NASA/HRP:** el reto invita a usar esos recursos y pide explicar cómo se usaron, así que no es un problema por sí mismo.
 
 ## Si sobra tiempo en el backend
-Tierra que responde con retraso, pérdida de paquetes con reintentos y resumir lo rutinario al enviar.
+Tierra que responde con retraso y pérdida de paquetes con reintentos. (Resumir lo rutinario al enviar ya está hecho.)
 
 ## Fuera de alcance, declarado como trabajo futuro
 Cifrado de la base, TLS en la red de la cabina, sensores y radio reales. El explicador de modelo local ya está integrado de forma opcional, pero requiere instalar y validar un modelo en la estación. Sus protecciones están en [IA_LOCAL.md](IA_LOCAL.md); la lista de frases de crisis necesita revisión profesional.
