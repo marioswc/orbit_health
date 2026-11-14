@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import sqlite3
 
+from ..repositorios import enlace as repo_enlace
 from ..servicios import cola
 from ..servicios import lecturas as servicio
 
@@ -52,7 +53,8 @@ def ejecutar(conn: sqlite3.Connection, nombre: str, reconectar: bool = False) ->
             registro.append({"paso": f"enlace {'activo' if activo else 'ECLIPSE'} ({entorno})",
                              "despachados": len(r["despachados"])})
     if reconectar:
-        r = cola.cambiar_enlace(conn, True, "marte")
+        entorno_actual = repo_enlace.leer(conn)["entorno"]
+        r = cola.cambiar_enlace(conn, True, entorno_actual)
         registro.append({"paso": "reconexion", "despachados": len(r["despachados"]),
                          "orden_prioridades": [d["prioridad"] for d in r["despachados"]]})
     return {"escenario": nombre, "pasos": registro}

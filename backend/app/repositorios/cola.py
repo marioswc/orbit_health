@@ -23,6 +23,17 @@ def retenidos_ordenados(conn: sqlite3.Connection) -> list[dict]:
            WHERE estado='retenido' ORDER BY prioridad ASC, id ASC""")]
 
 
+def en_transito_ordenados(conn: sqlite3.Connection) -> list[dict]:
+    return [dict(f) for f in conn.execute(
+        """SELECT id, tripulante_id, tipo_evento, prioridad, transmitido_ts, llegada_estimada_ts
+           FROM cola_salida WHERE estado='en_transito' ORDER BY prioridad ASC, id ASC""")]
+
+
+def conteo_por_estado_y_prioridad(conn: sqlite3.Connection) -> list[dict]:
+    return [dict(f) for f in conn.execute(
+        "SELECT estado, prioridad, COUNT(*) AS total FROM cola_salida GROUP BY estado, prioridad")]
+
+
 def marcar_en_transito(conn: sqlite3.Connection, evento_id: int, transmitido: str, llegada: str,
                        ack: str | None = None) -> None:
     conn.execute(
