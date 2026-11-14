@@ -38,12 +38,13 @@ Sistema de apoyo a la decisión clínica para tripulaciones en misiones de espac
 ## 4. Arquitectura
 
 ```
-React + TS (build estático)  ──HTTP local──▶  FastAPI
-                                                 │
-                              ┌──────────────────┼──────────────────┐
-                           engine.py        queue_manager.py     SQLite (WAL)
-                        (NEWS2, ambiente,    (cola, hash,        orbit_health.db
-                         línea base)          despacho)
+React + TS (build estático) ──HTTP local──▶ api (routers FastAPI)
+                                              │
+                                          servicios (casos de uso)
+                                           │            │
+                                    repositorios      dominio
+                                    (SQL, SQLite)   (reglas, hash,
+                                                     umbrales.json)
 ```
 
 | Capa | Tecnología | Responsabilidad |
@@ -52,7 +53,7 @@ React + TS (build estático)  ──HTTP local──▶  FastAPI
 | Backend | Python, FastAPI | API REST y motor clínico |
 | Datos | SQLite con `foreign_keys=ON` y WAL | Persistencia local |
 
-Estructura propuesta del repo: `backend/` (app, tests), `frontend/`, `docs/`, `data/` (series de calibración).
+Estructura del repo: ver README. Backend por capas (`api`, `servicios`, `repositorios`, `dominio`, `fuentes`); umbrales clínicos en `backend/app/datos/umbrales.json`.
 
 ## 5. Modelo de datos
 

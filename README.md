@@ -1,7 +1,7 @@
 # ORBIT Health
 
 Apoyo a la decisión clínica para tripulaciones con comunicación degradada. Funciona 100 % local.
-Plan completo: [PLAN_DE_DESARROLLO.md](PLAN_DE_DESARROLLO.md).
+Plan completo: [PLAN_DE_DESARROLLO.md](backend/docs/PLAN_DE_DESARROLLO.md).
 
 ## Producción local (un solo servidor, sin internet)
 
@@ -56,13 +56,23 @@ Ver `.env.example`. Umbrales marcados como *Supuesto* en el plan requieren valid
 
 ## Validación médica
 
-Ver [docs/VALIDACION_MEDICA.md](docs/VALIDACION_MEDICA.md) y `docs/casos_validacion.csv`.
+Ver [docs/VALIDACION_MEDICA.md](docs/VALIDACION_MEDICA.md), [docs/DECISIONES_EQUIPO.md](docs/DECISIONES_EQUIPO.md) y `docs/casos_validacion.csv`.
 
 ## Estructura
 
-| Ruta | Contenido |
-|---|---|
-| `backend/app/` | API FastAPI, motor clínico, cola, base de datos |
-| `backend/tests/` | Pruebas pytest |
-| `frontend/src/` | React + TypeScript |
-| `data/` | Base local (no se versiona) |
+```
+backend/app/
+  api/            routers HTTP (sistema, lecturas, bienestar, enlace)
+  servicios/      casos de uso (registrar lectura, estado, cola y enlace, bienestar)
+  repositorios/   acceso a SQLite (todo el SQL) y schema.sql
+  dominio/        reglas clínicas puras, catálogo, integridad (hash) y carga de umbrales
+  fuentes/        calibración PhysioNet y semilla demo
+  datos/          umbrales.json: fuente única de umbrales clínicos
+backend/tests/    pruebas pytest
+frontend/src/     React + TypeScript
+data/             series de calibración (BIDMC) y base local (no se versiona)
+docs/             validación médica y casos escenario
+scripts/          arranque, E2E, calibración, generador de casos
+```
+
+Dependencias entre capas: `api → servicios → repositorios`, y `servicios → dominio`. `dominio` no depende de nada.

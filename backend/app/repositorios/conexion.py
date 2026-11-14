@@ -1,7 +1,7 @@
 import sqlite3
 from pathlib import Path
 
-from . import config
+from .. import config
 
 SCHEMA = Path(__file__).with_name("schema.sql")
 

@@ -1,3 +1,4 @@
+import pytest
 import sqlite3
 
 from app import config
@@ -61,6 +62,45 @@ def test_eclipse_y_reconexion_prioriza_rojo(cliente):
     assert cliente.get("/api/cola/verificar").json()["valida"] is True
 
 
+def test_respuesta_incluye_proxima_captura(cliente):
+    assert lectura(cliente, "spo2", 98).json()["proxima_captura_min"] == 60
+    assert lectura(cliente, "spo2", 90).json()["proxima_captura_min"] == 5
+    assert cliente.get("/api/estado/T1").json()["proxima_captura_min"] == 5
+
+
+def test_umbrales_expone_estado_de_validacion(cliente):
+    r = cliente.get("/api/umbrales").json()
+    assert r["estado"].startswith("pendiente") and r["version"]
+
+
+def test_estado_resumen(cliente):
+    lectura(cliente, "spo2", 90)
+    e = cliente.get("/api/estado/T1").json()
+    assert e["nivel_general"] == "rojo" and e["indicadores"][0]["indicador"] == "spo2"
+
+
+def test_enlace_persiste_entre_reinicios(cliente):
+    from fastapi.testclient import TestClient
+    from app import main
+    cliente.post("/api/enlace", json={"activo": False, "entorno": "luna"})
+    with TestClient(main.app) as otro:   # nuevo arranque sobre la misma base
+        assert otro.get("/api/enlace").json() == {"activo": False, "entorno": "luna"}
+
+
+def test_ruta_db_por_defecto_apunta_a_data_del_repo(monkeypatch):
+    import importlib
+    from pathlib import Path
+    from app import config
+    monkeypatch.delenv("ORBIT_DB_PATH", raising=False)
+    try:
+        importlib.reload(config)
+        raiz = Path(__file__).resolve().parents[2]
+        assert Path(config.DB_PATH) == raiz / "data" / "orbit_health.db"
+    finally:
+        monkeypatch.undo()
+        importlib.reload(config)
+
+
 def test_umbrales_expone_estado_de_validacion(cliente):
     r = cliente.get("/api/umbrales").json()
     assert r["estado"].startswith("pendiente") and r["version"]
@@ -84,3 +124,46 @@ def test_ruta_db_por_defecto_es_absoluta():
     from pathlib import Path
     from app import config
     assert Path(config.RAIZ.parent / "data").is_absolute()
+
+
+def test_lectura_y_evento_son_atomicos(cliente, monkeypatch):
+    """Si falla el encolado, tampoco debe quedar la lectura."""
+    import sqlite3
+    from app.servicios import cola
+
+    def falla(*_a, **_k):
+        raise RuntimeError("fallo simulado")
+
+    monkeypatch.setattr(cola, "encolar_sin_commit", falla)
+    with pytest.raises(RuntimeError):
+        lectura(cliente, "spo2", 98)
+    conn = sqlite3.connect(config.DB_PATH)
+    assert conn.execute("SELECT COUNT(*) FROM lecturas").fetchone()[0] == 0
+    conn.close()
+
+
+def test_regla_combinada_sube_el_nivel_y_se_informa(cliente):
+    lectura(cliente, "presion_sistolica", 108)
+    r = lectura(cliente, "frecuencia_cardiaca", 95).json()
+    assert [a["id"] for a in r["reglas_combinadas"]] == ["posible_intolerancia_ortostatica"]
+    assert r["nivel"] == "amarillo" and r["prioridad"] == 2
+    e = cliente.get("/api/estado/T1").json()
+    assert e["nivel_general"] == "amarillo" and e["reglas_combinadas"]
+
+
+def test_sin_dato_de_ambas_variables_no_hay_regla(cliente):
+    r = lectura(cliente, "frecuencia_cardiaca", 95).json()
+    assert r["reglas_combinadas"] == [] and r["nivel"] == "verde"
+
+
+def test_alerta_colectiva_co2_con_dos_tripulantes_afectados(cliente):
+    assert cliente.get("/api/alertas/colectivas").json()["alertas"] == []
+    lectura(cliente, "co2", 3.6, tid="T3")                    # ambiental: no cuenta como afectado
+    lectura(cliente, "spo2", 90, tid="T1")                    # rojo
+    assert cliente.get("/api/alertas/colectivas").json()["alertas"] == []   # solo 1 afectado
+    lectura(cliente, "spo2", 92, tid="T2")
+    lectura(cliente, "frecuencia_respiratoria", 26, tid="T2")  # rojo
+    r = cliente.get("/api/alertas/colectivas").json()
+    assert r["alertas"] and r["alertas"][0]["id"] == "alerta_ambiental_colectiva"
+    assert r["alertas"][0]["afectados"] == 2
+    assert r["alertas"][0]["nivel"] == "rojo"

@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from app import db
+from app.repositorios import conexion as db
 from app.main import app
 
 

@@ -50,3 +50,19 @@ def test_json_equivale_a_tabla_oficial_en_valores_enteros():
         assert r._puntaje("frecuencia_respiratoria", v) == ref_fr(v)
     for v in range(20, 251):
         assert r._puntaje("frecuencia_cardiaca", v) == ref_fc(v)
+
+
+def test_captura_recomendada_se_acorta_con_la_gravedad():
+    from app.dominio import reglas as r
+    assert (r.captura_recomendada_min("verde"), r.captura_recomendada_min("amarillo"),
+            r.captura_recomendada_min("rojo")) == (60, 15, 5)
+
+
+def test_rechaza_captura_recomendada_incoherente():
+    d = copy.deepcopy(u.UMBRALES)
+    d["captura_recomendada_min"] = {"verde": 10, "amarillo": 15, "rojo": 5}
+    with pytest.raises(u.UmbralesInvalidos):
+        u.validar(d)
+    d["captura_recomendada_min"] = {"verde": 60, "amarillo": 15}
+    with pytest.raises(u.UmbralesInvalidos):
+        u.validar(d)
