@@ -97,7 +97,7 @@ Reglas: máximo 4 superficies con `backdrop-filter` a la vez; **no** aplicarlo a
 - **Cabecera de ancho completo** (vidrio, pegada arriba): marca a la izquierda, **vistas al centro** (Monitor · Bienestar · Enlace, control segmentado oscuro), a la derecha **Captura manual** (botón primario), selector de tripulante y tema. Con menos de 800 px las vistas pasan a una segunda fila centrada; con menos de 480 px quedan solo los iconos.
 - **Captura manual** vive en el Drawer (se abre desde la cabecera o desde el aviso "Registrar una medición" cuando no hay lecturas), no en una tarjeta al final.
 - **Indicadores** son una tira de chips arriba del escenario.
-- **Tierra:** foto real (fotografía "Blue Marble" del Apollo 17, NASA, dominio público; ver [ATRIBUCION.md](../src/shared/assets/ATRIBUCION.md)) fija en la parte baja de la pantalla, **estática**, media esfera visible, detrás del contenido y sin recortes (el brillo no se corta). Las tarjetas sobre ella usan 93 % de opacidad para conservar contraste.
+- **Tierra:** foto real (fotografía "Blue Marble" del Apollo 17, NASA, dominio público; ver [ATRIBUCION.md](../src/features/monitor/assets/ATRIBUCION.md)) fija en la parte baja de la pantalla, **estática**, media esfera visible, detrás del contenido y sin recortes (el brillo no se corta). Las tarjetas sobre ella usan 93 % de opacidad para conservar contraste.
 - **Bienestar:** diario con línea de tiempo y estado vacío; tamizaje con respuestas segmentadas y medidor 0–6.
 - **Enlace:** estado del canal, tres contadores (retenidos / en tránsito / recibidos), controles segmentados, columnas por prioridad con acento rojo/amarillo/verde e integridad de la cola.
 - **URL de ensayo:** `?vista=enlace`, `?captura=1`, `?tema=light|dark`, `?zona=…&capa=…&zoom=0`.

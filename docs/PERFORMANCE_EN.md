@@ -4,10 +4,12 @@ Measured with `scripts/medir_tiempos.py`: it starts the real server, sends 300 r
 
 | Operation | Median | 95th percentile | Worst |
 |---|---|---|---|
-| Register a reading (classify, store, queue the event) | 4.7 ms | 6.3 ms | 6.9 ms |
-| Read a crew member's current status | 4.4 ms | 5.8 ms | 8.0 ms |
-| Read a time series for a chart | 3.3 ms | 4.3 ms | 5.7 ms |
-| Build the exportable report | 6.6 ms | 10.4 ms | 14.8 ms |
+| Register a reading (classify, store, queue the event) | 4.6 ms | 5.9 ms | 14.6 ms |
+| Read a crew member's current status | 4.1 ms | 5.2 ms | 6.9 ms |
+| Read a time series for a chart | 3.4 ms | 4.4 ms | 5.6 ms |
+| Build the exportable report | 5.8 ms | 6.9 ms | 21.2 ms |
+
+Re-measured after the later features were added; results vary slightly from run to run.
 
 Machine: Linux x86_64, 8 CPUs, Python 3.12.3 (a development laptop, **not flight hardware**).
 

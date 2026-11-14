@@ -14,7 +14,7 @@ Principio: el sistema vive sin internet, con una tripulación pequeña y con la 
 | Sin soporte desde Tierra para restablecer accesos | Código de recuperación entregado al alta, o reinicio por médico o comandante |
 | Turnos largos y reinicios de equipo | Sesión de 12 h guardada en la base, revocable |
 | Nadie puede auditar desde fuera | Auditoría con hash encadenado, verificable sin red |
-| Privacidad de salud mental | Diario y PHQ-2: solo su dueño, **sin excepción de rol** |
+| Privacidad de salud mental | Diario, PHQ-2 y ánimo: solo su dueño, **sin excepción de rol**. Única vía de salida: un aviso que el propio tripulante decide enviar (con consentimiento, revocable y auditado) al médico o al comandante, sin diario ni puntaje |
 
 ## Permisos
 
@@ -23,6 +23,7 @@ Principio: el sistema vive sin internet, con una tripulación pequeña y con la 
 | Ver y registrar signos de cualquiera | Sí | Sí | Sí |
 | Diario y PHQ-2 propios | Sí | Sí | Sí |
 | Diario y PHQ-2 de otra persona | No | No | No |
+| Ver los avisos de salud mental que un tripulante decidió enviar | No | Sí | Sí |
 | Cambiar el enlace, escenarios de demo | No | Sí | Sí |
 | Reiniciar el PIN de otro, ver auditoría | No | Sí | Sí |
 

@@ -2,6 +2,8 @@
 
 Sistema de apoyo a la decisión clínica para tripulaciones en misiones de espacio profundo con comunicación degradada. Funciona 100 % local, sin internet, con reglas clínicas deterministas y auditables.
 
+> **Nota:** este es el plan inicial del día. El estado vigente está en [PENDIENTES.md](../../docs/PENDIENTES.md) y las rutas reales en [API_REFERENCIA.md](../../docs/API_REFERENCIA.md).
+
 > **Alcance:** prototipo funcional construido desde cero en este repositorio. Es una herramienta de apoyo; no sustituye criterio médico. Todo umbral marcado como *Supuesto* requiere validación por un profesional de la salud antes de uso real.
 
 ---
@@ -63,8 +65,14 @@ Estructura del repo: ver README. Backend por capas (`api`, `servicios`, `reposit
 | `lecturas` | Mediciones | tripulante_id, indicador, valor, unidad, nivel, puntos_news2, origen, ts |
 | `cola_salida` | Eventos hacia Tierra | prioridad (1–3), payload, hash_prev, hash, estado (`retenido`/`en_transito`/`recibido`), ts |
 | `diario_privado` | Notas personales | tripulante_id, contenido, ts. **Sin relación con `cola_salida`** |
-| `tamizajes` | PHQ-2 | tripulante_id, item1, item2, total, ts. Acceso solo del propio tripulante |
+| `tamizajes` | PHQ-2 y pregunta de riesgo | tripulante_id, item1, item2, total, riesgo_autolesion, nivel_protocolo, ts. Acceso solo del propio tripulante |
 | `capsulas` | Guías de autorregulación | categoría, título, contenido |
+| `animo_diario` | Ánimo 1 a 5, privado | tripulante_id, valor, ts |
+| `preferencias` | Tono, detalle y recordatorios que elige cada tripulante | tripulante_id, tono, detalle, recordatorios |
+| `avisos_salud_mental` | Aviso que el tripulante decide enviar al médico o comandante | tipo, nivel_protocolo, mensaje_opcional, consentimiento, estado. Sin relación con `cola_salida` |
+| `credenciales`, `sesiones` | Acceso por PIN, sesiones revocables | PIN y código de recuperación solo como hash |
+| `auditoria` | Registro encadenado con hash | actor, acción, objetivo, ts |
+| `estado_enlace` | Enlace con Tierra persistente | activo, entorno |
 
 Reglas de integridad:
 - Índice por (tripulante, ts) en `lecturas` y por (estado, prioridad, creado) en la cola.
@@ -82,14 +90,14 @@ Variables: frecuencia respiratoria, SpO₂ (escala 1), presión sistólica, frec
 | 5–6, o un parámetro en 3 | Riesgo medio / respuesta urgente | Amarillo |
 | ≥ 7 | Riesgo alto | Rojo |
 
-**Decisión pendiente:** el esquema RCP trata un parámetro aislado en 3 como urgente, no como máxima alerta. Opciones:
+**Decisión tomada por el equipo: opción B** (ver `docs/DECISIONES_EQUIPO.md`; sigue pendiente de validación médica). El esquema RCP trata un parámetro aislado en 3 como urgente, no como máxima alerta. Opciones consideradas:
 
 | Opción | Pro | Contra |
 |---|---|---|
 | A. Seguir RCP (parámetro en 3 = amarillo) | Fiel a la fuente, defendible | Una hipoxia severa aislada no sale roja |
 | B. Parámetro en 3 = rojo (criterio conservador propio) | Prioriza seguridad en aislamiento | Se aparta del estándar; declararlo como adaptación |
 
-Recomendación: B, documentada como adaptación propia y sujeta a validación médica.
+Se eligió B, documentada como adaptación propia y sujeta a validación médica.
 
 ### 6.2 Línea base personal
 - Media y desviación estándar muestral de los últimos 14 días por indicador.

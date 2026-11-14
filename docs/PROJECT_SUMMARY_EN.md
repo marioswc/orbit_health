@@ -13,11 +13,11 @@ On a long mission, communication with Earth is delayed or interrupted and there 
 - **Adapts how it talks to each astronaut.** Each crew member chooses a tone (direct or warm), a level of detail (brief or complete) and how often to be reminded. This changes the wording only, never the alert level, the priority or the essential warnings, and nothing is inferred from the diary or the mood score.
 - **Compares each person with themselves.** A rolling personal baseline flags deviations, because "normal" in microgravity is not "normal" on Earth.
 - **Survives the isolation.** A store-and-forward queue holds events during a blackout and releases the most urgent first when the link returns. Delivery and the round-trip confirmation are simulated with configurable delay per environment. A hash chain makes tampering detectable.
-- **Protects privacy.** The personal diary, the PHQ-2 mood screening and the daily mood score belong to their owner only. They are never queued for Earth and no role can read them.
+- **Protects privacy.** The personal diary, the PHQ-2 answers and the daily mood score belong to their owner only, and none of them is ever queued for Earth. The single way out is a notice the crew member chooses to send: with explicit, revocable consent, a short notice (its type and level plus an optional message, never the diary or the score) can reach the flight surgeon or the commander. Creating, revoking and handling it is audited.
 - **Heals itself.** On start-up it verifies its database, restores the last valid backup if needed and keeps automatic backups, because nobody on board can repair it.
 
 ## Indicators covered
-Blood pressure, heart rate, respiratory rate, blood oxygen, body temperature, consciousness level, blood glucose, cabin CO₂, accumulated radiation dose, hours of sleep, minutes of exercise, and mood.
+Blood pressure, heart rate, respiratory rate, blood oxygen, body temperature, consciousness level, blood glucose, cabin CO₂, cabin oxygen, accumulated radiation dose, hours of sleep, minutes of exercise, and mood.
 
 ## Built for the environment
 Runs fully offline from a single local server. Optional local authentication (switched on with a setting; off by default for a single-station demo) by PIN with temporary lockouts, a recovery code and audit trail, designed for a small crew with no internet, where any member may need to log vital signs for an incapacitated colleague.

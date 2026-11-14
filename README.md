@@ -60,6 +60,8 @@ variabilidad realista a la demo, no como línea base clínica.
 
 ## Endpoints útiles para el frontend
 
+La lista completa y siempre actual está en [docs/API_REFERENCIA.md](docs/API_REFERENCIA.md) (generada desde el código).
+
 | Endpoint | Para qué |
 |---|---|
 | `GET /api/historial/{id}?indicador=` | Serie temporal para gráficas |

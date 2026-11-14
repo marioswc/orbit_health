@@ -15,7 +15,7 @@ Spanish documentation is in [README.md](README.md). The material for judges is h
 - Keeps a personal rolling baseline for each crew member and explains each measurement in plain words, with links to the official sources.
 - Queues events during a blackout and sends the most urgent first when the link returns, with a simulated delay, a round-trip confirmation and a tamper-evident hash chain.
 - Links every alert to NASA's Human Research Program hazards and shows, risk by risk, what it covers. Honest count: 1 of 17 risks fully, 7 partly, 9 not covered.
-- Keeps the diary, the PHQ-2 screening and the daily mood score private to their owner; they are never queued for Earth.
+- Keeps the diary, the PHQ-2 screening and the daily mood score private to their owner; none is ever queued for Earth. Only a notice the crew member explicitly chooses to send (revocable, audited, without the diary or the score) can reach the flight surgeon or the commander.
 - Adapts its wording to each astronaut's chosen tone and level of detail, without changing any alert level.
 - Verifies and restores its own database and exports a report for Earth with an integrity fingerprint.
 
