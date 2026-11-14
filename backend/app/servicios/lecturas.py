@@ -5,7 +5,7 @@ import sqlite3
 from datetime import datetime, timedelta, timezone
 
 from .. import config
-from ..dominio import combinadas, reglas
+from ..dominio import acciones, combinadas, reglas
 from ..dominio.catalogos import INDICADORES, NEWS2_VARS, validar
 from ..repositorios import lecturas as repo
 from . import cola
@@ -13,6 +13,7 @@ from . import cola
 PRIORIDAD = {"rojo": 1, "amarillo": 2, "verde": 3}
 _ORDEN = {"verde": 0, "amarillo": 1, "rojo": 2}
 AVPU = "AVPU"
+ETIQUETAS = {k: v[0] for k, v in INDICADORES.items()}
 
 
 def signos_recientes(conn: sqlite3.Connection, tid: str, desde: str) -> dict:
@@ -78,7 +79,10 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
     except Exception:
         conn.rollback()
         raise
-    return {"lectura_id": lectura_id, "nivel": nivel_evento, "puntos_news2": c["puntos"],
+    proxima = reglas.captura_recomendada_min(nivel_evento)
+    return {"lectura_id": lectura_id, "nivel": nivel_evento,
+            "acciones_sugeridas": acciones.acciones_sugeridas(
+                nivel_evento, proxima, c["observacion"], linea["aviso"], c["faltantes"], activas, ETIQUETAS), "puntos_news2": c["puntos"],
             "observacion": c["observacion"], "aviso_linea_base": linea["aviso"],
             "faltantes_news2": c["faltantes"], "reglas_combinadas": activas, "cola_evento_id": evento_id,
             "prioridad": PRIORIDAD[nivel_evento],
