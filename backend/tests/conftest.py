@@ -39,3 +39,12 @@ def cliente_auth(tmp_path, monkeypatch):
 
         c.entrar = entrar
         yield c
+
+
+@pytest.fixture(autouse=True)
+def _flujo_limpio():
+    """El estado de las ventanas de sensores vive en memoria: cada prueba empieza limpia."""
+    from app.servicios import flujo
+    flujo.reiniciar()
+    yield
+    flujo.reiniciar()

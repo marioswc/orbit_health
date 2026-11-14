@@ -84,6 +84,9 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 
 | Método | Ruta | Sesión | Qué hace |
 |---|---|---|---|
+| POST | `/api/sensores/flujo` | requerida | Una muestra de un flujo continuo (p. ej. una banda): se agrupa por ventanas, salvo los valores extremos |
+| POST | `/api/sensores/flujo/lote` | requerida | Varias muestras de un flujo continuo en una sola petición (hasta 500); todo o nada si alguna es inválida |
+| POST | `/api/sensores/flujo/vaciar` | requerida | Cierra ya las ventanas abiertas y registra su resumen (útil al desconectar un dispositivo) |
 | POST | `/api/sensores/lectura` | requerida | Entrada de un dispositivo: misma clasificación y misma cola que la captura manual, con origen 'sensor' |
 | POST | `/api/sensores/lote` | requerida | Varias lecturas de un dispositivo. Todo o nada: si una es inválida no se guarda ninguna |
 
@@ -96,4 +99,4 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 | POST | `/api/demo/escenarios/{nombre}` | requerida | Ejecuta un escenario guionizado. Escribe datos de demostración; desactivar con ORBIT_DEMO_API=0 |
 | POST | `/api/demo/sensor/{tid}` | requerida | Un dispositivo portátil simulado envía `ticks` rondas de constantes vitales (origen 'sensor'). Escribe datos de demo |
 
-Total: 49 operaciones, 11 públicas.
+Total: 52 operaciones, 11 públicas.
