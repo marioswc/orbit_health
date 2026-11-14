@@ -35,6 +35,7 @@ def estado_auth() -> dict:
 
 @router.post("/auth/login")
 def login(datos: LoginIn, conn=Depends(conexion)) -> dict:
+    """Inicia sesión con el PIN y devuelve un token"""
     try:
         return auth.login(conn, datos.tripulante_id, datos.pin)
     except auth.AuthError as e:
@@ -43,6 +44,7 @@ def login(datos: LoginIn, conn=Depends(conexion)) -> dict:
 
 @router.post("/auth/logout")
 def logout(authorization: str | None = Header(default=None), a: dict = Depends(actor), conn=Depends(conexion)) -> dict:
+    """Cierra la sesión actual"""
     token = token_de(authorization)
     if token:
         auth.logout(conn, token, a["tripulante_id"])
@@ -51,11 +53,13 @@ def logout(authorization: str | None = Header(default=None), a: dict = Depends(a
 
 @router.get("/auth/yo")
 def yo(a: dict = Depends(actor)) -> dict:
+    """Quién es el usuario de la sesión actual y cuál es su rol"""
     return a
 
 
 @router.post("/auth/recuperar")
 def recuperar(datos: RecuperarIn, conn=Depends(conexion)) -> dict:
+    """Restablece el PIN con el código de recuperación"""
     try:
         return auth.recuperar(conn, datos.tripulante_id, datos.codigo_recuperacion, datos.pin_nuevo)
     except auth.AuthError as e:
@@ -66,6 +70,7 @@ def recuperar(datos: RecuperarIn, conn=Depends(conexion)) -> dict:
 
 @router.post("/auth/reiniciar-pin/{tid}")
 def reiniciar_pin(tid: str, a: dict = Depends(requiere("pin:reiniciar")), conn=Depends(conexion)) -> dict:
+    """El médico o el comandante reinicia el PIN de otro tripulante"""
     try:
         return auth.reiniciar_pin(conn, a, tid)
     except auth.AuthError as e:
@@ -76,9 +81,11 @@ def reiniciar_pin(tid: str, a: dict = Depends(requiere("pin:reiniciar")), conn=D
 
 @router.get("/auditoria")
 def ver_auditoria(_: dict = Depends(requiere("auditoria:leer")), conn=Depends(conexion)) -> list[dict]:
+    """Últimos registros de auditoría (médico o comandante)"""
     return auditoria.recientes(conn)
 
 
 @router.get("/auditoria/verificar")
 def verificar_auditoria(_: dict = Depends(requiere("auditoria:leer")), conn=Depends(conexion)) -> dict:
+    """Comprueba que la cadena de hash de la auditoría no fue alterada"""
     return auditoria.verificar(conn)

@@ -1,0 +1,99 @@
+# Referencia de la API
+
+> **Generado automáticamente** por `scripts/generar_api_doc.py` a partir del código. No se edita a mano: una prueba
+> falla si este archivo no coincide con las rutas reales. Para regenerarlo: `backend/.venv/bin/python scripts/generar_api_doc.py`.
+
+Con `ORBIT_AUTH=1` todas las rutas exigen sesión (`Authorization: Bearer <token>`) **excepto** las marcadas como públicas.
+Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.md).
+
+
+## sistema
+
+| Método | Ruta | Sesión | Qué hace |
+|---|---|---|---|
+| GET | `/api/explicaciones` | pública | Qué es cada medición, por qué se mide, cómo medirla y qué cambia en el espacio |
+| GET | `/api/explicaciones/{clave}` | pública | Explicación de un indicador: qué es, por qué se mide y cómo medirlo |
+| GET | `/api/health` | pública | Comprobación de que el servidor responde |
+| GET | `/api/indicadores` | pública | Catálogo de indicadores con su unidad y rango de captura |
+| GET | `/api/peligros` | pública | Marco de peligros y riesgos del HRP, con la cobertura real de ORBIT Health por cada riesgo |
+| GET | `/api/salud` | pública | Estado de la base y de los respaldos. Pensado para que un tripulante no técnico sepa si todo está bien |
+| GET | `/api/tripulantes` | pública | Lista de tripulantes (id, nombre y rol) para el selector de acceso |
+| GET | `/api/umbrales` | pública | Versión y estado de validación clínica de los umbrales en uso |
+
+## seguridad
+
+| Método | Ruta | Sesión | Qué hace |
+|---|---|---|---|
+| GET | `/api/auditoria` | requerida | Últimos registros de auditoría (médico o comandante) |
+| GET | `/api/auditoria/verificar` | requerida | Comprueba que la cadena de hash de la auditoría no fue alterada |
+| GET | `/api/auth/estado` | pública | Permite al frontend saber si debe mostrar la pantalla de acceso |
+| POST | `/api/auth/login` | pública | Inicia sesión con el PIN y devuelve un token |
+| POST | `/api/auth/logout` | requerida | Cierra la sesión actual |
+| POST | `/api/auth/recuperar` | pública | Restablece el PIN con el código de recuperación |
+| POST | `/api/auth/reiniciar-pin/{tid}` | requerida | El médico o el comandante reinicia el PIN de otro tripulante |
+| GET | `/api/auth/yo` | requerida | Quién es el usuario de la sesión actual y cuál es su rol |
+
+## lecturas
+
+| Método | Ruta | Sesión | Qué hace |
+|---|---|---|---|
+| GET | `/api/alertas/colectivas` | requerida | Cruce de CO2 de cabina con el estado de la tripulación |
+| GET | `/api/estado/{tid}` | requerida | Estado clínico vigente de un tripulante: niveles, NEWS2, reglas y acciones sugeridas |
+| GET | `/api/historial/{tid}` | requerida | Serie temporal de un indicador (para gráficas). El ánimo diario es privado y no sale por aquí |
+| POST | `/api/lecturas` | requerida | Cualquier tripulante autenticado puede registrar signos de un compañero (p. ej. si este queda incapacitado) |
+| GET | `/api/recordatorios` | requerida | Quién tiene la medición vencida, según su nivel actual y su frecuencia de recordatorios elegida |
+| GET | `/api/recordatorios/{tid}` | requerida | Indica si la medición de un tripulante está vencida o al día |
+
+## bienestar
+
+| Método | Ruta | Sesión | Qué hace |
+|---|---|---|---|
+| POST | `/api/animo` | requerida | Ánimo diario de 1 a 5. Exclusivo de su dueño y nunca se transmite |
+| GET | `/api/animo/{tid}` | requerida | Serie del ánimo diario del propio tripulante (privado) |
+| POST | `/api/crisis/aviso-medico` | requerida | Notifica al médico de a bordo con consentimiento explícito. Nunca entra a la cola hacia Tierra |
+| GET | `/api/crisis/avisos` | requerida | Vista exclusiva para el médico o comandante: solo muestra avisos con consentimiento vigente |
+| POST | `/api/crisis/avisos/{aviso_id}/atender` | requerida | El médico o el comandante marca un aviso de salud mental como atendido |
+| POST | `/api/crisis/avisos/{aviso_id}/revocar` | requerida | El propio tripulante revoca su consentimiento: el aviso deja de ser visible para el médico |
+| GET | `/api/crisis/avisos/{tid}` | requerida | Avisos que el propio tripulante compartió con el médico y su estado (pendiente, atendido o revocado) |
+| GET | `/api/crisis/protocolo` | requerida | Protocolo de crisis psicológica / riesgo de autolesión, integrando tono y calidad de oxígeno en cabina |
+| POST | `/api/diario` | requerida | Guarda en local. Por diseño no escribe en la cola de salida |
+| GET | `/api/diario/{tid}` | requerida | Notas del diario del propio tripulante (privado) |
+| GET | `/api/preferencias/{tid}` | requerida | Cómo quiere cada tripulante que le hable el asistente. Solo cambia la forma, nunca el nivel de alerta |
+| PUT | `/api/preferencias/{tid}` | requerida | Guarda el tono, el detalle y los recordatorios elegidos por el tripulante |
+| POST | `/api/tamizajes` | requerida | Registra un PHQ-2 y, si procede, devuelve el protocolo de apoyo (privado) |
+
+## enlace
+
+| Método | Ruta | Sesión | Qué hace |
+|---|---|---|---|
+| GET | `/api/cola` | requerida | Cola de salida: resumen por estado y eventos recientes |
+| GET | `/api/cola/verificar` | requerida | Comprueba que la cadena de hash de la cola no fue alterada |
+| GET | `/api/enlace` | requerida | Estado actual del enlace con Tierra (activo o eclipse, y entorno) |
+| POST | `/api/enlace` | requerida | Cambia el estado o el entorno del enlace y despacha lo retenido si hay enlace |
+| GET | `/api/enlace/latencia` | requerida | Perfil de retardo en uso, factor de aceleración y eventos en tránsito |
+| GET | `/api/tierra/mensajes` | requerida | Vista del centro de control: solo lo que ya llegó por la hora estimada, lo urgente primero |
+
+## informe
+
+| Método | Ruta | Sesión | Qué hace |
+|---|---|---|---|
+| GET | `/api/informe` | requerida | Resumen de toda la tripulación para Tierra, con huella de integridad. Sin datos personales privados |
+| GET | `/api/informe/{tid}` | requerida | Informe de un tripulante. `formato=csv` devuelve solo las lecturas, listas para una hoja de cálculo |
+
+## sensores
+
+| Método | Ruta | Sesión | Qué hace |
+|---|---|---|---|
+| POST | `/api/sensores/lectura` | requerida | Entrada de un dispositivo: misma clasificación y misma cola que la captura manual, con origen 'sensor' |
+| POST | `/api/sensores/lote` | requerida | Varias lecturas de un dispositivo. Todo o nada: si una es inválida no se guarda ninguna |
+
+## demo
+
+| Método | Ruta | Sesión | Qué hace |
+|---|---|---|---|
+| GET | `/api/demo/comparativa` | requerida | Mismo evento (hipoxia severa) visto con y sin ORBIT. No escribe datos; es una ilustración con supuestos |
+| GET | `/api/demo/escenarios` | requerida | Lista de escenarios de demostración disponibles |
+| POST | `/api/demo/escenarios/{nombre}` | requerida | Ejecuta un escenario guionizado. Escribe datos de demostración; desactivar con ORBIT_DEMO_API=0 |
+| POST | `/api/demo/sensor/{tid}` | requerida | Un dispositivo portátil simulado envía `ticks` rondas de constantes vitales (origen 'sensor'). Escribe datos de demo |
+
+Total: 49 operaciones, 11 públicas.

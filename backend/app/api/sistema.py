@@ -13,6 +13,7 @@ router = APIRouter(prefix="/api", tags=["sistema"])
 
 @router.get("/health")
 def health() -> dict:
+    """Comprobación de que el servidor responde"""
     return {"status": "ok"}
 
 
@@ -30,6 +31,7 @@ def umbrales_estado() -> dict:
 
 @router.get("/indicadores")
 def indicadores() -> list[dict]:
+    """Catálogo de indicadores con su unidad y rango de captura"""
     return [{"clave": k, "etiqueta": v[0], "unidad": v[1], "min": v[2], "max": v[3]}
             for k, v in INDICADORES.items()]
 
@@ -42,6 +44,7 @@ def explicaciones() -> dict:
 
 @router.get("/explicaciones/{clave}")
 def explicacion(clave: str) -> dict:
+    """Explicación de un indicador: qué es, por qué se mide y cómo medirlo"""
     if clave not in EXPLICACIONES["explicaciones"]:
         raise HTTPException(404, "No hay explicación para ese indicador")
     return {"clave": clave, "estado": EXPLICACIONES["estado"], "aviso": EXPLICACIONES["aviso"],
@@ -56,4 +59,5 @@ def peligros() -> dict:
 
 @router.get("/tripulantes")
 def listar_tripulantes(conn=Depends(conexion)) -> list[dict]:
+    """Lista de tripulantes (id, nombre y rol) para el selector de acceso"""
     return tripulantes.listar(conn)

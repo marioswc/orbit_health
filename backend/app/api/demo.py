@@ -14,6 +14,7 @@ router = APIRouter(prefix="/api/demo", tags=["demo"])
 
 @router.get("/escenarios")
 def listar(_: dict = Depends(requiere("demo:ejecutar"))) -> list[dict]:
+    """Lista de escenarios de demostración disponibles"""
     return escenarios.listar()
 
 
