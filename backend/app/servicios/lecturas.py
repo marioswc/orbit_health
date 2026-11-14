@@ -44,6 +44,8 @@ def _clasificar(conn, tid: str, indicador: str, valor: float, ventana: str) -> d
         return {**base, "nivel": nivel, "nivel_global": nivel}
     if indicador == "glucosa":
         nivel, obs = reglas.evaluar_glucosa(valor)
+    elif indicador == "sueno_horas":
+        nivel, obs = reglas.evaluar_sueno(valor)
     else:  # presion_diastolica
         nivel, obs = reglas.evaluar_diastolica(valor)
     return {**base, "nivel": nivel, "nivel_global": nivel, "observacion": obs}

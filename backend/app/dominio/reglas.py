@@ -111,6 +111,16 @@ def evaluar_glucosa(mg_dl: float) -> tuple[str, bool]:
     return "verde", g["observacion_desde"] <= mg_dl <= g["observacion_hasta"]
 
 
+def evaluar_sueno(horas: float) -> tuple[str, bool]:
+    """Supuesto de diseño: pocas horas dormidas son un aviso (amarillo), nunca rojo por sí solas."""
+    return ("amarillo" if horas < UMBRALES["sueno_horas"]["amarillo_menor_que"] else "verde"), False
+
+
+def animo_bajo(valor: int) -> bool:
+    """Autorreporte 1 a 5. Supuesto: valores bajos activan apoyo privado, no alertas."""
+    return valor <= UMBRALES["animo"]["bajo_menor_igual"]
+
+
 def evaluar_diastolica(mmhg: float) -> tuple[str, bool]:
     """Supuesto: valores bajos se marcan como observación de perfusión, no como alerta."""
     return "verde", mmhg < UMBRALES["diastolica_mmhg"]["observacion_menor_que"]

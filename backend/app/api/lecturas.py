@@ -5,6 +5,7 @@ from ..servicios import alertas as servicio_alertas
 from ..servicios import estado as servicio_estado
 from ..servicios import lecturas as servicio
 from ..servicios import auditoria
+from ..servicios import historial as servicio_historial
 from .dependencias import conexion, requerir_tripulante, requiere
 
 router = APIRouter(prefix="/api", tags=["lecturas"])
@@ -41,3 +42,14 @@ def estado(tid: str, conn=Depends(conexion), _: dict = Depends(requiere("clinico
 def alertas_colectivas(conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) -> dict:
     """Cruce de CO2 de cabina con el estado de la tripulación."""
     return servicio_alertas.alertas_colectivas(conn)
+
+
+@router.get("/historial/{tid}")
+def historial(tid: str, indicador: str, dias: float = 14, limite: int = 500, conn=Depends(conexion),
+              _: dict = Depends(requiere("clinico:leer"))) -> dict:
+    """Serie temporal de un indicador (para gráficas). El ánimo diario es privado y no sale por aquí."""
+    requerir_tripulante(conn, tid)
+    try:
+        return servicio_historial.serie_indicador(conn, tid, indicador, dias, limite)
+    except ValueError as e:
+        raise HTTPException(422, str(e))

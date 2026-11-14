@@ -105,3 +105,12 @@ CREATE TABLE IF NOT EXISTS auditoria (
     hash_prev TEXT NOT NULL,
     hash TEXT NOT NULL UNIQUE
 );
+
+-- Ánimo diario (1 a 5): privado como el PHQ-2; nunca entra a la cola de salida.
+CREATE TABLE IF NOT EXISTS animo_diario (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tripulante_id TEXT NOT NULL REFERENCES tripulantes(id) ON DELETE CASCADE,
+    valor INTEGER NOT NULL CHECK (valor BETWEEN 1 AND 5),
+    ts TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_animo_trip_ts ON animo_diario (tripulante_id, ts DESC);

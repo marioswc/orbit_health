@@ -34,7 +34,7 @@ def _validar_bandas(nombre: str, bandas: list) -> None:
 
 def validar(datos: dict) -> dict:
     for clave in ("version", "estado", "ventana_news2_min", "news2", "ambiente",
-                  "glucosa_mg_dl", "diastolica_mmhg", "linea_base", "indicadores", "reglas_combinadas"):
+                  "glucosa_mg_dl", "diastolica_mmhg", "sueno_horas", "animo", "linea_base", "indicadores", "reglas_combinadas"):
         if clave not in datos:
             raise UmbralesInvalidos(f"Falta la sección '{clave}'")
     bandas = datos["news2"].get("bandas", {})
