@@ -23,6 +23,7 @@ function SimuladorDemo() {
   const [entorno, setEntorno] = useState("marte");
   const [comp, setComp] = useState<ComparativaOrbit | null>(null);
   const [resultado, setResultado] = useState<{ escenario: string; pasos: { paso: string; nivel?: string; prioridad?: number; despachados?: number }[] } | null>(null);
+  const [sensorRes, setSensorRes] = useState<{ perfil: string; rondas: { ronda: number; nivel: string; puntos_news2: number }[]; primera_ronda_amarillo: number | null; primera_ronda_rojo: number | null } | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -40,6 +41,16 @@ function SimuladorDemo() {
     try {
       const r = await post<NonNullable<typeof resultado>>(`/demo/escenarios/${encodeURIComponent(id)}?reconectar=${reconectar}`, {});
       setResultado(r);
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
+  async function correrSensor(perfil: string) {
+    setError("");
+    try {
+      const r = await post<NonNullable<typeof sensorRes>>(`/demo/sensor/T1?perfil=${encodeURIComponent(perfil)}`, {});
+      setSensorRes(r);
     } catch (e) {
       setError((e as Error).message);
     }
@@ -123,6 +134,27 @@ function SimuladorDemo() {
           )}
         </section>
       )}
+
+      <section className="tarjeta pieza escenarios" aria-label="Dispositivo portátil simulado">
+        <div className="tierra-cab">
+          <div>
+            <h2>Dispositivo portátil simulado</h2>
+            <p className="suave">Envía 12 rondas de signos vitales continuos sobre T1 con origen sensor.</p>
+          </div>
+          <div className="fila">
+            <button type="button" onClick={() => correrSensor("deterioro_respiratorio")}>Simular deterioro</button>
+            <button type="button" className="ghost" onClick={() => correrSensor("estable")}>Simular estable</button>
+          </div>
+        </div>
+        {sensorRes && (
+          <div className="escenario-res">
+            <strong>{sensorRes.rondas.length} rondas ({sensorRes.perfil.replace(/_/g, " ")})</strong>
+            <span className="suave" style={{ marginLeft: 8 }}>
+              Primer amarillo: {sensorRes.primera_ronda_amarillo ?? "—"} · Primer rojo: {sensorRes.primera_ronda_rojo ?? "—"}
+            </span>
+          </div>
+        )}
+      </section>
 
       {error && <Alerta tono="error" titulo="No se pudo cargar el simulador">{error}</Alerta>}
     </div>

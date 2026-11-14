@@ -102,4 +102,18 @@
 .acceso-form { display: grid; gap: var(--spacing-12); }
 .campo-form { display: grid; gap: var(--spacing-4); font-size: var(--text-body-sm); color: var(--color-graphite); }
 
+/* ---- Recordatorios, Tierra e informe ---- */
+.recordatorio-ok { margin-top: var(--spacing-16); padding: var(--spacing-12) var(--spacing-16); }
+.recordatorio-ok p { margin: 0; font-size: var(--text-body-sm); }
+.tierra-bloque { display: grid; gap: var(--spacing-16); }
+.tierra-cab { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--spacing-12); }
+.tierra-cab h2, .tierra-cab h3 { margin: 0 0 var(--spacing-4); }
+.tierra-lista, .informe-lista { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--spacing-8); }
+.tierra-lista li, .informe-lista li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--spacing-8); padding: var(--spacing-8) var(--spacing-12); border-radius: var(--radius-input); background: var(--color-eggshell); border: 1px solid var(--color-stone); font-size: var(--text-body-sm); }
+.tierra-lista li { justify-content: flex-start; }
+.informe-bloque { padding-top: var(--spacing-16); border-top: 1px solid var(--color-stone); display: grid; gap: var(--spacing-12); }
+.informe-acciones { display: flex; align-items: center; gap: var(--spacing-8); }
+.informe-btn { text-decoration: none; min-height: 40px; display: inline-flex; align-items: center; }
+
+
 

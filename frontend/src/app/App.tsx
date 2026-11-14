@@ -91,6 +91,7 @@ export default function App() {
         <div className="vista" key={vista} style={{ display: vista === "monitor" ? "contents" : undefined, "--dx": `${dx}px` } as CSSProperties}>
           {tid && vista === "monitor" && (
             <MonitorPage
+              tripulanteId={tid}
               estado={estado}
               ambiente={ambiente.nivel}
               cabina={<MonitorCabina ambiente={ambiente} alerta={colectivas?.alertas[0] ?? null} />}

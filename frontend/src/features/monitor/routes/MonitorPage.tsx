@@ -4,11 +4,13 @@ import Titular from "../../../shared/components/Titular";
 import AccionesClinicas from "../components/AccionesClinicas";
 import DetalleZona from "../components/DetalleZona";
 import FiguraHumana from "../components/FiguraHumana";
+import RecordatorioCaptura from "../components/RecordatorioCaptura";
 import { useZonaSeleccionada } from "../hooks/useZonaSeleccionada";
 import type { Estado, LecturaEstado } from "../types/estado";
 import { CAPAS, ZONAS, nivelZona, type NivelZona } from "../zonas";
 
 interface Props {
+  tripulanteId?: string;
   estado: Estado | null;
   /** Monitor de cabina (feature cabina), compuesto desde app/: se muestra en la columna izquierda. */
   cabina?: ReactNode;
@@ -20,7 +22,7 @@ const SIN_LECTURAS: LecturaEstado[] = []; // referencia estable: evita recalcula
 const TITULAR = { verde: "Sin alertas activas", amarillo: "Requiere vigilancia", rojo: "Atención inmediata", sin_datos: "Sin lecturas recientes" } as const;
 const LEYENDA: [string, string][] = [["verde", "Verde"], ["amarillo", "Amarillo"], ["rojo", "Rojo"], ["sin_datos", "Sin datos"]];
 
-export default function MonitorPage({ estado, cabina, ambiente = null }: Props) {
+export default function MonitorPage({ tripulanteId = "", estado, cabina, ambiente = null }: Props) {
   const { zona, acercado, capa, setCapa, elegir, alejar } = useZonaSeleccionada();
   const [meses, setMeses] = useState(0);
   const nivel = estado?.nivel_general ?? "sin_datos";
@@ -96,6 +98,7 @@ export default function MonitorPage({ estado, cabina, ambiente = null }: Props) 
           acciones={estado.acciones_sugeridas}
         />
       )}
+      {tripulanteId && <RecordatorioCaptura tripulanteId={tripulanteId} estado={estado} />}
     </div>
   );
 }
