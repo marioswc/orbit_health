@@ -39,6 +39,6 @@
 |---|---|---|
 | Criterio "Relevancia" pide integrar datos de NASA como componente central | Se integró el marco de peligros y riesgos del HRP (`GET /api/peligros`) y cada alerta indica su peligro | La asociación indicador-peligro es de diseño nuestro, no oficial. Cobertura honesta: 1 de 17 riesgos cubierto, 7 parciales, 9 no |
 | Uso de IA | Se permite, con declaración obligatoria y sin usarla para idear la solución | Ver `SI_DISCLOSURE.md`; el equipo debe completar los puntos marcados |
-| "IA adaptada a la personalidad" | Se implementó como preferencias elegidas por cada tripulante (tono, detalle, recordatorios) | Solo cambia la redacción, nunca el nivel de alerta. No se infiere nada del diario ni del ánimo. Un modelo local es trabajo futuro |
+| "IA adaptada a la personalidad" | Se implementó como preferencias elegidas por cada tripulante (tono, detalle, recordatorios), un explicador local opcional (`GET /api/estado/{tid}/explicacion`) y voz push-to-talk opcional (`POST /api/voz/chat/{tid}`) | El modelo solo explica o conversa sobre un estado ya calculado; nunca cambia nivel, prioridad ni acciones. No se infiere nada del diario ni del ánimo. Sin modelos configurados se usan fallbacks locales |
 | Contenido educativo | `GET /api/explicaciones` por indicador, con fuentes oficiales | Pendiente de validación clínica; sin consejo médico ni de medicación |
 | Sueño y ánimo | Indicadores nuevos; el ánimo es privado como el PHQ-2 | Umbrales son supuestos |

@@ -35,3 +35,16 @@ RESPALDOS_CONSERVAR = int(os.getenv("ORBIT_RESPALDOS_CONSERVAR", "24"))
 # --- Flujo continuo de sensores (una banda envía una muestra por segundo): se agrupa en ventanas ---
 FLUJO_VENTANA_S = float(os.getenv("ORBIT_FLUJO_VENTANA_S", "60"))             # 0 = sin agrupar
 FLUJO_ENFRIAMIENTO_S = float(os.getenv("ORBIT_FLUJO_ENFRIAMIENTO_S", "30"))   # mínimo entre extremos del mismo indicador
+
+# Explicador opcional: solo acepta un modelo servido en la propia estación.
+# Si no se configura, se usa la explicación determinista local.
+IA_LOCAL_URL = os.getenv("ORBIT_IA_LOCAL_URL", "")
+IA_LOCAL_MODELO = os.getenv("ORBIT_IA_LOCAL_MODELO", "")
+IA_LOCAL_TIMEOUT_S = float(os.getenv("ORBIT_IA_LOCAL_TIMEOUT_S", "4"))
+
+# Voz local opcional. Se carga solo cuando se invoca el endpoint de voz.
+VOZ_ACTIVA = os.getenv("ORBIT_VOZ_ACTIVA", "0") == "1"
+VOZ_STT_MODELO = os.getenv("ORBIT_VOZ_STT_MODELO", "small")
+VOZ_PIPER_BIN = os.getenv("ORBIT_VOZ_PIPER_BIN", "piper")
+VOZ_PIPER_MODELO = os.getenv("ORBIT_VOZ_PIPER_MODELO", "")
+VOZ_MAX_AUDIO_BYTES = int(os.getenv("ORBIT_VOZ_MAX_AUDIO_BYTES", "10000000"))

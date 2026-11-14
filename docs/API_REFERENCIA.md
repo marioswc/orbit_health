@@ -105,4 +105,16 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 | GET | `/api/demo/simulacion/estado` | requerida | Progreso de la misión simulada: minuto, línea de tiempo narrada y hitos (primer rojo, alerta colectiva, retenidos) |
 | POST | `/api/demo/simulacion/iniciar` | requerida | Pone en marcha una misión simulada en vivo: las bandas envían solas, el enlace se corta y vuelve. Escribe datos de demo |
 
-Total: 58 operaciones, 13 públicas.
+## asistente
+
+| Método | Ruta | Sesión | Qué hace |
+|---|---|---|---|
+| GET | `/api/estado/{tid}/explicacion` | requerida | Explica un estado ya calculado con reglas locales o un modelo local opcional |
+
+## voz
+
+| Método | Ruta | Sesión | Qué hace |
+|---|---|---|---|
+| POST | `/api/voz/chat/{tid}` | requerida | Transcribe audio localmente, responde con el LLM local y devuelve audio opcional |
+
+Total: 60 operaciones, 13 públicas.

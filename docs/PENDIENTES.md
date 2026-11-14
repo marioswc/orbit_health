@@ -67,4 +67,4 @@
 Tierra que responde con retraso, pérdida de paquetes con reintentos y resumir lo rutinario al enviar.
 
 ## Fuera de alcance, declarado como trabajo futuro
-Cifrado de la base, TLS en la red de la cabina, sensores y radio reales, y un modelo de lenguaje local.
+Cifrado de la base, TLS en la red de la cabina, sensores y radio reales. El explicador de modelo local ya está integrado de forma opcional, pero requiere instalar y validar un modelo en la estación.
