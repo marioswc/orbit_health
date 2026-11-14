@@ -34,7 +34,7 @@ def _validar_bandas(nombre: str, bandas: list) -> None:
 
 def validar(datos: dict) -> dict:
     for clave in ("version", "estado", "ventana_news2_min", "news2", "ambiente",
-                  "glucosa_mg_dl", "diastolica_mmhg", "linea_base", "indicadores"):
+                  "glucosa_mg_dl", "diastolica_mmhg", "linea_base", "indicadores", "reglas_combinadas"):
         if clave not in datos:
             raise UmbralesInvalidos(f"Falta la sección '{clave}'")
     bandas = datos["news2"].get("bandas", {})
@@ -52,7 +52,27 @@ def validar(datos: dict) -> dict:
     for clave, d in datos["indicadores"].items():
         if d["min"] >= d["max"]:
             raise UmbralesInvalidos(f"indicador '{clave}': min debe ser menor que max")
+    _validar_combinadas(datos)
     return datos
+
+
+_OPS = (">", ">=", "<", "<=")
+_NIVELES = ("verde", "amarillo", "rojo")
+
+
+def _validar_combinadas(datos: dict) -> None:
+    rc = datos["reglas_combinadas"]
+    for r in rc.get("individuales", []):
+        if r.get("nivel") not in _NIVELES or not r.get("condiciones"):
+            raise UmbralesInvalidos(f"regla combinada '{r.get('id')}': nivel o condiciones inválidos")
+        for c in r["condiciones"]:
+            if c.get("indicador") not in datos["indicadores"] or c.get("op") not in _OPS \
+                    or not isinstance(c.get("valor"), (int, float)):
+                raise UmbralesInvalidos(f"regla combinada '{r['id']}': condición inválida {c}")
+    col = rc.get("colectiva_co2")
+    if col is not None and (col.get("nivel") not in _NIVELES or col.get("nivel_minimo") not in _NIVELES
+                            or col.get("min_tripulantes", 0) < 1):
+        raise UmbralesInvalidos("colectiva_co2: nivel, nivel_minimo o min_tripulantes inválidos")
 
 
 def cargar(ruta: str | Path | None = None) -> dict:

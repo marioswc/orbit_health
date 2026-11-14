@@ -41,6 +41,37 @@
   },
   "diastolica_mmhg": {"observacion_menor_que": 60},
   "linea_base": {"dias": 14, "min_muestras": 5, "desviaciones": 2.0},
+  "reglas_combinadas": {
+    "nota": "Cruce de señales. Niveles y condiciones son supuestos de diseño pendientes de validación clínica.",
+    "individuales": [
+      {
+        "id": "posible_intolerancia_ortostatica",
+        "nombre": "Pulso elevado con presión sistólica baja",
+        "nivel": "amarillo",
+        "condiciones": [
+          {"indicador": "frecuencia_cardiaca", "op": ">", "valor": 90},
+          {"indicador": "presion_sistolica", "op": "<=", "valor": 110}
+        ]
+      },
+      {
+        "id": "posible_proceso_infeccioso",
+        "nombre": "Temperatura elevada con pulso elevado",
+        "nivel": "amarillo",
+        "condiciones": [
+          {"indicador": "temperatura", "op": ">=", "valor": 38.1},
+          {"indicador": "frecuencia_cardiaca", "op": ">", "valor": 90}
+        ]
+      }
+    ],
+    "colectiva_co2": {
+      "id": "alerta_ambiental_colectiva",
+      "nombre": "CO2 de cabina elevado con varios tripulantes afectados",
+      "min_tripulantes": 2,
+      "nivel_minimo": "amarillo",
+      "co2_sobre": 3.0,
+      "nivel": "rojo"
+    }
+  },
   "indicadores": {
     "temperatura": {"etiqueta": "Temperatura", "unidad": "°C", "min": 30.0, "max": 43.0},
     "presion_sistolica": {"etiqueta": "Presión sistólica", "unidad": "mmHg", "min": 40, "max": 280},
