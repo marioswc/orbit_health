@@ -20,7 +20,7 @@ On a long mission, communication with Earth is delayed or interrupted and there 
 Blood pressure, heart rate, respiratory rate, blood oxygen, body temperature, consciousness level, blood glucose, cabin CO₂, accumulated radiation dose, hours of sleep, and mood.
 
 ## Built for the environment
-Runs fully offline from a single local server. Local authentication by PIN with temporary lockouts, a recovery code and audit trail, designed for a small crew with no internet, where any member may need to log vital signs for an incapacitated colleague.
+Runs fully offline from a single local server. Optional local authentication (switched on with a setting; off by default for a single-station demo) by PIN with temporary lockouts, a recovery code and audit trail, designed for a small crew with no internet, where any member may need to log vital signs for an incapacitated colleague.
 
 ## Sources we used
 - NASA Human Research Program, [Five Hazards of Human Spaceflight](https://www.nasa.gov/hrp/hazards) and [Risks of Human Spaceflight](https://www.nasa.gov/hrp/risks/), plus the ARCHeR study description, as the framework the tool is organised around. The hazard-to-indicator association is our own design decision, not an official NASA classification.
