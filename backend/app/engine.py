@@ -143,3 +143,17 @@ def desviacion_linea_base(valor: float, historial: Sequence[float]) -> dict:
         z = (valor - mu) / sigma
         aviso = abs(z) > K_DESVIACIONES
     return {"aplica": True, "n": n, "media": mu, "desviacion": sigma, "z": z, "aviso": aviso}
+
+
+def evaluar_glucosa(mg_dl: float) -> tuple[str, bool]:
+    """Devuelve (nivel, observacion). Supuesto: umbrales de diseño pendientes de validación médica."""
+    if mg_dl < 54 or mg_dl >= 300:
+        return "rojo", False
+    if mg_dl < 70 or mg_dl >= 126:
+        return "amarillo", False
+    return "verde", 100 <= mg_dl <= 125
+
+
+def evaluar_diastolica(mmhg: float) -> tuple[str, bool]:
+    """Supuesto: <60 mmHg se marca como observación de perfusión, no como alerta."""
+    return "verde", mmhg < 60

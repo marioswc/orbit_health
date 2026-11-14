@@ -5,7 +5,7 @@ from app.main import app
 
 
 def test_health():
-    assert TestClient(app).get("/health").json() == {"status": "ok"}
+    assert TestClient(app).get("/api/health").json() == {"status": "ok"}
 
 
 def test_schema_se_crea(tmp_path):
