@@ -11,6 +11,7 @@ import base64
 import os
 import subprocess
 import tempfile
+import threading
 from functools import lru_cache
 from pathlib import Path
 
@@ -22,13 +23,31 @@ class VozNoDisponible(RuntimeError):
     """La capacidad de voz no está instalada o configurada."""
 
 
+_TRABAJO_VOZ = threading.BoundedSemaphore(1)
+
+
+def adquirir_trabajo() -> bool:
+    """Evita que varias inferencias pesadas saturen CPU y memoria a bordo."""
+    return _TRABAJO_VOZ.acquire(blocking=False)
+
+
+def liberar_trabajo() -> None:
+    _TRABAJO_VOZ.release()
+
+
 @lru_cache(maxsize=1)
 def _modelo_stt():
+    if not config.VOZ_STT_MODELO:
+        raise VozNoDisponible("Configura ORBIT_VOZ_STT_MODELO con una ruta local")
+    ruta_modelo = Path(config.VOZ_STT_MODELO).expanduser()
+    if config.VOZ_STT_LOCAL_ONLY and not ruta_modelo.is_dir():
+        raise VozNoDisponible("El modelo Whisper local no existe; no se permite descargarlo")
     try:
         from faster_whisper import WhisperModel
     except ImportError as error:
         raise VozNoDisponible("Instala backend/requirements-voice.txt para activar voz") from error
-    return WhisperModel(config.VOZ_STT_MODELO, device="cpu", compute_type="int8")
+    return WhisperModel(str(ruta_modelo), device="cpu", compute_type="int8",
+                        local_files_only=config.VOZ_STT_LOCAL_ONLY)
 
 
 def transcribir(audio: bytes, extension: str = ".wav") -> str:
@@ -68,7 +87,8 @@ def responder(texto: str, estado: dict, preferencias: dict) -> dict:
             "texto": f"Recibí: «{texto}». El nivel actual es {estado.get('nivel_general', 'verde')}. "
                       "Puedo explicar el resultado, pero el modelo de conversación local no está disponible.",
         }
-    return {"fuente": "modelo_local", "texto": respuesta}
+    return {"fuente": "modelo_local",
+            "texto": respuesta[:config.VOZ_MAX_RESPUESTA_CARACTERES].strip()}
 
 
 def sintetizar(texto: str) -> str:
@@ -84,4 +104,7 @@ def sintetizar(texto: str) -> str:
             )
         except (OSError, subprocess.SubprocessError) as error:
             raise VozNoDisponible("Piper no pudo sintetizar la respuesta") from error
-        return base64.b64encode(Path(salida).read_bytes()).decode("ascii")
+        try:
+            return base64.b64encode(Path(salida).read_bytes()).decode("ascii")
+        except OSError as error:
+            raise VozNoDisponible("Piper no produjo un archivo de audio") from error

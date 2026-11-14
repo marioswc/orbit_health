@@ -44,7 +44,9 @@ IA_LOCAL_TIMEOUT_S = float(os.getenv("ORBIT_IA_LOCAL_TIMEOUT_S", "4"))
 
 # Voz local opcional. Se carga solo cuando se invoca el endpoint de voz.
 VOZ_ACTIVA = os.getenv("ORBIT_VOZ_ACTIVA", "0") == "1"
-VOZ_STT_MODELO = os.getenv("ORBIT_VOZ_STT_MODELO", "small")
+VOZ_STT_MODELO = os.getenv("ORBIT_VOZ_STT_MODELO", "")
+VOZ_STT_LOCAL_ONLY = os.getenv("ORBIT_VOZ_STT_LOCAL_ONLY", "1") == "1"
 VOZ_PIPER_BIN = os.getenv("ORBIT_VOZ_PIPER_BIN", "piper")
 VOZ_PIPER_MODELO = os.getenv("ORBIT_VOZ_PIPER_MODELO", "")
 VOZ_MAX_AUDIO_BYTES = int(os.getenv("ORBIT_VOZ_MAX_AUDIO_BYTES", "10000000"))
+VOZ_MAX_RESPUESTA_CARACTERES = int(os.getenv("ORBIT_VOZ_MAX_RESPUESTA_CARACTERES", "600"))

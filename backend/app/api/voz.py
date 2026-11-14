@@ -11,15 +11,20 @@ router = APIRouter(prefix="/api/voz", tags=["voz"])
 
 @router.post("/chat/{tid}")
 def chat_voz(tid: str, audio: bytes = Body(...), content_type: str | None = Header(default=None),
+             content_length: int | None = Header(default=None),
              conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) -> dict:
     """Transcribe audio localmente, responde con el LLM local y devuelve audio opcional."""
     if not config.VOZ_ACTIVA:
         raise HTTPException(503, "La voz local está desactivada")
+    if content_length is not None and content_length > config.VOZ_MAX_AUDIO_BYTES:
+        raise HTTPException(413, "Audio demasiado grande")
     requerir_tripulante(conn, tid)
     extension = ".wav" if not content_type else {
         "audio/wav": ".wav", "audio/webm": ".webm", "audio/ogg": ".ogg",
         "audio/mpeg": ".mp3", "audio/mp4": ".m4a",
     }.get(content_type.split(";", 1)[0].lower(), ".wav")
+    if not voz_local.adquirir_trabajo():
+        raise HTTPException(429, "La capacidad de voz está ocupada; inténtalo de nuevo")
     try:
         texto = voz_local.transcribir(audio, extension)
         estado = servicio_estado.estado_tripulante(conn, tid)
@@ -35,3 +40,5 @@ def chat_voz(tid: str, audio: bytes = Body(...), content_type: str | None = Head
         raise HTTPException(503, str(error)) from error
     except ValueError as error:
         raise HTTPException(422, str(error)) from error
+    finally:
+        voz_local.liberar_trabajo()
