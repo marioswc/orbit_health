@@ -28,6 +28,22 @@ Hay una prueba automática (`test_auditoria_seguridad.py`) que corre el script s
 
 9. **Respaldo a la nube sin datos personales**: si el proveedor es automático (primero el modelo local y, si falla, DeepSeek) o es la nube directa, a DeepSeek solo viajan las preferencias de trato, el estado calculado y la pregunta. **Nunca** el perfil, los rasgos, la conversación reciente ni el nombre (`explicador_local.datos_personales_permitidos` y el parámetro `externo` de `consultar_modelo`). Lo cubren dos pruebas. Lo que la persona escribe en la pregunta sí viaja, y la respuesta lo avisa (`aviso`).
 
+## Registro de auditoría (qué se anota)
+La bitácora (`GET /api/auditoria`, solo el comandante; `/api/auditoria/verificar` comprueba su cadena de hashes) anota **quién hizo qué y cuándo, nunca el contenido**.
+
+| Acción | Cuándo |
+|---|---|
+| `inscripcion`, `login`, `logout`, `bloqueo_temporal`, `recuperacion`, `reinicio_pin` | Acceso y credenciales |
+| `enlace_cambio` | Alguien cambia el estado o el entorno del enlace |
+| `lectura_a_tercero` | Un compañero registra signos de otro |
+| `consentimiento_salud_mental`, `atencion_salud_mental`, `revocacion_salud_mental` | Avisos que la propia persona decidió compartir |
+| `simulacion_iniciada`, `simulacion_detenida` | Alguien enciende o apaga la misión simulada (escribe datos de demo) |
+| `ia_salida_nube` | **Una consulta salió de la estación hacia DeepSeek** (con la ruta y si fue directa o respaldo), sin el texto |
+| `limite_ia` | Alguien superó el tope de peticiones al asistente |
+| `intento_inyeccion` | Se detectó un intento evidente de cambiar las reglas del asistente; **sin texto y sin identificar a la persona** (la heurística puede equivocarse) |
+
+**Lo que a propósito NO se anota:** una crisis, la respiración guiada, lo que alguien escribe a Nova, su perfil, el diario, el ánimo ni el PHQ-2. El comandante lee esta bitácora, y el contenido emocional es solo de su dueño.
+
 ## Cabeceras HTTP
 `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Permissions-Policy` (solo micrófono), `Cross-Origin-Opener-Policy`, y `Cache-Control: no-store` en la API.
 
