@@ -17,3 +17,25 @@ def test_respuesta_de_voz_no_decide_el_nivel(monkeypatch):
     )
     assert resultado["fuente"] == "reglas_locales"
     assert "rojo" in resultado["texto"]
+
+
+def test_voz_no_envia_datos_privados_al_modelo(monkeypatch):
+    vistos = []
+    monkeypatch.setattr(voz_local.explicador_local, "consultar_modelo", lambda p: vistos.append(p) or None)
+    voz_local.responder(
+        "¿Qué significa mi estado?",
+        {
+            "nivel_general": "amarillo",
+            "nivel_fisiologico": "amarillo",
+            "indicadores": [
+                {"indicador": "spo2", "valor": 96, "nivel": "verde"},
+                {"indicador": "animo", "valor": 1, "nivel": "amarillo"},
+                {"indicador": "sueno_horas", "valor": 4, "nivel": "amarillo"},
+            ],
+            "news2": {"puntos": 2, "faltantes": []},
+        },
+        {"tono": "directo"},
+    )
+    assert '"indicador": "spo2"' in vistos[0]
+    assert '"indicador": "animo"' not in vistos[0]
+    assert '"indicador": "sueno_horas"' not in vistos[0]

@@ -112,3 +112,7 @@
 .pieza-cab { flex-wrap: wrap; }
 .pieza-cab > div:first-child { flex: 1 1 260px; min-width: 0; }
 .pieza-cab > .segmentado, .pieza-cab > .selector { flex: none; }
+.asistente-voz .pieza-cab { align-items: center; }
+.voz-controles { display: flex; flex-wrap: wrap; gap: var(--spacing-12); }
+.voz-turno { display: grid; gap: var(--spacing-8); margin-top: var(--spacing-16); padding: var(--spacing-16); border-radius: 18px; background: color-mix(in srgb, var(--color-eggshell) 80%, transparent); }
+.voz-turno p { margin: 0; line-height: 1.5; }
