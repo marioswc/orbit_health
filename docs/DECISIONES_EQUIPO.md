@@ -42,3 +42,7 @@
 | "IA adaptada a la personalidad" | Se implementó como preferencias elegidas por cada tripulante (tono, detalle, recordatorios), un explicador local opcional (`GET /api/estado/{tid}/explicacion`) y voz push-to-talk opcional (`POST /api/voz/chat/{tid}`) | El modelo solo explica o conversa sobre un estado ya calculado; nunca cambia nivel, prioridad ni acciones. No se infiere nada del diario ni del ánimo. Sin modelos configurados se usan fallbacks locales |
 | Contenido educativo | `GET /api/explicaciones` por indicador, con fuentes oficiales | Pendiente de validación clínica; sin consejo médico ni de medicación |
 | Sueño y ánimo | Indicadores nuevos; el ánimo es privado como el PHQ-2 | Umbrales son supuestos |
+
+
+## Roles de acceso (decisión del 14-nov-2026)
+Todos los integrantes de la tripulación son astronautas y **no hay médico a bordo**: ese es el motivo del sistema. Solo hay dos roles de acceso: `tripulante` y `comandante` (uno por tripulación, con permisos extra: cambiar el enlace, reiniciar PIN de otros, ver la auditoría y los avisos que alguien decida compartir). La profesión (ingeniero, piloto, etc.) es un dato de la ficha y no cambia los permisos. Los textos del sistema derivan al comandante o a un compañero, nunca a un médico. Los nombres de API `aviso-medico` y `permite_aviso_medico` se conservan por compatibilidad: hoy van al comandante.

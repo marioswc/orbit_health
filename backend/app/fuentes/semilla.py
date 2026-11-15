@@ -6,7 +6,7 @@ from ..servicios import auth
 
 TRIPULANTES = [
     ("T1", "Tripulante Uno", "Comandante", "1985-03-12"),
-    ("T2", "Tripulante Dos", "Médico de a bordo", "1988-07-21"),
+    ("T2", "Tripulante Dos", "Especialista de misión", "1988-07-21"),
     ("T3", "Tripulante Tres", "Ingeniero", "1990-11-02"),
     ("T4", "Tripulante Cuatro", "Piloto", "1987-05-30"),
 ]
@@ -25,11 +25,11 @@ CAPSULAS = [
     ("rutina-sueno", "autorregulacion", "Rutina de descanso",
      "Mantén horarios fijos de descanso y reduce luz intensa antes de dormir."),
     ("contacto", "autorregulacion", "Habla con alguien de confianza",
-     "Si el ánimo bajo persiste, conversa con un compañero o con el médico de a bordo. Es tu decisión."),
+     "Si el ánimo bajo persiste, conversa con un compañero o con el comandante. Es tu decisión."),
     ("crisis-anclaje", "crisis", "Anclaje inmediato 5-4-3-2-1",
      "Nombra en voz alta 5 cosas que ves en el módulo, 4 que puedes tocar, 3 sonidos, 2 olores y 1 respiración profunda."),
     ("crisis-acompanamiento", "crisis", "No permanezcas a solas",
-     "Sal ahora a un módulo común o llama por el intercomunicador al médico de a bordo o a un compañero de confianza."),
+     "Sal ahora a un módulo común o llama por el intercomunicador al comandante o a un compañero de confianza."),
     ("crisis-respiracion", "crisis", "Respiración de contención (4-7-8)",
      "Inhala por la nariz 4 segundos, sostén el aire 7 segundos y suelta despacio durante 8 segundos. Repite 4 ciclos."),
 ]

@@ -98,7 +98,8 @@ def test_con_autenticacion_los_sensores_exigen_sesion_y_la_demo_un_rol(cliente_a
     assert c.post("/api/sensores/lectura", json=cuerpo).status_code == 401
     assert c.post("/api/sensores/lectura", json=cuerpo, headers=c.entrar("T3")).status_code == 200
     assert c.post("/api/demo/sensor/T1", headers=c.entrar("T3")).status_code == 403
-    assert c.post("/api/demo/sensor/T1?ticks=3", headers=c.entrar("T2")).status_code == 200
+    assert c.post("/api/demo/sensor/T1?ticks=3", headers=c.entrar("T2")).status_code == 403          # otro astronauta no
+    assert c.post("/api/demo/sensor/T1?ticks=3", headers=c.entrar("T1")).status_code == 200            # el comandante sí
 
 
 def test_perfiles_ampliados_cubren_reglas_combinadas_glucosa_o2_y_news2_completo(cliente):

@@ -7,7 +7,7 @@
       "por_que_se_mide": "Una temperatura muy alta o muy baja puede indicar infección, inflamación o que el cuerpo no regula bien el calor.",
       "como_medirlo": "Usa el termómetro del equipo, en reposo, siempre en la misma zona y sin ejercicio reciente.",
       "en_el_espacio": "En una nave cerrada, el estrés y el aislamiento pueden afectar las defensas del cuerpo, y la temperatura de la cabina o el ejercicio pueden alterar la lectura.",
-      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al médico de a bordo.",
+      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al comandante o a un compañero.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-altered-immune-system-responses/"
       ],
@@ -29,7 +29,7 @@
       "por_que_se_mide": "Valores muy bajos o muy altos pueden señalar problemas del corazón, de los vasos o de hidratación.",
       "como_medirlo": "Mide sentado y en reposo unos minutos antes, con el brazalete a la altura del corazón.",
       "en_el_espacio": "El cuerpo debe adaptarse a otros niveles de gravedad, y eso puede cambiar la presión. Por eso se compara con tu propio historial.",
-      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al médico de a bordo.",
+      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al comandante o a un compañero.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/",
         "https://www.nasa.gov/hrp/hazard-gravity-fields/"
@@ -47,7 +47,7 @@
       "por_que_se_mide": "Junto con la sistólica, ayuda a ver cómo está funcionando el sistema circulatorio.",
       "como_medirlo": "Sale en la misma medición que la sistólica, en reposo.",
       "en_el_espacio": "La adaptación del cuerpo a otros niveles de gravedad también puede influir en este valor.",
-      "cuando_avisar": "Un valor bajo se marca solo como observación; si te sientes mal, avisa al médico de a bordo.",
+      "cuando_avisar": "Un valor bajo se marca solo como observación; si te sientes mal, avisa al comandante o a un compañero.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/"
       ],
@@ -64,7 +64,7 @@
       "por_que_se_mide": "Un pulso muy alto o muy bajo en reposo puede indicar estrés, fiebre, deshidratación o problemas del corazón.",
       "como_medirlo": "Mide en reposo, contando durante un minuto o con el sensor del equipo.",
       "en_el_espacio": "El ejercicio, el estrés y la adaptación a otra gravedad pueden modificarla; por eso importa más cómo cambia respecto a tu rango habitual.",
-      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al médico de a bordo.",
+      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al comandante o a un compañero.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/"
       ],
@@ -81,7 +81,7 @@
       "por_que_se_mide": "Respirar más rápido de lo normal es una de las primeras señales de que algo no va bien, por ejemplo con fiebre o poco oxígeno.",
       "como_medirlo": "Cuenta las respiraciones durante un minuto, en reposo y sin que la persona lo note, porque se altera al pensar en ello.",
       "en_el_espacio": "En un ambiente cerrado, un aire con más dióxido de carbono puede hacerte respirar más rápido. Por eso el sistema cruza esta medida con el aire de la cabina.",
-      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al médico de a bordo.",
+      "cuando_avisar": "Cuando el sistema marca amarillo o rojo, repite la medición y avisa al comandante o a un compañero.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-hypoxia/"
       ],
@@ -98,7 +98,7 @@
       "por_que_se_mide": "Un valor bajo significa que al cuerpo le llega menos oxígeno y es una señal importante a vigilar.",
       "como_medirlo": "Usa el oxímetro en el dedo, con la mano tibia, quieta y sin esmalte. Las manos frías o el movimiento dan lecturas falsas.",
       "en_el_espacio": "Un fallo en la depuración del aire o un exceso de dióxido de carbono en la cabina puede afectar la respiración.",
-      "cuando_avisar": "Si baja, repite la medición enseguida para descartar un error y avisa al médico de a bordo o al comandante.",
+      "cuando_avisar": "Si baja, repite la medición enseguida para descartar un error y avisa al comandante o a un compañero.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-hypoxia/"
       ],
@@ -146,7 +146,7 @@
       "por_que_se_mide": "Si baja demasiado provoca hipoxia en toda la tripulación; si sube en exceso dentro de un módulo cerrado aumenta el riesgo de incendio.",
       "como_medirlo": "Se registra desde el panel ambiental del sistema de soporte vital de la nave.",
       "en_el_espacio": "La atmósfera de la cabina es artificial y cerrada: cualquier fuga o fallo en la generación de oxígeno altera la calidad del aire.",
-      "cuando_avisar": "Cuando sale del rango normal (bajo o alto), revisa el soporte vital, verifica la SpO₂ de la tripulación y avisa al comandante y al médico.",
+      "cuando_avisar": "Cuando sale del rango normal (bajo o alto), revisa el soporte vital, verifica la SpO₂ de la tripulación y avisa al comandante.",
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-hypoxia/",
         "https://www.nasa.gov/hrp/hazard-hostile-closed-environments/"
@@ -198,7 +198,7 @@
       "en_el_espacio": "Vivir en un espacio pequeño y cerrado con poca variedad pone a prueba el ánimo de cualquier persona.",
       "cuando_avisar": "Es privado: nadie lo ve ni se envía a Tierra. Si baja, el sistema te ofrece apoyo y siempre decides tú.",
       "habitos_generales": [
-        "Habla con un compañero o con el médico de a bordo cuando lo necesites."
+        "Habla con un compañero o con el comandante cuando lo necesites."
       ],
       "fuentes": [
         "https://www.nasa.gov/reference/risk-of-behavioral-conditions-and-psychiatric-disorders/",

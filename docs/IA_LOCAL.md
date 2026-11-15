@@ -12,8 +12,19 @@ Es **opcional** y funciona sin internet: un modelo de lenguaje que corre en la p
 | El modelo no puede mandar la consulta a otro sitio | La conexión no sigue redirecciones |
 | Lo generado por IA **se marca** | `generado_por_ia: true` y un `aviso` en la respuesta |
 
+## Adaptación a cada tripulante
+Cada persona elige **tono** (directo o cálido), **detalle** (breve o completo) y frecuencia de recordatorios (`PUT /api/preferencias/{id}`). La explicación (`/api/estado/{id}/explicacion`) y la voz usan esa elección: cambian la longitud y el tono, tanto en el texto del modelo como en el texto escrito de respaldo. Solo se leen opciones de una lista cerrada, así que no entra texto libre al prompt. **No aprende ni infiere personalidad**: se adapta solo a lo que la persona eligió. Un diario o ánimo privado nunca se usa para esto.
+
 ## Instalar el modelo local (una vez, con internet)
 `scripts/instalar_ia_local.sh [modelo]` descarga Ollama en `~/.local/ollama` **sin sudo**, verifica su hash contra el publicado en la release y al final imprime cómo arrancarlo y bajar el modelo (por defecto `qwen2.5:1.5b`, unos 1 GB, en CPU). Después funciona sin internet. Para usarlo en lugar de DeepSeek: `ORBIT_IA_PROVEEDOR=local` en `.env`.
+
+### Medición real (laptop de desarrollo: 8 núcleos, 7 GB de RAM, sin GPU, 14-nov-2026)
+| Modelo | Tamaño | Tiempo por explicación | Calidad |
+|---|---|---|---|
+| `qwen2.5:1.5b` | ~1 GB | 10 a 15 s (antes de limitar los tokens) | Texto utilizable pero genérico |
+| `qwen2.5:0.5b` | ~0.4 GB | 4 a 6 s, con tope de 220 tokens | **Floja**: a veces redacta frases poco claras o dice que no tiene información; la guardia no juzga calidad, solo que no invente cifras, fármacos ni alertas, y a veces descarta por larga |
+
+Un modelo pequeño sin tope se queda generando y las peticiones siguientes se acumulan: por eso `consultar_modelo` limita la respuesta a 220 tokens. Con cualquiera de los dos, **el texto escrito de antemano es más claro**; la IA local suma como complemento, no como sustituto. Mediciones de una sola máquina, no un benchmark.
 
 ## Proveedor externo opcional: DeepSeek (decisión del equipo)
 Si se define `ORBIT_DEEPSEEK_API_KEY`, las explicaciones y la voz usan **DeepSeek, un servicio en internet**, en vez del modelo local (`ORBIT_IA_PROVEEDOR=local` lo fuerza de vuelta a lo local).

@@ -11,7 +11,7 @@
 | E2E del backend (`scripts/verificar_e2e.sh`) | OK |
 | Compilación del frontend (`npm run build`) | OK, sin recursos remotos (sin CDN ni fuentes externas) |
 | Servidor real sirviendo el frontend compilado | `GET /` responde, los recursos del `index` cargan y los 24 GET y 5 escrituras probados responden 200 (no se probaron por HTTP los endpoints de crisis, solo con pruebas automáticas) |
-| Autenticación activada, servidor real por HTTP | Sin sesión 401; PIN incorrecto 401; diario solo del dueño (médico y comandante 403); solo médico o comandante cambian el enlace; auditoría verificable |
+| Autenticación activada, servidor real por HTTP | Sin sesión 401; PIN incorrecto 401; diario solo del dueño (ni el comandante); solo el comandante cambia el enlace; auditoría verificable |
 | Seguridad de rutas | Con la autenticación activa, **solo las 11 rutas declaradas públicas** responden sin sesión; lo comprueba una prueba que recorre todas |
 | Documentación contra el código | Probada: rutas citadas, referencia de la API, enlaces, variables de entorno y cifras de cobertura deben coincidir con el código |
 | Ramas | `frontend-santi` y `dev-frontend` ya están dentro de `main` |
@@ -31,7 +31,7 @@
 | 3 | Demo en inglés: video de 30 s o menos, o 7 diapositivas, en enlace público | Equipo | Si el video es en español, con subtítulos en inglés |
 | 4 | Ensayar el demo completo **con el Wi-Fi apagado** en el equipo de la presentación | Equipo | Correr antes `scripts/verificar_e2e.sh` |
 | 5 | Validación médica de los umbrales y de los textos del protocolo de crisis | Médico y profesional de salud mental | Es lo más expuesto frente al criterio de Validez |
-| 6 | Decidir si el **comandante** debe poder ver los avisos de salud mental | Equipo | Hoy pueden verlos médico y comandante; la interfaz se lo dice al tripulante antes de consentir |
+| 6 | Decidir si el **comandante** debe poder ver los avisos de salud mental | Equipo | Hoy solo los ve el comandante (no hay médico a bordo); si el comandante es quien necesita apoyo, el aviso no tiene destinatario: pendiente de decidir; la interfaz se lo dice al tripulante antes de consentir |
 
 ## Hallazgos menores de la última revisión
 - Listar los avisos de salud mental **no queda en la auditoría** (crear, revocar y atender sí). Conviene auditarlo.

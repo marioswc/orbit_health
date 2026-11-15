@@ -185,22 +185,23 @@ def test_revocar_consentimiento_oculta_el_aviso_al_medico_y_atender_queda_audita
 def test_permisos_de_protocolo_y_avisos_con_autenticacion(cliente_auth):
     c = cliente_auth
     h1 = c.entrar("T1")  # comandante
-    h2 = c.entrar("T2")  # médico
+    h2 = c.entrar("T2")  # tripulante
     h3 = c.entrar("T3")  # tripulante
     h4 = c.entrar("T4")  # tripulante
 
     assert c.post("/api/crisis/aviso-medico", json={"tripulante_id": "T3", "consentimiento": True}, headers=h4).status_code == 403
     av = c.post("/api/crisis/aviso-medico", json={"tripulante_id": "T3", "consentimiento": True, "tipo": "crisis"}, headers=h3).json()
-    assert c.get("/api/crisis/avisos/T3", headers=h2).status_code == 403
+    assert c.get("/api/crisis/avisos/T3", headers=h2).status_code == 403          # otro astronauta no ve avisos ajenos
     assert c.post(f"/api/crisis/avisos/{av['id']}/revocar", json={"tripulante_id": "T3"}, headers=h2).status_code == 403
 
     assert c.get("/api/crisis/avisos", headers=h4).status_code == 403
     assert c.post(f"/api/crisis/avisos/{av['id']}/atender", headers=h4).status_code == 403
 
-    lista = c.get("/api/crisis/avisos", headers=h2).json()
+    assert c.get("/api/crisis/avisos", headers=h2).status_code == 403          # solo el comandante ve la lista
+    lista = c.get("/api/crisis/avisos", headers=h1).json()
     assert len(lista) == 1 and lista[0]["id"] == av["id"]
-    at = c.post(f"/api/crisis/avisos/{av['id']}/atender", headers=h2).json()
-    assert at["estado"] == "atendido" and at["atendido_por"] == "T2"
+    at = c.post(f"/api/crisis/avisos/{av['id']}/atender", headers=h1).json()
+    assert at["estado"] == "atendido" and at["atendido_por"] == "T1"
 
     aud = c.get("/api/auditoria", headers=h1).json()
     acciones = {a["accion"] for a in aud}

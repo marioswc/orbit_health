@@ -42,9 +42,9 @@ def test_inscribir_valida_datos(conn):
 
 
 def test_login_correcto_crea_sesion_y_se_valida(conn):
-    auth.inscribir(conn, "T1", "medico", pin="123456")
+    auth.inscribir(conn, "T1", "comandante", pin="123456")
     s = auth.login(conn, "T1", "123456", AHORA)
-    assert auth.sesion(conn, s["token"], AHORA) == {"tripulante_id": "T1", "rol": "medico"}
+    assert auth.sesion(conn, s["token"], AHORA) == {"tripulante_id": "T1", "rol": "comandante"}
     assert auth.sesion(conn, "token-falso", AHORA) is None
     assert auth.sesion(conn, None) is None
 
@@ -92,14 +92,14 @@ def test_recuperacion_con_codigo_cambia_pin_y_rota_el_codigo(conn):
         auth.recuperar(conn, "T1", r["codigo_recuperacion"], "111111", AHORA)
 
 
-def test_medico_reinicia_pin_de_otro_y_tripulante_no(conn):
+def test_el_comandante_reinicia_pin_de_otro_y_un_tripulante_no(conn):
     auth.inscribir(conn, "T1", "tripulante", pin="123456")
-    auth.inscribir(conn, "T2", "medico", pin="222222")
+    auth.inscribir(conn, "T2", "comandante", pin="222222")
     auth.inscribir(conn, "T3", "tripulante", pin="333333")
     with pytest.raises(auth.AuthError) as e:
         auth.reiniciar_pin(conn, {"tripulante_id": "T3", "rol": "tripulante"}, "T1")
     assert e.value.codigo == "permiso"
-    r = auth.reiniciar_pin(conn, {"tripulante_id": "T2", "rol": "medico"}, "T1")
+    r = auth.reiniciar_pin(conn, {"tripulante_id": "T2", "rol": "comandante"}, "T1")
     assert auth.login(conn, "T1", r["pin_temporal"], AHORA)["rol"] == "tripulante"
 
 

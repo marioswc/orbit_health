@@ -16,6 +16,7 @@ from urllib.request import HTTPRedirectHandler, HTTPSHandler, Request, build_ope
 
 from .. import config
 from ..dominio import guardia_ia
+from ..dominio.acciones import DETALLES, ESTILO_POR_DEFECTO, TONOS
 
 log = logging.getLogger("orbit.ia")
 _LOOPBACKS = {"localhost", "127.0.0.1", "::1"}
@@ -61,7 +62,7 @@ def _url_local(url: str) -> bool:
         return False
 
 
-def _fallback(estado: dict) -> str:
+def _fallback(estado: dict, preferencias: dict | None = None) -> str:
     nivel = estado.get("nivel_general", "verde")
     news2 = estado.get("news2", {})
     faltantes = news2.get("faltantes") or []
@@ -80,10 +81,25 @@ def _fallback(estado: dict) -> str:
     if faltantes:
         partes.append("La evaluación NEWS2 está incompleta; faltan: " + ", ".join(faltantes) + ".")
     partes.append("Esta explicación no es un diagnóstico ni modifica la alerta; sigue las acciones procedimentales mostradas.")
+    tono, detalle = _estilo(preferencias)
+    if detalle == "breve":                      # lo esencial: el nivel y el aviso, sin el detalle intermedio
+        partes = [partes[0], partes[-1]]
+    if tono == "calido":
+        partes.insert(0, "Vamos paso a paso.")
     return " ".join(partes)
 
 
-def _prompt(estado: dict) -> str:
+def _estilo(preferencias: dict | None) -> tuple[str, str]:
+    """(tono, detalle) válidos; cualquier otra cosa vuelve al valor por defecto. Solo se leen opciones elegidas de una lista."""
+    p = preferencias or {}
+    return (p["tono"] if p.get("tono") in TONOS else ESTILO_POR_DEFECTO["tono"],
+            p["detalle"] if p.get("detalle") in DETALLES else ESTILO_POR_DEFECTO["detalle"])
+
+
+def _prompt(estado: dict, preferencias: dict | None = None) -> str:
+    tono, detalle = _estilo(preferencias)
+    palabras = 60 if detalle == "breve" else 120
+    voz = ("Habla con calidez y cercanía, sin dramatizar." if tono == "calido" else "Habla de forma directa y sobria.")
     resumen = {
         "nivel_general": estado.get("nivel_general"),
         "nivel_fisiologico": estado.get("nivel_fisiologico"),
@@ -93,7 +109,7 @@ def _prompt(estado: dict) -> str:
         "peligros_relacionados": estado.get("peligros_relacionados", []),
     }
     return (
-        "Explica en español, en máximo 120 palabras, este resultado de un sistema de "
+        f"Explica en español, en máximo {palabras} palabras. {voz} Es el resultado de un sistema de "
         "apoyo a la decisión para una tripulación espacial. Describe qué señales "
         "contribuyeron al nivel ya calculado y qué información falta. No diagnostiques, "
         "no prescribas tratamientos o medicamentos, no inventes valores y no cambies "
@@ -117,24 +133,24 @@ def _modelo_activo() -> tuple[str, str] | None:
     return None
 
 
-def explicar(estado: dict) -> dict:
+def explicar(estado: dict, preferencias: dict | None = None) -> dict:
     """Genera una explicación con el proveedor configurado y devuelve siempre el nivel calculado intacto."""
     nivel = estado.get("nivel_general", "verde")
     activo = _modelo_activo()
     if not activo:
         return {"fuente": "reglas_locales", "modelo": None, "generado_por_ia": False,
-                "explicacion": _fallback(estado), "nivel_general": nivel}
+                "explicacion": _fallback(estado, preferencias), "nivel_general": nivel}
     fuente, modelo = activo
 
-    texto = consultar_modelo(_prompt(estado))
+    texto = consultar_modelo(_prompt(estado, preferencias))
     if texto is None:
         return {"fuente": "reglas_locales", "modelo": None, "generado_por_ia": False,
-                "explicacion": _fallback(estado), "nivel_general": nivel}
+                "explicacion": _fallback(estado, preferencias), "nivel_general": nivel}
     ok, motivo = guardia_ia.validar_respuesta(texto, estado)
     if not ok:                                              # lo que el modelo dijo no pasa: se usa el texto determinista
         log.warning("Respuesta del modelo descartada: %s", motivo)
         return {"fuente": "reglas_locales", "modelo": None, "generado_por_ia": False, "descartado_por": motivo,
-                "explicacion": _fallback(estado), "nivel_general": nivel}
+                "explicacion": _fallback(estado, preferencias), "nivel_general": nivel}
     return {"fuente": fuente, "modelo": modelo, "generado_por_ia": True, "aviso": aviso_para(fuente),
             "explicacion": texto, "nivel_general": nivel}
 
@@ -179,7 +195,7 @@ def consultar_modelo(prompt: str) -> str | None:
         "model": modelo,
         "prompt": prompt,
         "stream": False,
-        "options": {"temperature": 0.1},
+        "options": {"temperature": 0.1, "num_predict": 220},     # tope de tokens: un modelo chico no debe quedarse generando
     }).encode("utf-8")
     request = Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
     try:

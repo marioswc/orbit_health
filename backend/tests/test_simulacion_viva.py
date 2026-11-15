@@ -143,10 +143,10 @@ def test_con_autenticacion_la_simulacion_exige_rol(cliente_auth):
     assert c.post("/api/demo/simulacion/iniciar?ritmo=300&tick_s=0.01").status_code == 401
     assert c.post("/api/demo/simulacion/iniciar?ritmo=300&tick_s=0.01", headers=c.entrar("T3")).status_code == 403
     assert c.get("/api/demo/simulacion/estado", headers=c.entrar("T3")).status_code == 403
-    assert c.post("/api/demo/simulacion/iniciar?ritmo=300&tick_s=0.01", headers=c.entrar("T2")).status_code == 200
+    assert c.post("/api/demo/simulacion/iniciar?ritmo=300&tick_s=0.01", headers=c.entrar("T1")).status_code == 200
     esperar_fin_auth = time.time() + 40
     while time.time() < esperar_fin_auth:
-        if not c.get("/api/demo/simulacion/estado", headers=c.entrar("T2")).json()["activa"]:
+        if not c.get("/api/demo/simulacion/estado", headers=c.entrar("T1")).json()["activa"]:
             break
         time.sleep(0.05)
 

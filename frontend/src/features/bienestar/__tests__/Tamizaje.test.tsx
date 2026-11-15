@@ -5,7 +5,7 @@ import Tamizaje from "../components/Tamizaje";
 describe("Tamizaje y protocolo de crisis con calidad de oxígeno", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("permite abrir el protocolo de crisis considerando calidad de oxígeno y avisar al médico con consentimiento", async () => {
+  it("permite abrir el protocolo de crisis considerando calidad de oxígeno y avisar al comandante con consentimiento", async () => {
     const fetchMock = vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
       const ruta = String(url);
       if (ruta.includes("/crisis/protocolo")) {
@@ -26,7 +26,7 @@ describe("Tamizaje y protocolo de crisis con calidad de oxígeno", () => {
               alerta: true,
               causa: "hipoxia_ambiental",
             },
-            contactos_abordo: [{ rol: "medico", etiqueta: "Médico de a bordo" }],
+            contactos_abordo: [{ rol: "comandante", etiqueta: "Comandante o un compañero de confianza" }],
             permite_aviso_medico: true,
             privado: true,
             transmitido_tierra: false,
@@ -81,14 +81,14 @@ describe("Tamizaje y protocolo de crisis con calidad de oxígeno", () => {
     expect(screen.getByText(/Calidad de oxígeno en cabina: 18.5 %/)).toBeInTheDocument();
     expect(screen.getByText("Anclaje inmediato 5-4-3-2-1")).toBeInTheDocument();
 
-    const botonAvisar = screen.getByRole("button", { name: "Avisar al médico con mi consentimiento" });
+    const botonAvisar = screen.getByRole("button", { name: "Avisar al comandante con mi consentimiento" });
     expect(botonAvisar).toBeDisabled();
 
-    fireEvent.click(screen.getByLabelText(/Autorizo avisar al médico de a bordo/));
+    fireEvent.click(screen.getByLabelText(/Autorizo avisar al comandante/));
     expect(botonAvisar).not.toBeDisabled();
     fireEvent.click(botonAvisar);
 
-    expect(await screen.findByText("Aviso compartido con el médico de a bordo")).toBeInTheDocument();
+    expect(await screen.findByText("Aviso compartido con el comandante")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Revocar consentimiento" }));
     await waitFor(() =>
