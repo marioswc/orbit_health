@@ -18,12 +18,14 @@ services:
         CON_VOZ: ${CON_VOZ:-libs}                                   # libs: las librerías de voz; los modelos se montan desde ./backend/models
     image: orbit-health:latest
     ports:
-      - "127.0.0.1:${ORBIT_PUERTO:-3000}:${ORBIT_PUERTO:-3000}"   # solo loopback: los datos de salud no se exponen en la red
+      - "127.0.0.1:${ORBIT_PUERTO:-3000}:3000"   # host:contenedor. Solo loopback: los datos de salud no se exponen en la red
     extra_hosts:
       - "host.docker.internal:host-gateway"                         # en Linux hace falta declararlo; en Docker Desktop ya existe
     env_file:
       - path: .env                                                  # opcional: si no existe, se usan los valores por defecto
         required: false
+    environment:
+      ORBIT_PUERTO: "3000"   # puerto INTERNO fijo; el del host es ORBIT_PUERTO de tu .env/entorno (así nunca quedan desalineados)
     volumes:
       - orbit-data:/app/data
       - ./backend/models:/app/backend/models:ro                     # modelos de voz (scripts/instalar_voz_local.sh)

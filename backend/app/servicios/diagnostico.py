@@ -84,9 +84,9 @@ def reunir() -> dict:
         adv.append(_aviso("aviso", "interfaz", f"No hay interfaz compilada en {dist}: solo funcionará la API.", "cd frontend && npm run build"))
     if _en_contenedor() and os.environ.get("ORBIT_HOST", "").strip() in ("127.0.0.1", "localhost", "::1"):
         adv.append(_aviso("info", "contenedor", "ORBIT_HOST=127.0.0.1 no afecta a un contenedor: ahí se escucha en ORBIT_CONTENEDOR_HOST (0.0.0.0) y el acceso externo lo limita docker-compose.yml."))
-    if _en_contenedor() and config.IA_LOCAL_URL and "127.0.0.1" in config.IA_LOCAL_URL:
-        adv.append(_aviso("aviso", "contenedor", "ORBIT_IA_LOCAL_URL apunta a 127.0.0.1, que dentro del contenedor es el propio contenedor, no tu computadora.",
-                          "Usa el modelo incrustado (ORBIT_IA_MODELO_GGUF) o ejecuta ORBIT sin Docker."))
+    if _en_contenedor() and config.IA_LOCAL_URL and any(h in config.IA_LOCAL_URL for h in ("127.0.0.1", "localhost")):
+        adv.append(_aviso("info", "contenedor", "ORBIT_IA_LOCAL_URL apunta a 127.0.0.1: dentro del contenedor se traduce a host.docker.internal (tu computadora).",
+                          "En Linux, Ollama debe escuchar fuera de localhost (OLLAMA_HOST=0.0.0.0) o usa el modelo incrustado (ORBIT_IA_MODELO_GGUF)."))
     rec = recursos.resumen()
     for tema, detalle, arreglo in recursos.advertencias(rec, usa_modelo_grande=ia["embebida"]["disponible"] or bool(config.IA_LOCAL_URL)):
         adv.append(_aviso("aviso", tema, detalle, arreglo))
