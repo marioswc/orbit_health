@@ -15,7 +15,7 @@ The NASA Space Apps Challenge requires every project to state where and how SI t
 | Research | Read the official challenge pages and public references while building | Cited in `docs/PROJECT_SUMMARY_EN.md` |
 
 ## SI inside the product (optional)
-The product can use a **local language model** (no internet) to rephrase an alert and to answer by voice. It never sets the alert level, crisis messages are always the written protocol and never go through the model, and every model output is checked (no invented numbers, medication, links or foreign alert levels) and labelled as AI-generated. Details: `docs/IA_LOCAL.md`. No model is bundled and none has been clinically validated.
+The product can use a **local language model** (no internet) to rephrase an alert and to answer by voice. It never sets the alert level, crisis messages are always the written protocol and never go through the model, and every model output is checked (no invented numbers, medication, links or foreign alert levels) and labelled as AI-generated. Details: `docs/IA_LOCAL.md`. An optional external provider (DeepSeek, over the internet) can be enabled with an API key; when it is, the user's question and calculated health state leave the device, the response says so, and it is meant for development and demos, not for the offline mission scenario. No model is bundled and none has been clinically validated.
 
 ## What SI tools did not do
 - The backend author did not generate images, video or audio with SI. The frontend artwork is a separate matter: the origin and licence of the astronaut illustration are still being confirmed (see `frontend/src/features/monitor/assets/ATRIBUCION.md`), and any SI-generated image must carry a visible watermark.

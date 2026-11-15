@@ -138,7 +138,7 @@ function FiguraHumana({ lecturas, seleccionada, acercado, capa, meses, alSelecci
                     <g key={z.id} transform={`translate(${ax} ${ay})`}>
                       <g className={`punto ${niveles[z.id]} ${seleccionada === z.id ? "sel" : ""}${amb ? ` amb-${amb}` : ""}`} style={{ transform: `scale(${1 / s})` }} aria-hidden="true" pointerEvents="none">
                         {amb && <circle className="p-ambiente" r="8.5" />}
-                        <circle className="p-anillo" r="5" />
+                        <circle className="p-anillo" r="9" />
                         <circle className="p-base" r="4" />
                         <circle className="p-centro" r="1.5" />
                       </g>

@@ -8,6 +8,7 @@ node_modules/
 dist/
 # Entorno y datos locales
 .env
+backend/models/
 *.db
 *.db-wal
 *.db-shm

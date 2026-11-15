@@ -4,7 +4,6 @@ import AnimoDiario from "../components/AnimoDiario";
 import DiarioTripulante from "../components/DiarioTripulante";
 import Tamizaje from "../components/Tamizaje";
 import AvisosCompartidos from "../components/AvisosCompartidos";
-import AsistentePreferencias from "../components/AsistentePreferencias";
 
 export default function BienestarPage({ tripulanteId }: { tripulanteId: string }) {
   const { t } = useTranslation("bienestar");
@@ -21,7 +20,6 @@ export default function BienestarPage({ tripulanteId }: { tripulanteId: string }
           <AnimoDiario tripulanteId={tripulanteId} />
           <Tamizaje tripulanteId={tripulanteId} />
           <AvisosCompartidos tripulanteId={tripulanteId} />
-          <AsistentePreferencias tripulanteId={tripulanteId} />
         </div>
         <DiarioTripulante tripulanteId={tripulanteId} />
       </div>

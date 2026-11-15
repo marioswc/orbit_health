@@ -37,5 +37,6 @@
   "language.es": "español",
   "language.en": "inglés",
   "language.hint": "Traduciendo la interfaz",
-  "nav.banda": "Banda"
+  "nav.banda": "Banda",
+  "nav.asistente": "Asistente"
 }

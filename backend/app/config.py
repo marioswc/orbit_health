@@ -1,7 +1,28 @@
 import os
+import sys
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[2]
+
+
+def _cargar_dotenv() -> None:
+    """Carga .env de la raíz automáticamente (salvo en pytest) para no depender de --env-file."""
+    if "pytest" in sys.modules:
+        return
+    ruta = RAIZ / ".env"
+    if not ruta.is_file():
+        return
+    for linea in ruta.read_text(encoding="utf-8").splitlines():
+        texto = linea.strip()
+        if not texto or texto.startswith("#") or "=" not in texto:
+            continue
+        clave, valor = texto.split("=", 1)
+        k = clave.strip()
+        if not os.environ.get(k):
+            os.environ[k] = valor.strip().strip("'\"")
+
+
+_cargar_dotenv()
 
 # Ruta absoluta por defecto: no depende del directorio desde el que se arranque.
 DB_PATH = os.getenv("ORBIT_DB_PATH") or str(RAIZ / "data" / "orbit_health.db")
@@ -42,6 +63,14 @@ FLUJO_ENFRIAMIENTO_S = float(os.getenv("ORBIT_FLUJO_ENFRIAMIENTO_S", "30"))   # 
 IA_LOCAL_URL = os.getenv("ORBIT_IA_LOCAL_URL", "")
 IA_LOCAL_MODELO = os.getenv("ORBIT_IA_LOCAL_MODELO", "")
 IA_LOCAL_TIMEOUT_S = float(os.getenv("ORBIT_IA_LOCAL_TIMEOUT_S", "4"))
+
+# Proveedor externo opcional (DeepSeek, API compatible con OpenAI). OJO: el texto sale del equipo.
+# Vacío = automático (usa DeepSeek si hay API key, si no el modelo local); "local" fuerza el de la estación.
+DEEPSEEK_API_KEY = os.getenv("ORBIT_DEEPSEEK_API_KEY", "").strip()
+DEEPSEEK_MODELO = os.getenv("ORBIT_DEEPSEEK_MODELO", "deepseek-flash")
+DEEPSEEK_URL = os.getenv("ORBIT_DEEPSEEK_URL", "https://api.deepseek.com/chat/completions")
+DEEPSEEK_TIMEOUT_S = float(os.getenv("ORBIT_DEEPSEEK_TIMEOUT_S", "20"))
+IA_PROVEEDOR = os.getenv("ORBIT_IA_PROVEEDOR", "").strip().lower()
 
 # Voz local opcional. Se carga solo cuando se invoca el endpoint de voz.
 VOZ_ACTIVA = os.getenv("ORBIT_VOZ_ACTIVA", "0") == "1"

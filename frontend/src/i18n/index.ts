@@ -16,7 +16,11 @@ const LOCALE: Record<SupportedLanguage, string> = { es: "es-MX", en: "en-US" };
 
 type Diccionario = Record<string, string>;
 // El espanol (idioma base y de respaldo) viaja en el paquete; el ingles se descarga solo cuando se usa.
-const modulosEs = import.meta.glob("./locales/ES/**/*.json", { eager: true, import: "default" }) as Record<string, Diccionario>;
+// Los namespaces de pantallas diferidas (voz, asistente) no viajan en el paquete inicial: su chunk los registra al cargarse.
+const modulosEs = import.meta.glob(
+  ["./locales/ES/**/*.json", "!./locales/ES/features/voz/*.json", "!./locales/ES/features/asistente/*.json"],
+  { eager: true, import: "default" },
+) as Record<string, Diccionario>;
 const cargadoresEn = import.meta.glob("./locales/EN/**/*.json", { import: "default" }) as Record<string, () => Promise<Diccionario>>;
 
 const recursos: Record<SupportedLanguage, Record<string, Diccionario>> = { es: {}, en: {} };
@@ -25,6 +29,8 @@ function registrar(ruta: string, dic: Diccionario) {
   if (m) recursos[m[1].toLowerCase() as SupportedLanguage][m[2]] = dic;
 }
 for (const [ruta, dic] of Object.entries(modulosEs)) registrar(ruta, dic);
+/** Registra los textos en espanol de un namespace diferido (lo llama el modulo de la pantalla al cargarse). */
+export function registrarEspanol(ns: string, dic: Diccionario) { recursos.es[ns] = dic; }
 
 let promesaEn: Promise<void> | null = null;
 /** Descarga los textos del idioma si hace falta (solo el ingles es diferido). Se reintenta si falla. */
