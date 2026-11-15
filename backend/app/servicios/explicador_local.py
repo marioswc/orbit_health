@@ -7,10 +7,12 @@ from __future__ import annotations
 
 import json
 import logging
+import ssl
 from ipaddress import ip_address
+from pathlib import Path
 from urllib.error import URLError
 from urllib.parse import urlparse
-from urllib.request import HTTPRedirectHandler, Request, build_opener
+from urllib.request import HTTPRedirectHandler, HTTPSHandler, Request, build_opener
 
 from .. import config
 from ..dominio import guardia_ia
@@ -27,7 +29,18 @@ class _SinRedireccion(HTTPRedirectHandler):
         return None
 
 
-_ABRIDOR = build_opener(_SinRedireccion)
+def _contexto_ssl() -> ssl.SSLContext:
+    """Usa el bundle de certifi (o /etc/ssl/cert.pem en macOS) cuando Python no trae certificados del sistema."""
+    try:
+        import certifi
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        cafile = "/etc/ssl/cert.pem" if Path("/etc/ssl/cert.pem").is_file() else None
+        return ssl.create_default_context(cafile=cafile)
+
+
+_ABRIDOR = build_opener(_SinRedireccion, HTTPSHandler(context=_contexto_ssl()))
 
 
 def _url_local(url: str) -> bool:
@@ -84,14 +97,28 @@ def _prompt(estado: dict) -> str:
     )
 
 
+def _usar_deepseek() -> bool:
+    return config.IA_PROVEEDOR != "local" and bool(config.DEEPSEEK_API_KEY)
+
+
+def _modelo_activo() -> tuple[str, str] | None:
+    """Devuelve (fuente, modelo) si hay un proveedor listo, o None si solo aplican reglas locales."""
+    if _usar_deepseek():
+        return "deepseek", config.DEEPSEEK_MODELO
+    url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
+    if url and modelo and _url_local(url):
+        return "modelo_local", modelo
+    return None
+
+
 def explicar(estado: dict) -> dict:
-    """Genera una explicación local y devuelve siempre el nivel calculado intacto."""
+    """Genera una explicación con el proveedor configurado y devuelve siempre el nivel calculado intacto."""
     nivel = estado.get("nivel_general", "verde")
-    url = config.IA_LOCAL_URL
-    modelo = config.IA_LOCAL_MODELO
-    if not url or not modelo or not _url_local(url):
+    activo = _modelo_activo()
+    if not activo:
         return {"fuente": "reglas_locales", "modelo": None, "generado_por_ia": False,
                 "explicacion": _fallback(estado), "nivel_general": nivel}
+    fuente, modelo = activo
 
     texto = consultar_modelo(_prompt(estado))
     if texto is None:
@@ -99,15 +126,45 @@ def explicar(estado: dict) -> dict:
                 "explicacion": _fallback(estado), "nivel_general": nivel}
     ok, motivo = guardia_ia.validar_respuesta(texto, estado)
     if not ok:                                              # lo que el modelo dijo no pasa: se usa el texto determinista
-        log.warning("Respuesta del modelo local descartada: %s", motivo)
+        log.warning("Respuesta del modelo descartada: %s", motivo)
         return {"fuente": "reglas_locales", "modelo": None, "generado_por_ia": False, "descartado_por": motivo,
                 "explicacion": _fallback(estado), "nivel_general": nivel}
-    return {"fuente": "modelo_local", "modelo": modelo, "generado_por_ia": True, "aviso": AVISO_IA,
+    return {"fuente": fuente, "modelo": modelo, "generado_por_ia": True, "aviso": AVISO_IA,
             "explicacion": texto, "nivel_general": nivel}
 
 
+def _consultar_deepseek(prompt: str) -> str | None:
+    cuerpo: dict = {
+        "model": config.DEEPSEEK_MODELO,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.2,
+        "stream": False,
+    }
+    if "flash" in config.DEEPSEEK_MODELO:
+        cuerpo["thinking"] = {"type": "disabled"}
+    payload = json.dumps(cuerpo).encode("utf-8")
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {config.DEEPSEEK_API_KEY}",
+        "User-Agent": "ORBIT-Health/1.0",
+    }
+    request = Request(config.DEEPSEEK_URL, data=payload, headers=headers, method="POST")
+    try:
+        with _ABRIDOR.open(request, timeout=max(0.5, config.DEEPSEEK_TIMEOUT_S)) as response:
+            body = json.loads(response.read().decode("utf-8"))
+        texto = body["choices"][0]["message"]["content"]
+        if not isinstance(texto, str) or not texto.strip():
+            raise ValueError("DeepSeek no devolvió texto")
+        return texto.strip()[:2000]
+    except (URLError, TimeoutError, OSError, ValueError, UnicodeDecodeError, KeyError, IndexError, TypeError) as error:
+        log.warning("No se pudo consultar DeepSeek; se usa fallback: %s", error)
+        return None
+
+
 def consultar_modelo(prompt: str) -> str | None:
-    """Consulta el modelo configurado y devuelve None si no está disponible."""
+    """Consulta el proveedor configurado (DeepSeek o Ollama local) y devuelve None si no está disponible."""
+    if _usar_deepseek():
+        return _consultar_deepseek(prompt)
     url = config.IA_LOCAL_URL
     modelo = config.IA_LOCAL_MODELO
     if not url or not modelo or not _url_local(url):
