@@ -165,7 +165,9 @@ def responder(texto: str, estado: dict, preferencias: dict, perfil: str = "", no
     contexto = _contexto_voz(estado)
     nivel_actual = contexto.get("nivel_general") or "verde"
     prompt = (
-        "Eres el asistente de voz de ORBIT Health conversando en español con un astronauta"
+        ("You are the ORBIT Health voice assistant speaking clear, natural English with an astronaut. "
+         if idioma == "en" else
+         "Eres el asistente de voz de ORBIT Health conversando en español con un astronauta")
         + (f" que se llama {json.dumps(nombre, ensure_ascii=False)}" if nombre else "")
         + ". Tu papel es acompañarlo: escucha, valida lo que siente y, si te cuenta sus intereses, menciona uno de forma natural. "
         "Responde de forma natural, cercana y directa a lo que dice o pregunta en «Pregunta», "
