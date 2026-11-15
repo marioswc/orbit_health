@@ -17,6 +17,7 @@ jobs:
           - { os: ubuntu-22.04,   nombre: linux,   archivo: orbit-health }
           - { os: windows-latest, nombre: windows, archivo: orbit-health.exe }
           - { os: macos-latest,   nombre: macos,   archivo: orbit-health }       # Apple Silicon
+          - { os: macos-15-intel, nombre: macos-intel, archivo: orbit-health }  # Mac con procesador Intel (el de arriba solo sirve en Apple Silicon)
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:

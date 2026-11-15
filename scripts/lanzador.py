@@ -307,6 +307,7 @@ def main() -> int:
     ap.add_argument("--puerto", type=int, default=3000)
     ap.add_argument("--sin-navegador", action="store_true", help="solo el servidor: no abrir ninguna ventana")
     ap.add_argument("--navegador", action="store_true", help="abrir el navegador normal en vez de la ventana de aplicación")
+    ap.add_argument("--diagnostico", action="store_true", help="escribe un informe de la configuración y del sistema (archivo en la carpeta de datos) y termina")
     ap.add_argument("--instalar-acceso", action="store_true", help="crea el icono en el menú de aplicaciones y el escritorio (Linux), menú Inicio y Escritorio (Windows) o ~/Applications (Mac)")
     ap.add_argument("--quitar-acceso", action="store_true", help="borra ese acceso directo")
     ap.add_argument("--descargar-modelo", action="store_true", help="baja el modelo de IA una sola vez (necesita internet) y termina")
@@ -340,6 +341,25 @@ def main() -> int:
         os.environ.setdefault("ORBIT_IA_PROVEEDOR", "local")    # y nada sale de la computadora aunque haya una clave de nube
 
     navegador = None if (args.sin_navegador or args.navegador) else navegador_de_ventana()
+
+    if args.diagnostico:                                     # un informe que se puede enviar: sin secretos
+        from app.servicios import diagnostico
+        d = diagnostico.reunir()
+        extra = [f"Ejecutable: {sys.executable}", f"Carpeta de datos: {datos}", f"Navegador para la ventana de aplicación: {navegador or 'ninguno (se usará el navegador normal)'}",
+                 f"Modelo de IA encontrado: {modelo or 'no'}"]
+        if platform.system() == "Darwin":
+            extra.append(f"macOS {platform.mac_ver()[0]} en {platform.machine()} (este programa es solo arm64 y pide macOS 11 o posterior)")
+            try:
+                q = subprocess.run(["xattr", "-l", sys.executable], capture_output=True, text=True, timeout=5).stdout
+                extra.append("Marca de cuarentena (bloqueo de Gatekeeper): " + ("SÍ, ver docs/EJECUTABLE.md" if "com.apple.quarantine" in q else "no"))
+            except (OSError, subprocess.SubprocessError):
+                pass
+        texto = diagnostico.como_texto(d) + "\n\nDEL LANZADOR:\n  " + "\n  ".join(extra)
+        informe = datos / "diagnostico.txt"
+        informe.write_text(texto, encoding="utf-8")
+        print(texto)
+        print(f"\nInforme guardado en: {informe}")
+        return 0
 
     if hay_orbit(args.puerto):                               # ya está corriendo: solo abrir otra ventana, sin duplicar el servidor
         url = f"http://127.0.0.1:{args.puerto}"
