@@ -15,7 +15,7 @@ def cliente(tmp_path, monkeypatch):
 
 @pytest.fixture()
 def cliente_auth(tmp_path, monkeypatch):
-    """API con autenticación activa. T1 comandante, T2 médico, T3 y T4 tripulantes (PIN = 111111, 222222, ...)."""
+    """API con autenticación activa. T1 comandante; T2, T3 y T4 tripulantes (PIN = 111111, 222222, ...)."""
     from app.repositorios.conexion import get_conn
     from app.servicios import auth
 
@@ -26,7 +26,7 @@ def cliente_auth(tmp_path, monkeypatch):
     monkeypatch.setattr(config, "PBKDF2_ITER", 1000)
     with TestClient(main.app) as c:
         conn = get_conn()
-        for tid, rol, pin in (("T1", "comandante", "111111"), ("T2", "medico", "222222"),
+        for tid, rol, pin in (("T1", "comandante", "111111"), ("T2", "tripulante", "222222"),
                               ("T3", "tripulante", "333333"), ("T4", "tripulante", "444444")):
             auth.inscribir(conn, tid, rol, pin=pin)
         conn.close()

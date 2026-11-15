@@ -9,7 +9,7 @@ from ..repositorios.conexion import get_conn, init_db
 from ..servicios import auth
 from . import semilla
 
-CUENTAS = (("T1", "comandante", "111111"), ("T2", "medico", "222222"),
+CUENTAS = (("T1", "comandante", "111111"), ("T2", "tripulante", "222222"),
            ("T3", "tripulante", "333333"), ("T4", "tripulante", "444444"))
 
 

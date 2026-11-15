@@ -29,7 +29,7 @@ CURVAS = {
         "presion_sistolica": [(0, 120), (8, 120), (20, 106), (32, 120)],
         "temperatura": [(0, 36.7), (14, 36.7), (22, 37.4), (32, 36.8)],
     },
-    "T2": {  # el médico se ve afectado más tarde y de forma más leve (sin ningún signo extremo por sí solo)
+    "T2": {  # T2 se ve afectado más tarde y de forma más leve (sin ningún signo extremo por sí solo)
         "spo2": [(0, 98), (10, 98), (18, 93), (30, 98)],   # mínimo 93: con el ruido (±1) nunca baja a 91, que sería extremo
         "frecuencia_respiratoria": [(0, 16), (10, 16), (18, 23), (30, 16)],
         "frecuencia_cardiaca": [(0, 66), (10, 66), (18, 112), (30, 68)],

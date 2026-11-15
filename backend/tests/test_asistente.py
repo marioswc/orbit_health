@@ -10,7 +10,7 @@ def test_el_tono_cambia_la_forma_no_el_contenido():
     directo = a.acciones_sugeridas(**ROJO, tono="directo")
     calido = a.acciones_sugeridas(**ROJO, tono="calido")
     assert directo != calido and len(directo) == len(calido)            # mismos pasos, distinta redacción
-    assert any("médico de a bordo" in t for t in calido)                # el aviso urgente sigue ahí
+    assert any("al comandante" in t for t in calido)                # el aviso urgente sigue ahí
 
 
 def test_el_modo_breve_quita_explicaciones_pero_conserva_todos_los_avisos():

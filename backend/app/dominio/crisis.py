@@ -3,7 +3,7 @@ integrando la variable de calidad de oxígeno en cabina (`o2_cabina` / `calidad_
 
 Reglas de diseño:
 - Es orientación procedimental a bordo (acompañamiento, entorno seguro, verificación de oxígeno en cabina,
-  contención y aviso consentido al médico).
+  contención y aviso consentido al comandante).
 - En un hábitat espacial cerrado, la hipoxia o alteración de O2 ambiental produce síntomas neuroconductuales
   agudos (ansiedad severa, confusión, disforia, alteración del juicio) que pueden desencadenar o agravar una
   crisis psicológica; por ello el protocolo evalúa e incorpora la calidad de oxígeno.
@@ -41,8 +41,8 @@ PASO_OXIGENO = {
 
 PASOS_CRISIS = (
     {
-        "directo": "No permanezcas a solas: acude ahora a un módulo común o llama por el intercomunicador al médico de a bordo o a un compañero de confianza.",
-        "calido": "No tienes que pasar por esto a solas: sal ahora a un módulo común o llama por el intercomunicador al médico de a bordo o a un compañero de confianza.",
+        "directo": "No permanezcas a solas: acude ahora a un módulo común o llama por el intercomunicador al comandante o a un compañero de confianza.",
+        "calido": "No tienes que pasar por esto a solas: sal ahora a un módulo común o llama por el intercomunicador al comandante o a un compañero de confianza.",
     },
     {
         "directo": "Asegura tu entorno inmediato en cabina: aléjate de herramientas, medicamentos o equipos que puedan usarse para hacerte daño.",
@@ -53,8 +53,8 @@ PASOS_CRISIS = (
         "calido": "Haz una pausa para estabilizarte: respira despacio (inhala 4 s, exhala 6 s) y usa el ejercicio de anclaje 5-4-3-2-1 mientras llega tu compañero.",
     },
     {
-        "directo": "Solicita acompañamiento médico a bordo: con tu confirmación puedes enviar un aviso prioritario al médico de la tripulación sin exponer tu diario ni transmitir nada a Tierra.",
-        "calido": "Pide acompañamiento médico a bordo: si lo autorizas, enviaremos un aviso prioritario al médico de la tripulación, manteniendo tu diario privado y sin enviar nada a Tierra.",
+        "directo": "Solicita acompañamiento a bordo: con tu confirmación puedes enviar un aviso prioritario al comandante sin exponer tu diario ni transmitir nada a Tierra.",
+        "calido": "Pide acompañamiento a bordo: si lo autorizas, enviaremos un aviso prioritario al comandante, manteniendo tu diario privado y sin enviar nada a Tierra.",
     },
 )
 
@@ -64,8 +64,8 @@ PASOS_SEGUIMIENTO = (
         "calido": "Recuerda que este resultado es un tamizaje orientativo, no un diagnóstico. Tómate un momento para revisar las cápsulas de autorregulación y descanso.",
     },
     {
-        "directo": "Si estás de acuerdo, puedes compartir este resultado positivo con el médico de a bordo mediante consentimiento explícito para programar una conversación privada.",
-        "calido": "Si te sientes cómodo, puedes compartir este resultado positivo con el médico de a bordo con tu consentimiento explícito para conversar en privado.",
+        "directo": "Si estás de acuerdo, puedes compartir este resultado positivo con el comandante mediante consentimiento explícito para programar una conversación privada.",
+        "calido": "Si te sientes cómodo, puedes compartir este resultado positivo con el comandante con tu consentimiento explícito para conversar en privado.",
     },
     {
         "directo": "Si en algún momento aparece crisis aguda o riesgo de hacerte daño, activa de inmediato el protocolo de crisis psicológica.",
@@ -140,15 +140,15 @@ def protocolo_crisis(nivel: str = "crisis", tono: str = "directo",
         urgencia = "inmediata"
         pasos = [p[tono_efectivo] for p in PASOS_CRISIS]
         contactos = [
-            {"rol": "medico", "etiqueta": "Médico de a bordo (contacto prioritario)"},
-            {"rol": "comandante", "etiqueta": "Comandante / compañero de guardia en cabina"},
+            {"rol": "comandante", "etiqueta": "Comandante (contacto prioritario)"},
+            {"rol": "companero", "etiqueta": "Compañero de guardia en cabina"},
         ]
         permite_aviso = True
     elif nivel == "seguimiento":
         titulo = "Seguimiento sugerido tras tamizaje positivo"
         urgencia = "preventiva"
         pasos = [p[tono_efectivo] for p in PASOS_SEGUIMIENTO]
-        contactos = [{"rol": "medico", "etiqueta": "Médico de a bordo"}]
+        contactos = [{"rol": "comandante", "etiqueta": "Comandante o un compañero de confianza"}]
         permite_aviso = True
     else:
         titulo = "Sin señales de alerta en el tamizaje"
