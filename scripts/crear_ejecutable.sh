@@ -37,7 +37,7 @@ SEP=":"; ROOT="$PWD"; EXTRA=()
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*) SEP=";"; ROOT="$(pwd -W)"                       # en Windows PyInstaller necesita rutas D:/...
                         EXTRA=(--windowed --icon "$ROOT/empaquetado/orbit.ico");;   # sin ventana negra: solo la ventana de ORBIT
-  Darwin) EXTRA=(--icon "$PWD/empaquetado/orbit.icns");;                # en Mac se mantiene la terminal (un .app no se pudo probar)
+  Darwin) EXTRA=(--icon "$PWD/empaquetado/orbit.icns");;                # el programa crea después su .app con --instalar-acceso (sin Terminal)
 esac
 "$PY" -m PyInstaller --noconfirm --clean --onefile --name orbit-health \
   --distpath dist-ejecutable --workpath build/pyinstaller --specpath build \
@@ -45,6 +45,7 @@ esac
   --add-data "$ROOT/backend/app/datos${SEP}app/datos" \
   --add-data "$ROOT/backend/app/repositorios/schema.sql${SEP}app/repositorios" \
   --add-data "$ROOT/frontend/dist${SEP}frontend/dist" \
+  --add-data "$ROOT/empaquetado/orbit.icns${SEP}empaquetado" \
   --collect-submodules uvicorn --collect-submodules app ${EXTRA[@]+"${EXTRA[@]}"} ${EXTRA_IA[@]+"${EXTRA_IA[@]}"} \
   --exclude-module tkinter --exclude-module faster_whisper --exclude-module bleak \
   scripts/lanzador.py

@@ -33,6 +33,9 @@ jobs:
       - name: Prueba de humo (arranca el ejecutable y comprueba API, interfaz, Nova y datos)
         shell: bash
         run: scripts/probar_ejecutable.sh dist-ejecutable/${{ matrix.archivo }} 3650
+      - name: Prueba del acceso directo con icono (lo instala, lo comprueba y lo quita)
+        shell: bash
+        run: scripts/probar_acceso.sh dist-ejecutable/${{ matrix.archivo }}
       - name: Empaquetar (conserva el permiso de ejecución en Linux y Mac)
         shell: bash
         run: |

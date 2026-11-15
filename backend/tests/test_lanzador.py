@@ -137,3 +137,126 @@ def test_la_descarga_escribe_un_parcial_y_solo_al_terminar_lo_deja_listo(tmp_pat
         assert not list((tmp_path / "otro").rglob("*.gguf"))
     finally:
         s.shutdown()
+
+
+# ---------- icono en el menú de aplicaciones de Linux ----------
+@pytest.fixture
+def hogar_linux(tmp_path, monkeypatch):
+    monkeypatch.setattr(lanzador.platform, "system", lambda: "Linux")
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "datos"))
+    escritorio = tmp_path / "Escritorio"
+    escritorio.mkdir()
+    monkeypatch.setattr(lanzador, "_carpeta_del_escritorio", lambda: escritorio)
+    monkeypatch.setattr(lanzador.subprocess, "run", lambda *a, **k: None)           # sin tocar el sistema real
+    return tmp_path
+
+
+def test_el_acceso_directo_cumple_el_estandar_y_agrupa_la_ventana_con_su_icono():
+    t = lanzador.contenido_del_acceso("/opt/orbit/orbit-health", "/home/x/.local/share/icons/orbit-health.png")
+    assert t.startswith("[Desktop Entry]") and "Type=Application" in t and "Name=ORBIT Health" in t
+    assert 'Exec="/opt/orbit/orbit-health"' in t and "Icon=/home/x/.local/share/icons/orbit-health.png" in t
+    assert f"StartupWMClass={lanzador.CLASE_VENTANA}" in t and "Terminal=false" in t        # misma clase que la ventana
+    assert f"--class={lanzador.CLASE_VENTANA}" in lanzador.comando_de_ventana("/x", "http://127.0.0.1:3000", Path("/tmp"))
+
+
+def test_instalar_el_acceso_crea_menu_escritorio_e_icono_solo_en_la_carpeta_del_usuario(hogar_linux):
+    exe = hogar_linux / "app" / "orbit-health"
+    exe.parent.mkdir()
+    exe.write_text("x")
+    creados = lanzador.instalar_acceso(str(exe))
+    menu = hogar_linux / "datos" / "applications" / "orbit-health.desktop"
+    icono = hogar_linux / "datos" / "orbit-health" / "icono.png"
+    assert menu.is_file() and (hogar_linux / "Escritorio" / "orbit-health.desktop").is_file() and icono.is_file()
+    assert icono.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"                                  # el icono real, no un archivo vacío
+    assert menu.stat().st_mode & 0o111                                                      # ejecutable: el escritorio lo acepta como lanzador
+    assert str(exe) in menu.read_text() and all(str(c).startswith(str(hogar_linux)) for c in creados)
+    lanzador.instalar_acceso(str(exe))                                                      # repetirlo no falla ni duplica
+    assert len(list((hogar_linux / "datos" / "applications").glob("*.desktop"))) == 1
+
+
+def test_quitar_el_acceso_borra_lo_que_se_creo(hogar_linux):
+    exe = hogar_linux / "orbit-health"
+    exe.write_text("x")
+    lanzador.instalar_acceso(str(exe))
+    quitados = lanzador.quitar_acceso()
+    assert len(quitados) == 3 and not list(hogar_linux.rglob("orbit-health.desktop")) and not list(hogar_linux.rglob("icono.png"))
+    assert lanzador.quitar_acceso() == []
+
+
+def test_en_un_sistema_desconocido_explica_que_no_sabe(monkeypatch):
+    monkeypatch.setattr(lanzador.platform, "system", lambda: "FreeBSD")
+    with pytest.raises(SystemExit, match="FreeBSD"):
+        lanzador.instalar_acceso()
+
+
+# ---------- Windows: accesos .lnk con PowerShell ----------
+def test_en_windows_crea_accesos_en_inicio_y_escritorio_con_el_icono_del_exe(tmp_path, monkeypatch):
+    escritorio = tmp_path / "Desktop"
+    escritorio.mkdir()
+    monkeypatch.setattr(lanzador.platform, "system", lambda: "Windows")
+    monkeypatch.setenv("APPDATA", str(tmp_path / "AppData"))
+    ordenes = []
+
+    def falso(cmd, **k):
+        ordenes.append(cmd)
+        class R: returncode = 0; stdout = str(escritorio) + "\n"
+        return R()
+    monkeypatch.setattr(lanzador.subprocess, "run", falso)
+    exe = str(tmp_path / "Mi carpeta" / "O'Brien" / "orbit-health.exe")
+    creados = lanzador.instalar_acceso(exe)
+    assert [c.name for c in creados] == ["ORBIT Health.lnk", "ORBIT Health.lnk"]
+    assert "Start Menu" in str(creados[0]) and creados[1].parent == escritorio
+    lnk = [o for o in ordenes if o[0] == "powershell" and "CreateShortcut" in o[-1]]
+    assert len(lnk) == 2
+    for o in lnk:
+        assert "-ExecutionPolicy" in o and "$s.IconLocation=" in o[-1] and "orbit-health.exe,0" in o[-1]
+        assert "O''Brien" in o[-1] and "O'Brien" not in o[-1].replace("O''Brien", "")             # la comilla simple se escapa
+
+
+def test_en_windows_quitar_borra_los_dos_accesos(tmp_path, monkeypatch):
+    escritorio = tmp_path / "Desktop"
+    escritorio.mkdir()
+    monkeypatch.setattr(lanzador.platform, "system", lambda: "Windows")
+    monkeypatch.setenv("APPDATA", str(tmp_path / "AppData"))
+    class R: returncode = 0; stdout = str(escritorio) + "\n"
+    monkeypatch.setattr(lanzador.subprocess, "run", lambda *a, **k: R())
+    menu, esc = lanzador._rutas_windows()
+    menu.parent.mkdir(parents=True)
+    menu.write_text("x"); esc.write_text("x")
+    assert len(lanzador.quitar_acceso()) == 2 and not menu.exists() and not esc.exists()
+
+
+# ---------- macOS: ORBIT Health.app ----------
+def test_en_mac_crea_una_app_valida_que_lanza_el_programa_sin_terminal(tmp_path, monkeypatch):
+    import plistlib
+    monkeypatch.setattr(lanzador.platform, "system", lambda: "Darwin")
+    monkeypatch.setattr(lanzador.Path, "home", classmethod(lambda cls: tmp_path))
+    exe = tmp_path / "con espacios" / "orbit-health"
+    exe.parent.mkdir()
+    exe.write_text("x")
+    (app,) = lanzador.instalar_acceso(str(exe))
+    assert app == tmp_path / "Applications" / "ORBIT Health.app"
+    plist = plistlib.loads((app / "Contents" / "Info.plist").read_bytes())
+    assert plist["CFBundleExecutable"] == "orbit-health" and plist["CFBundlePackageType"] == "APPL" and plist["CFBundleIconFile"] == "orbit.icns"
+    arranque = app / "Contents" / "MacOS" / "orbit-health"
+    assert arranque.stat().st_mode & 0o111 and arranque.read_text().startswith("#!/bin/bash")
+    assert "'" + str(exe) + "'" in arranque.read_text()                                         # la ruta con espacios va entre comillas
+    assert (app / "Contents" / "Resources" / "orbit.icns").is_file()
+    lanzador.instalar_acceso(str(exe))                                                          # repetirlo no falla
+    assert [c.name for c in lanzador.quitar_acceso()] == ["ORBIT Health.app"] and not app.exists()
+
+
+def test_funciona_aunque_la_carpeta_de_iconos_del_sistema_sea_de_root(hogar_linux):
+    """Caso real: ~/.local/share/icons pertenece a root. El acceso no debe tocarla."""
+    icons = hogar_linux / "datos" / "icons" / "hicolor"
+    icons.mkdir(parents=True)
+    icons.parent.chmod(0o555)
+    icons.chmod(0o555)
+    try:
+        exe = hogar_linux / "orbit-health"
+        exe.write_text("x")
+        creados = lanzador.instalar_acceso(str(exe))
+        assert any(c.name == "orbit-health.desktop" for c in creados) and all("icons" not in str(c) for c in creados)
+    finally:
+        icons.chmod(0o755)
+        icons.parent.chmod(0o755)

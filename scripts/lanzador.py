@@ -95,6 +95,167 @@ def descargar_modelo(datos: Path, url: str = MODELO_URL) -> Path:
     return destino
 
 
+CLASE_VENTANA = "ORBITHealth"          # igual a StartupWMClass del acceso directo: así la barra de tareas agrupa la ventana con su icono
+
+
+def _carpeta_del_escritorio() -> Path | None:
+    try:
+        r = subprocess.run(["xdg-user-dir", "DESKTOP"], capture_output=True, text=True, timeout=3)
+        c = Path(r.stdout.strip()) if r.returncode == 0 and r.stdout.strip() else Path.home() / "Desktop"
+    except (OSError, subprocess.SubprocessError):
+        c = Path.home() / "Desktop"
+    return c if c.is_dir() else None
+
+
+def contenido_del_acceso(ejecutable: str, icono: str) -> str:
+    """Archivo .desktop (estándar freedesktop): hace que ORBIT aparezca en el menú de aplicaciones con su icono."""
+    return ("[Desktop Entry]\nType=Application\nVersion=1.0\nName=ORBIT Health\n"
+            "GenericName=Apoyo a la salud de la tripulación\n"
+            "Comment=Apoyo a la salud y el bienestar de una tripulación lejos de la Tierra (simulado, prototipo)\n"
+            f'Exec="{ejecutable}"\nIcon={icono}\nTerminal=false\nCategories=Science;MedicalSoftware;\n'
+            f"StartupWMClass={CLASE_VENTANA}\nStartupNotify=true\n")
+
+
+def _ruta_ejecutable(ejecutable: str | None) -> str:
+    return str(Path(ejecutable or (sys.executable if CONGELADO else Path(__file__).resolve())).resolve())
+
+
+def _icono_png() -> Path | None:
+    for c in (BASE / "frontend" / "dist" / "icono-512.png", BASE / "frontend" / "public" / "icono-512.png"):
+        if c.is_file():
+            return c
+    return None
+
+
+def _datos_usuario_linux() -> Path:
+    return Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local" / "share")
+
+
+def _acceso_linux(exe: str) -> list[Path]:
+    origen = _icono_png()
+    datos_usuario = _datos_usuario_linux()
+    icono = datos_usuario / "orbit-health" / "icono.png"      # carpeta propia: ~/.local/share/icons suele ser de root y no se puede escribir
+    icono.parent.mkdir(parents=True, exist_ok=True)
+    if origen:
+        shutil.copyfile(origen, icono)
+    texto = contenido_del_acceso(exe, str(icono))
+    creados = [icono]
+    destinos = [datos_usuario / "applications" / "orbit-health.desktop"]
+    escritorio = _carpeta_del_escritorio()
+    if escritorio:
+        destinos.append(escritorio / "orbit-health.desktop")
+    for d in destinos:
+        d.parent.mkdir(parents=True, exist_ok=True)
+        d.write_text(texto, encoding="utf-8")
+        d.chmod(0o755)                                   # el escritorio solo lo trata como lanzador si es ejecutable
+        creados.append(d)
+    if escritorio:                                       # GNOME pide marcar el lanzador del escritorio como "de confianza" para mostrar el icono
+        try:
+            subprocess.run(["gio", "set", str(destinos[-1]), "metadata::trusted", "true"], capture_output=True, timeout=10)
+        except (OSError, subprocess.SubprocessError):
+            pass
+    for orden in (["update-desktop-database", str(destinos[0].parent)],):
+        try:
+            subprocess.run(orden, capture_output=True, timeout=10)
+        except (OSError, subprocess.SubprocessError):
+            pass
+    return creados
+
+
+def _ps(texto: str) -> str:
+    return texto.replace("'", "''")                      # comilla simple dentro de una cadena de PowerShell
+
+
+def _rutas_windows() -> tuple[Path, Path | None]:
+    menu = Path(os.environ.get("APPDATA") or Path.home() / "AppData" / "Roaming") / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "ORBIT Health.lnk"
+    escritorio = None
+    try:                                                  # respeta un Escritorio redirigido (por ejemplo a OneDrive)
+        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", "[Environment]::GetFolderPath('Desktop')"],
+                           capture_output=True, text=True, timeout=15)
+        if r.returncode == 0 and r.stdout.strip():
+            escritorio = Path(r.stdout.strip())
+    except (OSError, subprocess.SubprocessError):
+        pass
+    escritorio = escritorio or Path.home() / "Desktop"
+    return menu, (escritorio / "ORBIT Health.lnk" if escritorio.is_dir() else None)
+
+
+def _acceso_windows(exe: str) -> list[Path]:
+    """Accesos .lnk en el menú Inicio y el Escritorio, con el icono que ya va dentro del .exe (se crean con el propio PowerShell)."""
+    menu, escritorio = _rutas_windows()
+    creados = []
+    for destino in [menu] + ([escritorio] if escritorio else []):
+        destino.parent.mkdir(parents=True, exist_ok=True)
+        orden = (f"$s=(New-Object -ComObject WScript.Shell).CreateShortcut('{_ps(str(destino))}');"
+                 f"$s.TargetPath='{_ps(exe)}';$s.WorkingDirectory='{_ps(str(Path(exe).parent))}';"
+                 f"$s.IconLocation='{_ps(exe)},0';$s.Description='ORBIT Health';$s.Save()")
+        subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", orden],
+                       check=True, capture_output=True, timeout=30)
+        creados.append(destino)
+    return creados
+
+
+def _app_mac() -> Path:
+    return Path.home() / "Applications" / "ORBIT Health.app"
+
+
+def _acceso_mac(exe: str) -> list[Path]:
+    """Crea `ORBIT Health.app` en ~/Applications: un paquete mínimo cuyo ejecutable lanza el programa. Al abrirse como app no sale
+    ninguna ventana de Terminal, y Launchpad y el Dock muestran su icono."""
+    import plistlib
+    import shlex
+    app = _app_mac()
+    macos, recursos = app / "Contents" / "MacOS", app / "Contents" / "Resources"
+    macos.mkdir(parents=True, exist_ok=True)
+    recursos.mkdir(parents=True, exist_ok=True)
+    arranque = macos / "orbit-health"
+    arranque.write_text(f'#!/bin/bash\nexec {shlex.quote(exe)} "$@"\n', encoding="utf-8")
+    arranque.chmod(0o755)
+    for c in (BASE / "empaquetado" / "orbit.icns", Path(__file__).resolve().parents[1] / "empaquetado" / "orbit.icns"):
+        if c.is_file():
+            shutil.copyfile(c, recursos / "orbit.icns")
+            break
+    with open(app / "Contents" / "Info.plist", "wb") as fh:
+        plistlib.dump({"CFBundleName": "ORBIT Health", "CFBundleDisplayName": "ORBIT Health", "CFBundleIdentifier": "org.orbithealth.app",
+                       "CFBundleVersion": "0.1.0", "CFBundleShortVersionString": "0.1.0", "CFBundleExecutable": "orbit-health",
+                       "CFBundleIconFile": "orbit.icns", "CFBundlePackageType": "APPL", "LSMinimumSystemVersion": "11.0",
+                       "NSHighResolutionCapable": True, "LSApplicationCategoryType": "public.app-category.healthcare-fitness"}, fh)
+    return [app]
+
+
+def instalar_acceso(ejecutable: str | None = None) -> list[Path]:
+    """Crea el acceso con icono para ORBIT en el sistema de quien lo usa: menú de aplicaciones y escritorio en Linux, menú Inicio y
+    Escritorio en Windows, y una app en ~/Applications en Mac. Solo escribe en la carpeta del propio usuario."""
+    exe = _ruta_ejecutable(ejecutable)
+    sistema = platform.system()
+    if sistema == "Linux":
+        return _acceso_linux(exe)
+    if sistema == "Windows":
+        return _acceso_windows(exe)
+    if sistema == "Darwin":
+        return _acceso_mac(exe)
+    raise SystemExit(f"No sé crear un acceso directo en {sistema}.")
+
+
+def quitar_acceso() -> list[Path]:
+    sistema = platform.system()
+    if sistema == "Windows":
+        menu, escritorio = _rutas_windows()
+        candidatos = [menu] + ([escritorio] if escritorio else [])
+    elif sistema == "Darwin":
+        candidatos = [_app_mac()]
+    else:
+        du = _datos_usuario_linux()
+        candidatos = [du / "applications" / "orbit-health.desktop", du / "orbit-health" / "icono.png"]
+        escritorio = _carpeta_del_escritorio()
+        if escritorio:
+            candidatos.append(escritorio / "orbit-health.desktop")
+    quitados = [c for c in candidatos if c.exists()]
+    for c in quitados:
+        shutil.rmtree(c) if c.is_dir() else c.unlink()
+    return quitados
+
+
 def navegador_de_ventana() -> str | None:
     """Ruta de un navegador basado en Chromium (el único con modo aplicación fiable), o None."""
     sistema = platform.system()
@@ -117,7 +278,7 @@ def comando_de_ventana(navegador: str, url: str, datos: Path) -> list[str]:
     """Comando para abrir la ventana de aplicación con un perfil propio (así es un proceso aparte que dura mientras la ventana
     esté abierta, y no toca el perfil ni las pestañas del navegador de la persona)."""
     return [navegador, f"--app={url}", f"--user-data-dir={datos / 'ventana'}", "--no-first-run", "--no-default-browser-check",
-            "--window-size=1280,820", "--disable-features=Translate"]
+            "--window-size=1280,820", "--disable-features=Translate", f"--class={CLASE_VENTANA}"]
 
 
 def abrir_cuando_responda(url: str, puerto: int) -> None:
@@ -146,11 +307,22 @@ def main() -> int:
     ap.add_argument("--puerto", type=int, default=3000)
     ap.add_argument("--sin-navegador", action="store_true", help="solo el servidor: no abrir ninguna ventana")
     ap.add_argument("--navegador", action="store_true", help="abrir el navegador normal en vez de la ventana de aplicación")
+    ap.add_argument("--instalar-acceso", action="store_true", help="crea el icono en el menú de aplicaciones y el escritorio (Linux), menú Inicio y Escritorio (Windows) o ~/Applications (Mac)")
+    ap.add_argument("--quitar-acceso", action="store_true", help="borra ese acceso directo")
     ap.add_argument("--descargar-modelo", action="store_true", help="baja el modelo de IA una sola vez (necesita internet) y termina")
     args = ap.parse_args()
 
     datos = carpeta_de_datos()
     _asegurar_salida(datos)
+    if args.instalar_acceso:
+        for c in instalar_acceso():
+            print("creado:", c)
+        print("Listo: busca \"ORBIT Health\" en tu menú de aplicaciones. Si no aparece al instante, cierra y abre sesión.")
+        return 0
+    if args.quitar_acceso:
+        for c in quitar_acceso():
+            print("borrado:", c)
+        return 0
     if args.descargar_modelo:
         descargar_modelo(datos)
         return 0
