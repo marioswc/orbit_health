@@ -23,7 +23,7 @@ export default function BandaPage({ tripulanteId, estado, refrescar }: Props) {
   const activa = sim.estado?.activa ?? false;
 
   // La racha cambia cuando entran lecturas: se vuelve a pedir al empezar, al terminar y al cambiar de tripulante
-  useEffect(() => { api<Racha>(`/racha/${tripulanteId}`).then(setRacha).catch(() => setRacha(null)); }, [tripulanteId, activa, sim.estado?.finalizada]);
+  useEffect(() => { api<Racha>(`/racha/${tripulanteId}`).then(setRacha).catch(() => setRacha(null)); }, [tripulanteId, activa, !!sim.estado?.finalizada]);
 
   const lecturas = estado?.indicadores ?? [];
   const valor = (k: string) => lecturas.find((l) => l.indicador === k)?.valor;

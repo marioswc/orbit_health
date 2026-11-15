@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRecargaPorClave } from "../../../shared/hooks/useRecargaPorClave";
 import { useTranslation } from "../../../i18n";
 import { api } from "../../../shared/api/client";
 import Alerta from "../../../shared/components/Alerta";
@@ -31,7 +32,7 @@ export default function RecordatorioCaptura({ tripulanteId, estado }: Props) {
   const [propio, setPropio] = useState<RecordatorioTripulante | null>(null);
   const [equipo, setEquipo] = useState<RecordatoriosEquipo | null>(null);
 
-  useEffect(() => {
+  useRecargaPorClave(() => {
     if (!tripulanteId) return;
     let activo = true;
     api<RecordatorioTripulante>(`/recordatorios/${encodeURIComponent(tripulanteId)}`)
@@ -41,7 +42,7 @@ export default function RecordatorioCaptura({ tripulanteId, estado }: Props) {
       .then((d) => { if (activo) setEquipo(d); })
       .catch(() => { if (activo) setEquipo(null); });
     return () => { activo = false; };
-  }, [tripulanteId, estado]);
+  }, estado, [tripulanteId]);
 
   if (!propio) return null;
 
