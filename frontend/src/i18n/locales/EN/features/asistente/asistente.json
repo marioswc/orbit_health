@@ -39,5 +39,14 @@
   "chat.rasgos": "How you are (optional, max. 160 characters)",
   "chat.rasgosEjemplo": "For example: calm, I need breaks, I cheer up with company",
   "chat.perfil": "How you want Nova to know you",
-  "chat.sugerencias": "Shortcuts to get started"
+  "chat.sugerencias": "Shortcuts to get started",
+  "tabs.aria": "Assistant sections",
+  "tabs.chat": "Chat with Nova",
+  "tabs.ajustes": "Style and voice",
+  "tabs.estado": "Explain my status",
+  "chat.perfilHint": "Nova can use this to support you better. It is optional and never leaves this device.",
+  "chat.interesesCorto": "What you like or what motivates you",
+  "chat.rasgosCorto": "What you are like",
+  "chat.guardando": "Saving…",
+  "chat.privado": "Only used by the AI on this device; never sent out."
 }

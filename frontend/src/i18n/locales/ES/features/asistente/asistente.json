@@ -39,5 +39,14 @@
   "chat.rasgos": "Cómo eres (opcional, máx. 160 caracteres)",
   "chat.rasgosEjemplo": "Por ejemplo: tranquila, necesito pausas, me animo con compañía",
   "chat.perfil": "Cómo quieres que te conozca Nova",
-  "chat.sugerencias": "Atajos para empezar"
+  "chat.sugerencias": "Atajos para empezar",
+  "tabs.aria": "Secciones del asistente",
+  "tabs.chat": "Chat con Nova",
+  "tabs.ajustes": "Estilo y voz",
+  "tabs.estado": "Explicar mi estado",
+  "chat.perfilHint": "Nova puede usar esto para acompañarte mejor. Es opcional y no sale de este equipo.",
+  "chat.interesesCorto": "Qué te gusta o te motiva",
+  "chat.rasgosCorto": "Cómo eres",
+  "chat.guardando": "Guardando…",
+  "chat.privado": "Solo se usa con la IA de este equipo; nunca se envía fuera."
 }

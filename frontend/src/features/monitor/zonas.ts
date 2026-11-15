@@ -101,7 +101,7 @@ export const ZONAS: Zona[] = [
 ];
 
 /** Donde queda el brazo en cada capa (el esqueleto, los musculos y los organos tienen otra postura que el traje). */
-const ANCLA_BRAZO: Partial<Record<Capa, [number, number]>> = { musculo: [205, 168], hueso: [184.7, 176.6], organos: [192, 152] };
+const ANCLA_BRAZO: Partial<Record<Capa, [number, number]>> = { musculo: [205, 168], hueso: [184.7, 176.6], organos: [170.6, 216.3] };
 
 /** En las capas de anatomia, cada zona apunta a donde esta el organo o musculo (no a las marcas del traje). */
 const ANCLA_ANATOMIA: Record<string, [number, number]> = { snc: [239, 76], resp: [239, 148], cardio: [247, 152], metab: [239, 212], piernas: [224, 320] };

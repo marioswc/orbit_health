@@ -9,9 +9,9 @@ const rasters = import.meta.glob("../assets/*.webp", { query: "?url", import: "d
 const tamanos = Object.entries(crudos).map(([ruta, texto]) => ({ nombre: ruta.split("/").pop()!, bytes: new Blob([texto]).size }));
 
 describe("presupuesto de assets", () => {
-  it("estan las 4 capas (esqueleto, musculos y organos son imagenes WebP)", () => {
-    expect(tamanos.map((t) => t.nombre).sort()).toEqual(["astronauta.svg"]);
-    expect(Object.keys(rasters).map((r) => r.split("/").pop())).toEqual(["esqueleto.webp", "musculos.webp", "organos.webp"]);
+  it("estan las 4 capas (esqueleto y musculos son imagenes WebP (organos sigue siendo un SVG))", () => {
+    expect(tamanos.map((t) => t.nombre).sort()).toEqual(["astronauta.svg", "organos.svg"]);
+    expect(Object.keys(rasters).map((r) => r.split("/").pop())).toEqual(["esqueleto.webp", "musculos.webp"]);
   });
   it("ningun SVG pasa de 300 KB", () => {
     for (const t of tamanos) expect(t.bytes, t.nombre).toBeLessThan(LIMITE_POR_ARCHIVO);

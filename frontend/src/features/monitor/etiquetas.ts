@@ -19,11 +19,11 @@ export interface Etiqueta {
 const IZQ = 142, DER = 316;
 export const ETIQUETAS: Partial<Record<Capa, Etiqueta[]>> = {
   organos: [
-    { texto: "Cerebro", zona: "snc", tx: 239, ty: 70, lx: IZQ, ly: 56, lado: "izq" },
-    { texto: "Pulmón", zona: "resp", tx: 257, ty: 138, lx: DER, ly: 134, lado: "der" },
-    { texto: "Corazón", zona: "cardio", tx: 252, ty: 176, lx: DER, ly: 170, lado: "der" },
-    { texto: "Intestinos", zona: "metab", tx: 238, ty: 220, lx: DER, ly: 224, lado: "der" },
-    { texto: "Fémur", zona: "piernas", tx: 225, ty: 331, lx: IZQ, ly: 334, lado: "izq" },
+    { texto: "Cerebro", zona: "snc", tx: 239, ty: 66, lx: IZQ, ly: 56, lado: "izq" },
+    { texto: "Pulmón", zona: "resp", tx: 222, ty: 165, lx: IZQ, ly: 150, lado: "izq" },
+    { texto: "Corazón", zona: "cardio", tx: 244, ty: 158, lx: DER, ly: 140, lado: "der" },
+    { texto: "Riñones", zona: "metab", tx: 254, ty: 208, lx: DER, ly: 214, lado: "der" },
+    { texto: "Vasos", zona: "piernas", tx: 262, ty: 330, lx: DER, ly: 322, lado: "der" },
   ],
   musculo: [
     { texto: "Pectoral", zona: "resp", tx: 222, ty: 146, lx: IZQ, ly: 128, lado: "izq" },
