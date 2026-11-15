@@ -15,6 +15,9 @@ Es **opcional** y funciona sin internet: un modelo de lenguaje que corre en la p
 ## Adaptación a cada tripulante
 Cada persona elige **tono** (directo o cálido), **detalle** (breve o completo) y frecuencia de recordatorios (`PUT /api/preferencias/{id}`). La explicación (`/api/estado/{id}/explicacion`) y la voz usan esa elección: cambian la longitud y el tono, tanto en el texto del modelo como en el texto escrito de respaldo. Solo se leen opciones de una lista cerrada, así que no entra texto libre al prompt. **No aprende ni infiere personalidad**: se adapta solo a lo que la persona eligió. Un diario o ánimo privado nunca se usa para esto.
 
+### Tu asistente personal (conversación y perfil)
+Como a bordo **no hay médico**, cada astronauta tiene su propio asistente de apoyo: `POST /api/asistente/chat/{id}` conversa por texto (no requiere la voz) y `PUT /api/perfil-ia/{id}` guarda lo que la persona cuenta de sí (hasta 160 caracteres: intereses, lo que la motiva). Reglas: **solo su dueño** puede leerlo, escribirlo o conversar (ni el comandante); el texto se entrega al modelo como dato entre comillas; **solo se usa con el modelo local**: con DeepSeek no se envía; una frase de crisis nunca llega al modelo; y el asistente no cambia alertas ni da tratamientos. Es adaptación a lo que la persona dice, no un perfil psicológico aprendido.
+
 ## Instalar el modelo local (una vez, con internet)
 `scripts/instalar_ia_local.sh [modelo]` descarga Ollama en `~/.local/ollama` **sin sudo**, verifica su hash contra el publicado en la release y al final imprime cómo arrancarlo y bajar el modelo (por defecto `qwen2.5:1.5b`, unos 1 GB, en CPU). Después funciona sin internet. Para usarlo en lugar de DeepSeek: `ORBIT_IA_PROVEEDOR=local` en `.env`.
 

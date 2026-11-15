@@ -15,3 +15,8 @@ ORBIT_AUTH=1 ./run.sh            # arranca pidiendo PIN
 | T4 | Tripulante | `444444` | Ver y capturar lo suyo |
 
 El PIN debe tener de 6 a 10 dígitos. Un PIN equivocado repetido bloquea la cuenta un rato (ver [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.md)). Para una cuenta real usa `scripts/inscribir_tripulante.sh`, que genera un PIN aleatorio y lo muestra una sola vez.
+
+## Probar el login y tu asistente
+1. En `.env`: `ORBIT_AUTH=1` y `ORBIT_IA_PROVEEDOR=local` (con Ollama corriendo).
+2. `scripts/cuentas_demo.sh`, luego `./run.sh` y abre `http://127.0.0.1:3000`.
+3. Entra como T3 (`333333`), abre **Asistente**: cuéntale tus intereses y conversa. El perfil y el chat son privados: T4 o el comandante no pueden verlos.
