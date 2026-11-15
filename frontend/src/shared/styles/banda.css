@@ -40,8 +40,8 @@
 .rl-dorso { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 /* Grosor de la caja: rectangulos redondeados apilados hacia atras (misma forma que la caja del SVG) */
 .rl-pared { position: absolute; left: 0; top: 0; backface-visibility: visible; }
-.rl-vidrio { position: absolute; left: 18%; top: 18.4%; width: 64%; height: 63.2%; border-radius: 25% / 20%; background: linear-gradient(135deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, .06)); transform: translateZ(calc(var(--u) * 11)); pointer-events: none; }
-.rl-pantalla { position: absolute; left: 18%; top: 18.4%; width: 64%; height: 63.2%; border-radius: 25% / 20%; transform: translateZ(calc(var(--u) * 12)); }
+.rl-vidrio { position: absolute; left: 18%; top: 18.4%; width: 64%; height: 63.2%; border-radius: 11% / 8.5%; background: linear-gradient(135deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, .06)); transform: translateZ(calc(var(--u) * 11)); pointer-events: none; }
+.rl-pantalla { position: absolute; left: 18%; top: 18.4%; width: 64%; height: 63.2%; border-radius: 11% / 8.5%; transform: translateZ(calc(var(--u) * 12)); }
 .rl-corona { position: absolute; left: 84.7%; top: 35.5%; width: 4.2%; height: 11.8%; min-height: 0; padding: 0; border: 1px solid #55555b; border-radius: 6px; background: linear-gradient(90deg, #8c8c93, #e0e0e5, #8c8c93); transform: translateZ(0); cursor: pointer; }
 .rl-corona:hover { border-color: #fff; }
 .rl-corona:active { transform: translateZ(0) translateX(-2px); }
