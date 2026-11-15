@@ -22,7 +22,7 @@ function audioDesdeBase64(base64: string, tipo: string): HTMLAudioElement {
 }
 
 export default function AsistenteVoz({ tripulanteId }: { tripulanteId: string }) {
-  const { t } = useTranslation("bienestar");
+  const { t, i18n } = useTranslation("bienestar");
   const [estado, setEstado] = useState<EstadoVoz>("inactivo");
   const [mensaje, setMensaje] = useState<{ ok: boolean; texto: string } | null>(null);
   const [ultimoTurno, setUltimoTurno] = useState<{ pregunta: string; respuesta: string } | null>(null);
@@ -76,7 +76,7 @@ export default function AsistenteVoz({ tripulanteId }: { tripulanteId: string })
   const enviarTurno = useCallback(async (grabacion: Blob, tipo: string) => {
     setEstado("procesando");
     try {
-      const resultado = await api<RespuestaVoz>(`/voz/chat/${tripulanteId}`, {
+      const resultado = await api<RespuestaVoz>(`/voz/chat/${tripulanteId}?idioma=${i18n.language}`, {
         method: "POST",
         headers: { "Content-Type": tipo.split(";", 1)[0] || "audio/webm" },
         body: grabacion,
@@ -100,7 +100,7 @@ export default function AsistenteVoz({ tripulanteId }: { tripulanteId: string })
       setEstado("inactivo");
       setMensaje({ ok: false, texto: error instanceof Error ? error.message : t("voz.error") });
     }
-  }, [iniciarTurno, t, tripulanteId]);
+  }, [i18n.language, iniciarTurno, t, tripulanteId]);
 
   const detenerTurno = () => {
     if (grabadora.current?.state === "recording") grabadora.current.stop();

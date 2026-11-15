@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { getCurrentLanguage } from "../i18n";
 import { getToken } from "../shared/api/client";
 import { useExplicacionEstado } from "../features/monitor/hooks/useExplicacionEstado";
 import type { Estado } from "../features/monitor/types/estado";
@@ -12,6 +13,7 @@ interface RespuestaVoz {
   aviso?: string;
   audio_base64?: string;
   audio_media_type?: string;
+  idioma?: "es" | "en";
 }
 
 interface Props {
@@ -84,11 +86,11 @@ export default function AsistenteFlotante({ tripulanteId, estado }: Props) {
     setHablando(false);
   }
 
-  function hablarTexto(texto: string) {
+  function hablarTexto(texto: string, idioma: "es" | "en" = getCurrentLanguage()) {
     if (!soportaVozNavegador || !texto) return;
     detenerAudio();
     const u = new SpeechSynthesisUtterance(texto);
-    u.lang = "es-MX";
+    u.lang = idioma === "en" ? "en-US" : "es-MX";
     u.rate = 1.02;
     u.onstart = () => setHablando(true);
     u.onend = () => setHablando(false);
@@ -103,7 +105,7 @@ export default function AsistenteFlotante({ tripulanteId, estado }: Props) {
       const token = getToken();
       const headers: Record<string, string> = { "Content-Type": blob.type || "audio/webm" };
       if (token) headers.Authorization = `Bearer ${token}`;
-      const r = await fetch(`/api/voz/chat/${encodeURIComponent(tripulanteId)}`, {
+      const r = await fetch(`/api/voz/chat/${encodeURIComponent(tripulanteId)}?idioma=${getCurrentLanguage()}`, {
         method: "POST",
         headers,
         body: blob,
@@ -123,7 +125,7 @@ export default function AsistenteFlotante({ tripulanteId, estado }: Props) {
         audio.onended = () => setHablando(false);
         audio.play().catch(() => setHablando(false));
       } else {
-        hablarTexto(res.texto);
+        hablarTexto(res.texto, res.idioma);
       }
     } catch {
       setAvisoVoz("No se pudo conectar con el servicio de voz local.");

@@ -28,7 +28,8 @@ def chat_voz(tid: str, audio: bytes = Body(...), idioma: str = "auto", content_t
     if not voz_local.adquirir_trabajo():
         raise HTTPException(429, "La capacidad de voz está ocupada; inténtalo de nuevo")
     try:
-        texto, idioma_real = voz_local.transcribir_con_idioma(audio, extension, None if idioma == "auto" else idioma)
+        idioma_solicitado = voz_local.normalizar_idioma(idioma)
+        texto, idioma_real = voz_local.transcribir_con_idioma(audio, extension, idioma_solicitado)
         estado = servicio_estado.estado_tripulante(conn, tid)
         preferencias = servicio_preferencias.obtener(conn, tid)
         ctx = servicio_perfil.contexto(conn, tid)

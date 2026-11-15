@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { getCurrentLanguage } from "../../../i18n";
 import { getToken } from "../../../shared/api/client";
 import { useExplicacionEstado } from "../hooks/useExplicacionEstado";
 import type { Estado } from "../types/estado";
@@ -38,7 +39,7 @@ export default function AsistenteLocal({ tripulanteId, estado }: Props) {
       const token = getToken();
       const headers: Record<string, string> = { "Content-Type": blob.type || "audio/webm" };
       if (token) headers.Authorization = `Bearer ${token}`;
-      const r = await fetch(`/api/voz/chat/${encodeURIComponent(tripulanteId)}`, {
+      const r = await fetch(`/api/voz/chat/${encodeURIComponent(tripulanteId)}?idioma=${getCurrentLanguage()}`, {
         method: "POST",
         headers,
         body: blob,

@@ -28,6 +28,16 @@ class VozNoDisponible(RuntimeError):
     """La capacidad de voz no está instalada o configurada."""
 
 
+def normalizar_idioma(idioma: str | None) -> str | None:
+    """Convierte una preferencia de idioma en un idioma soportado o autodetección."""
+    valor = (idioma or "").lower()
+    if valor.startswith("es"):
+        return "es"
+    if valor.startswith("en"):
+        return "en"
+    return None
+
+
 _TRABAJO_VOZ = threading.BoundedSemaphore(1)
 _INDICADORES_PRIVADOS = {
     "animo", "sueno_horas", "sueno_eficiencia_pct", "sueno_despertares_min",
@@ -98,12 +108,13 @@ def transcribir_con_idioma(audio: bytes, extension: str = ".wav", idioma: str | 
         archivo.write(audio)
         ruta = archivo.name
     try:
-        segmentos, info = _modelo_stt().transcribe(_decodificar_audio(ruta), language=idioma if idioma in IDIOMAS else None,
+        idioma_normalizado = normalizar_idioma(idioma)
+        segmentos, info = _modelo_stt().transcribe(_decodificar_audio(ruta), language=idioma_normalizado,
                                                    vad_filter=True, beam_size=1)
         texto = " ".join(s.text.strip() for s in segmentos if s.text.strip()).strip()
         if not texto:
             raise ValueError("No se pudo reconocer voz")
-        detectado = idioma if idioma in IDIOMAS else getattr(info, "language", "es")
+        detectado = idioma_normalizado or getattr(info, "language", "es")
         return texto[:2000], detectado if detectado in IDIOMAS else "es"
     finally:
         Path(ruta).unlink(missing_ok=True)
