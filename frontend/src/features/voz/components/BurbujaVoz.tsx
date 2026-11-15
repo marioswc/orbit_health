@@ -7,7 +7,7 @@ import "./voz.css";
 registrarEspanol("voz", esVoz);
 
 interface Props { tripulanteId: string }
-interface Respuesta { texto: string; transcripcion: string; nivel_general?: string; fuente?: string; audio_base64?: string; audio_media_type?: string }
+interface Respuesta { texto: string; transcripcion: string; nivel_general?: string; fuente?: string; idioma?: "es" | "en"; audio_base64?: string; audio_media_type?: string }
 type Fase = "reposo" | "grabando" | "procesando";
 
 const MAX_GRABACION_MS = 20_000;
@@ -18,14 +18,18 @@ const ERRORES: Record<number, string> = { 503: "error.desactivada", 429: "error.
 const puedeHablar = () => typeof window !== "undefined" && "speechSynthesis" in window && typeof SpeechSynthesisUtterance !== "undefined";
 
 /** Prefiere una voz en espanol instalada en el equipo (localService): funciona sin red. */
-function vozLocalEspanol(): SpeechSynthesisVoice | undefined {
-  const voces = window.speechSynthesis.getVoices().filter((v) => v.lang.toLowerCase().startsWith("es"));
-  return voces.find((v) => v.localService && v.lang === "es-MX") ?? voces.find((v) => v.localService) ?? voces[0];
+function vozLocal(idioma: "es" | "en"): SpeechSynthesisVoice | undefined {
+  const prefijo = idioma === "en" ? "en" : "es";
+  const voces = window.speechSynthesis.getVoices().filter((v) => v.lang.toLowerCase().startsWith(prefijo));
+  const exacta = idioma === "en" ? "en-US" : "es-MX";
+  return voces.find((v) => v.localService && v.lang.toLowerCase() === exacta.toLowerCase())
+    ?? voces.find((v) => v.localService)
+    ?? voces[0];
 }
 
 /** Burbuja flotante de voz (push-to-talk): graba, envia el audio al backend local y muestra/reproduce la respuesta. Sin librerias. */
 export default function BurbujaVoz({ tripulanteId }: Props) {
-  const { t } = useTranslation("voz");
+  const { t, i18n } = useTranslation("voz");
   const [fase, setFase] = useState<Fase>("reposo");
   const [abierta, setAbierta] = useState(false);
   const [respuesta, setRespuesta] = useState<Respuesta | null>(null);
@@ -120,7 +124,7 @@ export default function BurbujaVoz({ tripulanteId }: Props) {
     const limiteProcesamiento = window.setTimeout(() => controlador.abort(), MAX_PROCESAMIENTO_MS);
     try {
       const token = getToken();
-      const r = await fetch(`/api/voz/chat/${encodeURIComponent(tripulanteId)}`, {
+      const r = await fetch(`/api/voz/chat/${encodeURIComponent(tripulanteId)}?idioma=${i18n.language}`, {
         method: "POST",
         headers: { "Content-Type": blob.type.split(";")[0] || "audio/webm", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: blob,
@@ -156,9 +160,10 @@ export default function BurbujaVoz({ tripulanteId }: Props) {
       return;
     }
     if (!puedeHablar() || !d.texto) return;
+    const idioma = d.idioma ?? i18n.language;
     const u = new SpeechSynthesisUtterance(d.texto);
-    u.lang = "es-MX";
-    const voz = vozLocalEspanol();
+    u.lang = idioma === "en" ? "en-US" : "es-MX";
+    const voz = vozLocal(idioma);
     if (voz) u.voice = voz;
     u.onstart = () => setHablando(true);
     u.onend = u.onerror = () => setHablando(false);

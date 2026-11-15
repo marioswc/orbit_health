@@ -24,6 +24,15 @@ Como a bordo **no hay médico**, cada astronauta tiene su propio asistente de ap
 ### Español e inglés
 La voz y el chat funcionan en **español e inglés**. Por voz, faster-whisper **detecta el idioma** (entre los dos) y el asistente responde en el mismo, con la voz de Piper correspondiente (`ORBIT_VOZ_PIPER_MODELO` para español y `ORBIT_VOZ_PIPER_MODELO_EN` para inglés; sin la segunda, usa la española). Por texto, el idioma se detecta con una heurística simple (o se indica con `idioma`: `es` o `en`); ante la duda, español. La guardia vigila también el inglés (fármacos, colores de alerta, enlaces). Una crisis en inglés se atiende con un **protocolo en inglés** que es traducción fiel de los mismos pasos del español (`PROTOCOLO_CRISIS_EN`), pendiente de la misma validación por un especialista. Medido en la laptop de desarrollo con dos frases sintetizadas por Piper: ambas se entendieron y se contestaron en su idioma (la de español salió con errores menores de transcripción). Los textos escritos de respaldo en inglés son breves. **No se probó con acentos ni con personas reales.**
 
+### Rendimiento (optimizaciones)
+| Qué | Efecto |
+|---|---|
+| **Precalentamiento** al arrancar (`ORBIT_PRECALENTAR=1`): carga el modelo local y el de voz en segundo plano, con el inicio fijo del prompt | La primera pregunta ya no paga la carga (antes unos 10 s) |
+| **`keep_alive`** (`ORBIT_IA_LOCAL_KEEP_ALIVE=30m`) | El modelo se queda en memoria entre preguntas |
+| **Contexto corto** (`num_ctx` 2048) y tope de 220 tokens | Respuestas más rápidas; un modelo chico no se queda generando |
+| **Reglas aparte de los datos** (`system` y `prompt`), con lo fijo primero | El modelo respeta mejor las reglas y reutiliza lo ya procesado |
+Medido en la laptop de desarrollo (CPU, sin GPU, `qwen2.5:1.5b`): primera pregunta tras el arranque unos 4 s (antes 7 a 10 s); las siguientes, de 1 a 3.5 s. La respuesta por voz sigue sumando unos 4 s de transcripción y 2 s de síntesis. Una prueba con T2 usó el interés sembrado ("¿te gustaría hablar de tu familia?"), pero **es una sola prueba, no una evaluación**. Con `ORBIT_PRECALENTAR=0` no se carga nada al arrancar. El precalentamiento nunca contacta a DeepSeek.
+
 ### Calidad de la conversación (medición, misma laptop)
 | Modelo | Tiempo | Resultado de la prueba de acompañamiento |
 |---|---|---|

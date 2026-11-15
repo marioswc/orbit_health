@@ -155,10 +155,10 @@ def explicar(estado: dict, preferencias: dict | None = None) -> dict:
             "explicacion": texto, "nivel_general": nivel}
 
 
-def _consultar_deepseek(prompt: str) -> str | None:
+def _consultar_deepseek(prompt: str, system: str | None = None) -> str | None:
     cuerpo: dict = {
         "model": config.DEEPSEEK_MODELO,
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": ([{"role": "system", "content": system}] if system else []) + [{"role": "user", "content": prompt}],
         "temperature": 0.2,
         "stream": False,
     }
@@ -183,20 +183,25 @@ def _consultar_deepseek(prompt: str) -> str | None:
         return None
 
 
-def consultar_modelo(prompt: str) -> str | None:
+def consultar_modelo(prompt: str, system: str | None = None) -> str | None:
     """Consulta el proveedor configurado (DeepSeek o Ollama local) y devuelve None si no está disponible."""
     if _usar_deepseek():
-        return _consultar_deepseek(prompt)
+        return _consultar_deepseek(prompt, system)
     url = config.IA_LOCAL_URL
     modelo = config.IA_LOCAL_MODELO
     if not url or not modelo or not _url_local(url):
         return None
-    payload = json.dumps({
+    cuerpo = {
         "model": modelo,
         "prompt": prompt,
         "stream": False,
-        "options": {"temperature": 0.1, "num_predict": 220},     # tope de tokens: un modelo chico no debe quedarse generando
-    }).encode("utf-8")
+        "keep_alive": config.IA_LOCAL_KEEP_ALIVE,                 # el modelo se queda en memoria entre preguntas
+        # num_predict: un modelo chico no debe quedarse generando; num_ctx: contexto corto = respuesta más rápida
+        "options": {"temperature": 0.1, "num_predict": 220, "num_ctx": 2048},
+    }
+    if system:
+        cuerpo["system"] = system          # las reglas van aparte de los datos: un modelo chico las respeta mejor
+    payload = json.dumps(cuerpo).encode("utf-8")
     request = Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
     try:
         with _ABRIDOR.open(request, timeout=max(0.5, config.IA_LOCAL_TIMEOUT_S)) as response:
@@ -208,3 +213,22 @@ def consultar_modelo(prompt: str) -> str | None:
     except (URLError, TimeoutError, OSError, ValueError, UnicodeDecodeError) as error:
         log.warning("No se pudo consultar el modelo local; se usa fallback: %s", error)
         return None
+
+
+def precalentar_modelo() -> bool:
+    """Carga el modelo local en memoria con una petición mínima, para que la primera pregunta real no pague la carga.
+    Nunca toca un proveedor externo ni lanza excepciones: si no hay modelo local, no hace nada."""
+    url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
+    if _usar_deepseek() or not url or not modelo or not _url_local(url):
+        return False
+    from .voz_local import SISTEMA_BASE                     # el mismo inicio que usa la conversación: queda ya procesado
+    cuerpo = json.dumps({"model": modelo, "system": SISTEMA_BASE, "prompt": "ok", "stream": False,
+                         "keep_alive": config.IA_LOCAL_KEEP_ALIVE,
+                         "options": {"num_predict": 1, "num_ctx": 2048}}).encode("utf-8")
+    try:
+        with _ABRIDOR.open(Request(url, data=cuerpo, headers={"Content-Type": "application/json"}, method="POST"),
+                           timeout=max(5.0, config.IA_LOCAL_TIMEOUT_S * 2)) as r:
+            r.read()
+        return True
+    except (URLError, TimeoutError, OSError, ValueError):
+        return False

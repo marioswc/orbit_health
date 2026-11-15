@@ -36,6 +36,10 @@ async def lifespan(app: FastAPI):
             sembrar(conn)
         finally:
             conn.close()
+    if config.PRECALENTAR:                                 # en segundo plano: el arranque no espera al modelo
+        from .servicios import explicador_local, voz_local
+        asyncio.get_running_loop().run_in_executor(None, explicador_local.precalentar_modelo)
+        asyncio.get_running_loop().run_in_executor(None, voz_local.precalentar_stt)
     tarea = None
     if config.RESPALDO_CADA_MIN > 0:
         try:
