@@ -1,7 +1,9 @@
 import { memo, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "../../../i18n";
 import { api, post } from "../../../shared/api/client";
+import type { ApexOptions } from "apexcharts";
 import Alerta from "../../../shared/components/Alerta";
+import Grafica, { usePaleta } from "../../../shared/components/Grafica";
 import type { RespuestaAnimo, SerieAnimo } from "../types/bienestar";
 
 const DIAS = 14;
@@ -21,25 +23,47 @@ function Cara({ n }: { n: number }) {
   );
 }
 
-const W = 300, H = 96, PX = 14, PY = 12;
+const claveDia = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 
-/** Linea de los ultimos dias (eje Y fijo 1-5) con la media punteada. */
+/** Promedio del animo por dia, en los ultimos DIAS dias (el ultimo es hoy). Varios registros del mismo dia se promedian. */
+function porDia(serie: SerieAnimo) {
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const dias = Array.from({ length: DIAS }, (_, k) => { const d = new Date(hoy); d.setDate(hoy.getDate() - (DIAS - 1 - k)); return d; });
+  const acum = new Map<string, number[]>();
+  for (const p of serie.puntos) { const k = claveDia(new Date(p.ts)); acum.set(k, [...(acum.get(k) ?? []), p.valor]); }
+  return dias.map((d) => { const v = acum.get(claveDia(d)); return { fecha: d, n: v?.length ?? 0, valor: v ? v.reduce((a, b) => a + b, 0) / v.length : null }; });
+}
+
+/** Barras por dia (ultimos 14) con ApexCharts: altura = animo promedio (1-5), color = nivel, media punteada y hoy resaltado. */
 function Linea({ serie }: { serie: SerieAnimo }) {
-  const { t } = useTranslation("bienestar");
-  const ahora = Date.now(), ini = ahora - DIAS * 86400000;
-  const x = (ts: string) => PX + ((Math.max(ini, new Date(ts).getTime()) - ini) / (ahora - ini)) * (W - 2 * PX);
-  const y = (v: number) => PY + ((5 - v) / 4) * (H - 2 * PY);
-  const pts = serie.puntos.map((p) => [x(p.ts), y(p.valor)] as const);
-  const d = pts.map(([px, py], i) => `${i ? "L" : "M"}${px.toFixed(1)} ${py.toFixed(1)}`).join(" ");
-  const area = pts.length > 1 ? `${d} L${pts[pts.length - 1][0].toFixed(1)} ${H - PY} L${pts[0][0].toFixed(1)} ${H - PY} Z` : "";
+  const { t, locale } = useTranslation("bienestar");
+  const p = usePaleta();
+  const dias = porDia(serie);
+  const color = (v: number | null) => (v === null ? "transparent" : Math.round(v) <= 1 ? p.rojo : Math.round(v) === 2 ? p.amarillo : Math.round(v) === 3 ? p.smoke : p.verde);
+  const fmt = new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short" });
+  const opciones: ApexOptions = {
+    colors: dias.map((d) => color(d.valor)),
+    plotOptions: { bar: { distributed: true, borderRadius: 6, borderRadiusApplication: "end", columnWidth: "58%" } },
+    xaxis: {
+      categories: dias.map((d) => String(d.fecha.getDate())),
+      axisBorder: { show: false }, axisTicks: { show: false },
+      labels: { rotate: 0, hideOverlappingLabels: false, style: { fontSize: "11px", colors: dias.map((_, k) => (k === DIAS - 1 ? p.ink : p.smoke)) } },
+    },
+    yaxis: { min: 0, max: 5, tickAmount: 5, labels: { formatter: (v) => String(Math.round(v)), style: { fontSize: "11px" } } },
+    annotations: serie.media !== null ? { yaxis: [{ y: serie.media, borderColor: p.ink, strokeDashArray: 4, opacity: 0.55 }] } : {},
+    tooltip: {
+      x: { formatter: (_v, o) => fmt.format(dias[o?.dataPointIndex ?? 0].fecha) },
+      y: { title: { formatter: () => "" }, formatter: (v, o) => `${Number(v).toFixed(1)} / 5${dias[o?.dataPointIndex ?? 0].n > 1 ? ` · ${dias[o?.dataPointIndex ?? 0].n}` : ""}` },
+    },
+    grid: { padding: { left: 4, right: 4, top: 0, bottom: 0 } },
+  };
   return (
-    <svg className="animo-linea" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={serie.media !== null ? t("animo.chart.ariaMedia", { dias: DIAS, media: serie.media }) : t("animo.chart.aria", { dias: DIAS })}>
-      {[1, 3, 5].map((v) => <line key={v} x1={PX} x2={W - PX} y1={y(v)} y2={y(v)} className="animo-guia" />)}
-      {serie.media !== null && <line x1={PX} x2={W - PX} y1={y(serie.media)} y2={y(serie.media)} className="animo-media" />}
-      {area && <path d={area} className="animo-area" />}
-      {pts.length > 1 && <path d={d} className="animo-trazo" />}
-      {pts.map(([px, py], i) => <circle key={i} cx={px} cy={py} r={i === pts.length - 1 ? 4.5 : 3} className={i === pts.length - 1 ? "animo-punto ultimo" : "animo-punto"} />)}
-    </svg>
+    <Grafica
+      className="animo-linea" tipo="bar" altura={168}
+      series={[{ name: "animo", data: dias.map((d) => (d.valor === null ? null : Number(d.valor.toFixed(1)))) }]}
+      opciones={opciones}
+      etiqueta={serie.media !== null ? t("animo.chart.ariaMedia", { dias: DIAS, media: serie.media }) : t("animo.chart.aria", { dias: DIAS })}
+    />
   );
 }
 
@@ -72,6 +96,7 @@ function AnimoDiario({ tripulanteId }: { tripulanteId: string }) {
 
   return (
     <section className="tarjeta pieza animo">
+      <div className="animo-principal">
       <div className="pieza-cab">
         <div>
           <h2>{t("animo.title")}</h2>
@@ -102,6 +127,7 @@ function AnimoDiario({ tripulanteId }: { tripulanteId: string }) {
         </div>
       )}
 
+      </div>
       {serie && serie !== "no" && (
         <div className="animo-historial">
           <div className="animo-meta">

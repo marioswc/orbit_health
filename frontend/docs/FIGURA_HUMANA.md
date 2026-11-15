@@ -11,7 +11,7 @@ Ubicación: `features/monitor/` — `components/FiguraHumana.tsx`, `components/A
 | Traje | `astronauta.svg` | Vectorización con curvas de la ilustración de referencia del equipo. **Licencia por confirmar** (parece de banco de imágenes) |
 | Músculo | `musculos.webp` | Imagen aportada por el equipo; **licencia pendiente** (trae marca de agua), ver `src/features/monitor/assets/ATRIBUCION.md` |
 | Hueso | `esqueleto.webp` | Fotografía aportada por el equipo; **licencia pendiente** (trae marca de agua), ver `src/features/monitor/assets/ATRIBUCION.md` |
-| Órganos | `organos.webp` | Lámina aportada por el equipo (solo la figura central); **licencia pendiente**, ver `src/features/monitor/assets/ATRIBUCION.md` |
+| Órganos | `organos.svg` | Wikimedia Commons, dominio público (LadyofHats) |
 
 Detalle y atribuciones en `assets/ATRIBUCION.md`. Las capas se alinean por el centro de la cabeza (casco) y por los pies (botas). En cada capa activa, la región de la zona elegida se ve a todo color y el resto apagado (`REGIONES` en `ArteAstronauta.tsx`).
 

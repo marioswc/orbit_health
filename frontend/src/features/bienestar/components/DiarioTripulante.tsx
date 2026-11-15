@@ -45,6 +45,22 @@ function etiquetaDia(d: Date, locale: string, t: (k: string) => string): string 
 
 const hora = (f: Date, ts: string, locale: string) => (Number.isNaN(f.getTime()) ? ts.slice(11, 16) : f.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }));
 
+const palabras = (txt: string) => (txt.trim() ? txt.trim().split(/\s+/).length : 0);
+const CLAVE_BORRADOR = (tid: string) => `orbit-diario-borrador-${tid}`;
+
+/** Descarga las notas como texto plano; se genera en el navegador, no sale nada del equipo. */
+function exportar(notas: NotaDiario[], locale: string, sinTitulo: string) {
+  const cuerpo = notas.map((n) => {
+    const f = fecha(n.ts);
+    const cab = Number.isNaN(f.getTime()) ? n.ts : f.toLocaleString(locale, { dateStyle: "full", timeStyle: "short" });
+    return `# ${n.titulo ?? sinTitulo}\n${cab}\n\n${n.contenido}\n`;
+  }).join("\n---\n\n");
+  const url = URL.createObjectURL(new Blob([cuerpo], { type: "text/plain;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url; a.download = `diario-${aClave(new Date())}.txt`; a.click();
+  URL.revokeObjectURL(url);
+}
+
 function DiarioTripulante({ tripulanteId }: { tripulanteId: string }) {
   const { t, locale } = useTranslation("bienestar");
   const [titulo, setTitulo] = useState("");
@@ -57,6 +73,25 @@ function DiarioTripulante({ tripulanteId }: { tripulanteId: string }) {
   const [busqueda, setBusqueda] = useState("");
   const [abierta, setAbierta] = useState<NotaDiario | null>(null);
   const cerrar = useCallback(() => setAbierta(null), []);
+  const [borrador, setBorrador] = useState<"" | "guardado">("");
+  const [copiado, setCopiado] = useState(false);
+
+  // Borrador: se recupera al abrir y se guarda mientras escribes (solo en este navegador; se borra al guardar la nota)
+  useEffect(() => {
+    try {
+      const b = JSON.parse(localStorage.getItem(CLAVE_BORRADOR(tripulanteId)) ?? "null") as { titulo?: string; contenido?: string } | null;
+      setTitulo(b?.titulo ?? ""); setContenido(b?.contenido ?? "");
+    } catch { setTitulo(""); setContenido(""); }
+  }, [tripulanteId]);
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      try {
+        if (titulo || contenido) { localStorage.setItem(CLAVE_BORRADOR(tripulanteId), JSON.stringify({ titulo, contenido })); setBorrador("guardado"); }
+        else { localStorage.removeItem(CLAVE_BORRADOR(tripulanteId)); setBorrador(""); }
+      } catch { /* sin almacenamiento: el borrador solo vive en pantalla */ }
+    }, 600);
+    return () => window.clearTimeout(id);
+  }, [titulo, contenido, tripulanteId]);
 
   const cargar = useCallback(
     () => api<NotaDiario[]>(`/diario/${tripulanteId}`).then((n) => { setNotas(n); setFalloCarga(false); }).catch(() => { setNotas((p) => p ?? []); setFalloCarga(true); }),
@@ -64,12 +99,18 @@ function DiarioTripulante({ tripulanteId }: { tripulanteId: string }) {
   );
   useEffect(() => { setNotas(null); setAbierta(null); cargar(); }, [cargar]);
 
+  function descartar() {
+    setTitulo(""); setContenido(""); setMsg(null);
+    try { localStorage.removeItem(CLAVE_BORRADOR(tripulanteId)); } catch { /* nada */ }
+  }
+
   async function guardar(e: FormEvent) {
     e.preventDefault();
     if (!contenido.trim()) return setMsg({ ok: false, texto: t("diario.writeFirst") });
     try {
       await post("/diario", { tripulante_id: tripulanteId, titulo: titulo || null, contenido });
       setContenido(""); setTitulo("");
+      try { localStorage.removeItem(CLAVE_BORRADOR(tripulanteId)); } catch { /* nada */ }
       setMsg({ ok: true, texto: t("diario.saved") });
       cargar();
     } catch (err) { setMsg({ ok: false, texto: (err as Error).message }); }
@@ -108,6 +149,12 @@ function DiarioTripulante({ tripulanteId }: { tripulanteId: string }) {
   }, [notas, periodo, mes, busqueda, locale, t]);
   const visibles = grupos.reduce((s, g) => s + g.notas.length, 0);
   const total = notas?.length ?? 0;
+  const lista = useMemo(() => grupos.flatMap((g) => g.notas), [grupos]);
+  const posicion = abierta ? lista.findIndex((n) => n.id === abierta.id) : -1;
+  async function copiar() {
+    if (!abierta) return;
+    try { await navigator.clipboard.writeText(`${abierta.titulo ?? ""}\n\n${abierta.contenido}`.trim()); setCopiado(true); window.setTimeout(() => setCopiado(false), 1600); } catch { /* sin portapapeles */ }
+  }
 
   const fAbierta = abierta ? fecha(abierta.ts) : null;
 
@@ -121,14 +168,22 @@ function DiarioTripulante({ tripulanteId }: { tripulanteId: string }) {
         {total > 0 && <span className="conteo-notas">{t("diario.notes", { count: total })}</span>}
       </div>
 
-      <form onSubmit={guardar} className="redactor">
-        <label className="sr-only" htmlFor="diario-titulo">{t("diario.titleLabel")}</label>
-        <input id="diario-titulo" className="redactor-titulo" value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder={t("diario.titleLabel")} maxLength={120} />
+      <form onSubmit={guardar} className="redactor correo">
+        <div className="correo-cab">
+          <strong>{t("diario.compose")}</strong>
+          {borrador && <span className="correo-borrador">{t("diario.draft")}</span>}
+        </div>
+        <div className="correo-fila">
+          <label className="correo-etiqueta" htmlFor="diario-titulo">{t("diario.subject")}</label>
+          <input id="diario-titulo" className="redactor-titulo" value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder={t("diario.titleLabel")} maxLength={120} />
+        </div>
         <label className="sr-only" htmlFor="diario-texto">{t("diario.noteLabel")}</label>
-        <textarea id="diario-texto" className="redactor-texto" value={contenido} onChange={(e) => setContenido(e.target.value)} placeholder={t("diario.notePlaceholder")} />
-        <div className="redactor-pie">
-          <span className="redactor-cuenta">{contenido.trim() ? t("diario.chars", { count: contenido.trim().length }) : t("diario.onlyYou")}</span>
-          <button type="submit" className="btn-primario" disabled={!contenido.trim()}>{t("diario.save")}</button>
+        <textarea id="diario-texto" className="redactor-texto" value={contenido} onChange={(e) => setContenido(e.target.value)} placeholder={t("diario.notePlaceholder")}
+          onKeyDown={(e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); e.currentTarget.form?.requestSubmit(); } }} />
+        <div className="correo-pie">
+          <button type="submit" className="btn-primario" disabled={!contenido.trim()} title={t("diario.shortcut")}>{t("diario.save")}</button>
+          <button type="button" className="ghost" onClick={descartar} disabled={!titulo && !contenido}>{t("diario.discard")}</button>
+          <span className="redactor-cuenta">{contenido.trim() ? `${t("diario.words", { count: palabras(contenido) })} · ${t("diario.read", { min: Math.max(1, Math.round(palabras(contenido) / 200)) })}` : t("diario.onlyYou")}</span>
         </div>
       </form>
       {msg && <Alerta tono={msg.ok ? "ok" : "error"}>{msg.texto}</Alerta>}
@@ -148,6 +203,15 @@ function DiarioTripulante({ tripulanteId }: { tripulanteId: string }) {
         )}
       </div>
       <Segmentado etiqueta={t("diario.period")} opciones={PERIODOS.map((p) => ({ valor: p, etiqueta: t(`diario.period.${p}`) }))} valor={periodo} alCambiar={(v) => { setPeriodo(v as Periodo); setMes(""); }} />
+
+      {total > 0 && (
+        <div className="diario-acciones">
+          <button type="button" className="ghost" onClick={() => exportar(lista, locale, t("diario.untitled"))} disabled={lista.length === 0}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14" /></svg>
+            {t("diario.export", { count: lista.length })}
+          </button>
+        </div>
+      )}
 
       {filtrando && notas && total > 0 && (
         <p className="notas-resumen" role="status">
@@ -191,7 +255,13 @@ function DiarioTripulante({ tripulanteId }: { tripulanteId: string }) {
             <p className="nota-lectura-fecha">
               {Number.isNaN(fAbierta.getTime()) ? abierta.ts : `${fAbierta.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · ${hora(fAbierta, abierta.ts, locale)}`}
             </p>
+            <p className="nota-lectura-meta">{t("diario.words", { count: palabras(abierta.contenido) })} · {t("diario.read", { min: Math.max(1, Math.round(palabras(abierta.contenido) / 200)) })}</p>
             <p className="nota-lectura-texto">{abierta.contenido}</p>
+            <div className="nota-lectura-nav">
+              <button type="button" onClick={() => setAbierta(lista[posicion + 1])} disabled={posicion < 0 || posicion >= lista.length - 1}>‹ {t("diario.older")}</button>
+              <button type="button" className="ghost" onClick={copiar}>{copiado ? t("diario.copied") : t("diario.copy")}</button>
+              <button type="button" onClick={() => setAbierta(lista[posicion - 1])} disabled={posicion <= 0}>{t("diario.newer")} ›</button>
+            </div>
             <p className="nota-lectura-privada">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="3" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
               {t("diario.private")}

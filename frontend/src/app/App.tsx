@@ -91,10 +91,9 @@ export default function App() {
       <CambioIdioma />
       <Bienvenida />
       <div className="app">
-      <BarraLateral vista={vista} alCambiarVista={setVista} aviso={aviso} alSalir={auth.actor ? auth.logout : null} />
+      <BarraLateral vista={vista} alCambiarVista={setVista} aviso={aviso} />
       <div className="app-col">
       <BarraSuperior
-        titulo={VISTAS.some((v) => v.id === vista) ? t(`nav.${vista}`) : undefined}
         tema={tema} alAlternarTema={alternar}
         selector={!auth.actor ? <SelectorTripulante tripulantes={tripulantes} valor={tid} alCambiar={setTid} /> : undefined}
         perfil={auth.actor ? (
