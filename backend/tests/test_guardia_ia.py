@@ -228,7 +228,7 @@ def test_precalentar_la_voz_no_falla_si_esta_apagada(monkeypatch):
 def test_la_voz_manda_las_reglas_como_system_y_los_datos_como_prompt(monkeypatch):
     vistos = []
     monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "")
-    monkeypatch.setattr(explicador_local, "consultar_modelo", lambda p, system=None: vistos.append((p, system)) or None)
+    monkeypatch.setattr(explicador_local, "consultar_modelo", lambda p, system=None, **kw: vistos.append((p, system)) or None)
     voz_local.responder("hola", ESTADO, {"tono": "directo"}, nombre="Ana", idioma="en")
     prompt, system = vistos[0]
     assert system.startswith(voz_local.SISTEMA_BASE) and "inglés" in system and "Ana" in system     # lo fijo va primero

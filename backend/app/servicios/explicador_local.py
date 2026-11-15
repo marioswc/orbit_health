@@ -199,22 +199,32 @@ def _consultar_deepseek(prompt: str, system: str | None = None) -> str | None:
         return None
 
 
-def consultar_modelo(prompt: str, system: str | None = None) -> str | None:
-    """Consulta el proveedor configurado y registra qué fuente respondió."""
+def datos_personales_permitidos() -> bool:
+    """True solo si la consulta puede ir a un modelo LOCAL: hay uno configurado y el proveedor no es solo la nube. Perfil,
+    rasgos y conversación nunca se incluyen en lo que sale a un proveedor externo."""
+    url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
+    local_listo = bool(url and modelo and _url_local(url))
+    return local_listo and (config.IA_PROVEEDOR == "local" or _modo_automatico() or not config.DEEPSEEK_API_KEY)
+
+
+def consultar_modelo(prompt: str, system: str | None = None, externo: tuple[str, str | None] | None = None) -> str | None:
+    """Consulta el proveedor configurado y registra qué fuente respondió. `externo` es la versión (prompt, system) SIN datos
+    personales que se usa si la consulta sale a un proveedor externo (nube directa o respaldo del modelo local)."""
     _ULTIMA_FUENTE.set(None)
+    p_ext, s_ext = externo if externo else (prompt, system)
     if _modo_automatico():
         texto = _consultar_local(prompt, system)
         if texto is not None:
             _ULTIMA_FUENTE.set("modelo_local")
             return texto
         if config.DEEPSEEK_API_KEY:
-            texto = _consultar_deepseek(prompt, system)
+            texto = _consultar_deepseek(p_ext, s_ext)
             if texto is not None:
                 _ULTIMA_FUENTE.set("deepseek")
             return texto
         return None
     if _usar_deepseek():
-        texto = _consultar_deepseek(prompt, system)
+        texto = _consultar_deepseek(p_ext, s_ext)
         if texto is not None:
             _ULTIMA_FUENTE.set("deepseek")
         return texto
