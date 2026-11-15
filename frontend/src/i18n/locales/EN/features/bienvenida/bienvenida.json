@@ -16,5 +16,10 @@
   "p4.titulo": "Your link with Earth",
   "p4.texto": "If communication drops, nothing is lost: notices wait on board and, when the link returns, the urgent ones go first. You can follow it live in the Link tab.",
   "p5.titulo": "What you should know",
-  "p5.texto": "In this demo the crew and the readings are simulated and are labelled \"Simulated\". The thresholds have not yet been validated by a health professional: this is a prototype and does not replace a doctor."
+  "p5.texto": "In this demo the crew and the readings are simulated and are labelled \"Simulated\". The thresholds have not yet been validated by a health professional: this is a prototype and does not replace a doctor.",
+  "instalar.texto": "Install ORBIT on this device to open it like an app, even offline.",
+  "instalar.boton": "Install",
+  "instalar.luego": "Not now",
+  "actualizar.texto": "A new version of ORBIT is available.",
+  "actualizar.boton": "Update"
 }

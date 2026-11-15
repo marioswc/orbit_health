@@ -16,5 +16,10 @@
   "p4.titulo": "Tu enlace con la Tierra",
   "p4.texto": "Si se pierde la comunicación, nada se pierde: los avisos esperan a bordo y, al volver el enlace, sale primero lo urgente. En la pestaña Enlace lo ves en tiempo real.",
   "p5.titulo": "Lo que debes saber",
-  "p5.texto": "En esta demostración la tripulación y las lecturas son simuladas y lo dicen con la etiqueta «Simulado». Los umbrales aún no los ha validado un profesional de la salud: es un prototipo y no sustituye a un médico."
+  "p5.texto": "En esta demostración la tripulación y las lecturas son simuladas y lo dicen con la etiqueta «Simulado». Los umbrales aún no los ha validado un profesional de la salud: es un prototipo y no sustituye a un médico.",
+  "instalar.texto": "Instala ORBIT en este equipo para abrirlo como una app, incluso sin internet.",
+  "instalar.boton": "Instalar",
+  "instalar.luego": "Ahora no",
+  "actualizar.texto": "Hay una versión nueva de ORBIT.",
+  "actualizar.boton": "Actualizar"
 }
