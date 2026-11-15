@@ -37,11 +37,11 @@ Los valores numéricos viven en `backend/app/datos/umbrales.json`. Para aplicar 
 
 ## 3. Salud mental: puntos que requieren decisión humana
 
-El diseño actual protege la privacidad del tripulante: el diario, el PHQ-2 y el ánimo nunca salen de su espacio personal ni de la nave. La única vía hacia otra persona es un aviso que el propio tripulante decide enviar al médico o al comandante, con consentimiento explícito y revocable. Eso es deliberado, pero deja decisiones que no debemos tomar nosotros.
+El diseño actual protege la privacidad del tripulante: el diario, el PHQ-2 y el ánimo nunca salen de su espacio personal ni de la nave. La única vía hacia otra persona es un aviso que el propio tripulante decide enviar al comandante, con consentimiento explícito y revocable. Eso es deliberado, pero deja decisiones que no debemos tomar nosotros.
 
 | Tema | Situación actual | Riesgo | Opciones |
 |---|---|---|---|
-| PHQ-2 positivo (≥3) | Ofrece cápsulas y permite, solo con consentimiento explícito (`POST /api/crisis/aviso-medico`), avisar al médico de a bordo (revocable por el propio tripulante) | Un tamizaje positivo requiere seguimiento; en confinamiento no hay derivación externa | Implementada la opción B (consentimiento explícito y revocable), pendiente de validación por salud mental |
+| PHQ-2 positivo (≥3) | Ofrece cápsulas y permite, solo con consentimiento explícito (`POST /api/crisis/aviso-medico`), avisar al comandante (revocable por el propio tripulante) | Un tamizaje positivo requiere seguimiento; en confinamiento no hay derivación externa | Implementada la opción B (consentimiento explícito y revocable), pendiente de validación por salud mental |
 | Riesgo de autolesión o crisis aguda + calidad de O₂ (`o2_cabina` / `calidad_oxigeno`) | Protocolo procedimental de crisis (`GET /api/crisis/protocolo` y `POST /api/tamizajes`) que cruza síntomas agudos con la calidad de oxígeno en cabina (hipoxia/hiperoxia ambiental) y da pasos de acompañamiento y entorno seguro | Los pasos y umbrales de O₂ (19.5–23.0 % nominal) son supuestos procedimentales de diseño | Revisar y firmar el protocolo con especialistas en salud mental y medicina aeroespacial antes de uso real |
 | Validez del instrumento | PHQ-2 validado en población terrestre | Su desempeño en misiones prolongadas no está respaldado por este proyecto | Verificar la literatura; declararlo como tamizaje, no diagnóstico |
 | Diario | Texto libre, sin cifrar. La autenticación por tripulante existe pero viene apagada por defecto | Con la autenticación apagada, cualquiera con acceso al equipo puede leerlo | Activar la autenticación y cifrar en reposo |

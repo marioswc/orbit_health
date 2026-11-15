@@ -78,7 +78,7 @@ La lista completa y siempre actual está en [docs/API_REFERENCIA.md](docs/API_RE
 | `GET /api/explicaciones/{clave}` | Ahora trae `medidas_nasa` y `senales_a_vigilar` con cita textual y enlace |
 | `GET /api/tierra/mensajes` | Vista del centro de control: solo lo que ya llegó, lo urgente primero. Solo lectura, no consume mensajes |
 | `GET /api/informe` y `/api/informe/{id}` | Informe exportable (JSON o CSV) con huella de integridad |
-| `GET /api/crisis/protocolo`, `POST /api/crisis/aviso-medico` | Protocolo de crisis psicológica / riesgo de autolesión con evaluación de calidad de oxígeno en cabina (`o2_cabina`) y aviso al médico solo con consentimiento explícito |
+| `GET /api/crisis/protocolo`, `POST /api/crisis/aviso-medico` | Protocolo de crisis psicológica / riesgo de autolesión con evaluación de calidad de oxígeno en cabina (`o2_cabina`) y aviso al comandante solo con consentimiento explícito |
 
 ## Misión simulada en vivo (para la demo)
 

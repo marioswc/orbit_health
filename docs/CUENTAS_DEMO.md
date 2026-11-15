@@ -9,8 +9,8 @@ ORBIT_AUTH=1 ./run.sh            # arranca pidiendo PIN
 
 | Tripulante | Rol | PIN | Qué puede hacer |
 |---|---|---|---|
-| T1 | Comandante | `111111` | Ver y capturar; reiniciar el PIN de otros |
-| T2 | Médico | `222222` | Ver y capturar; reiniciar el PIN de otros |
+| T1 | Comandante | `111111` | Ver y capturar; reiniciar el PIN de otros, cambiar el enlace, ver auditoría y avisos |
+| T2 | Tripulante | `222222` | Ver y capturar lo suyo |
 | T3 | Tripulante | `333333` | Ver y capturar lo suyo |
 | T4 | Tripulante | `444444` | Ver y capturar lo suyo |
 
