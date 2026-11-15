@@ -23,11 +23,12 @@
 
 /* Control segmentado */
 .segmentado { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 4px; border-radius: 22px; background: var(--color-eggshell); border: 1px solid var(--color-stone); max-width: 100%; }
-.segmentado button { min-height: 38px; border-color: transparent; background: transparent; border-radius: 18px; padding: var(--spacing-8) var(--spacing-16); font-weight: 500; color: var(--color-graphite); }
+.segmentado button { min-height: 38px; border-color: transparent; background: transparent; border-radius: 18px; padding: var(--spacing-8) clamp(10px, 1.6vw, 16px); font-weight: 500; color: var(--color-graphite); }
 .segmentado button:hover { border-color: transparent; color: var(--color-ink); background: color-mix(in srgb, var(--color-ink) 6%, transparent); }
 .segmentado button[aria-checked="true"] { background: var(--color-ink); color: var(--color-eggshell); }
 .segmentado.rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; gap: var(--spacing-8); padding: 0; background: none; border: 0; }
-.segmentado.rejilla button { text-align: center; border: 1px solid var(--color-border-button); background: var(--color-eggshell); border-radius: 18px; min-height: 46px; }
+.segmentado:not(.rejilla) button { white-space: nowrap; }
+.segmentado.rejilla button { text-align: center; white-space: normal; overflow-wrap: anywhere; line-height: 1.25; border: 1px solid var(--color-border-button); background: var(--color-eggshell); border-radius: 18px; min-height: 46px; }
 .segmentado.rejilla button:hover { border-color: var(--color-ink); }
 .segmentado.rejilla button[aria-checked="true"], .segmentado.rejilla button[aria-checked="true"]:hover { background: var(--color-ink); color: var(--color-eggshell); border-color: var(--color-ink); }
 

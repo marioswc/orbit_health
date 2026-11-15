@@ -11,8 +11,8 @@ const DETALLES = ["breve", "completo"];
 const RECORDATORIOS = ["minimo", "normal", "frecuente"];
 
 /** Preferencias del asistente (GET/PUT /api/preferencias/{id}); se guardan al elegir y solo las ve su dueño. */
-function AsistentePreferencias({ tripulanteId }: { tripulanteId: string }) {
-  const { t } = useTranslation("bienestar");
+function PreferenciasAsistente({ tripulanteId }: { tripulanteId: string }) {
+  const { t } = useTranslation("asistente");
   const [p, setP] = useState<Prefs>(POR_DEFECTO);
   const opts = (campo: string, vals: string[]) => vals.map((v) => ({ valor: v, etiqueta: t(`prefs.${campo}.${v}`) }));
   const [msg, setMsg] = useState<{ ok: boolean; texto: string } | null>(null);
@@ -40,4 +40,4 @@ function AsistentePreferencias({ tripulanteId }: { tripulanteId: string }) {
   );
 }
 
-export default memo(AsistentePreferencias);
+export default memo(PreferenciasAsistente);

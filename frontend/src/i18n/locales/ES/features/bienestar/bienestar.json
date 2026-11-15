@@ -3,7 +3,6 @@
   "page.title": "Bienestar",
   "page.desc": "Ánimo, diario y tamizaje privados. Nada de esto se envía a la cola hacia la Tierra.",
   "page.private": "Privado · solo en este equipo",
-
   "animo.title": "¿Cómo te sientes hoy?",
   "animo.hint": "Un toque basta. Se guarda solo en este equipo.",
   "animo.group": "Ánimo de hoy, de 1 a 5",
@@ -25,7 +24,6 @@
   "animo.lastDays": "Últimos {{dias}} días",
   "animo.mean": "Media",
   "animo.empty": "Aún no hay registros. El primero aparecerá aquí.",
-
   "diario.title": "Diario personal",
   "diario.hint": "Almacenamiento local seguro, desconectado de la telemetría externa.",
   "diario.notes_one": "{{count}} nota",
@@ -59,7 +57,6 @@
   "diario.yesterday": "Ayer",
   "diario.untitled": "Nota sin título",
   "diario.private": "Privada · solo en este equipo",
-
   "avisos.aria": "Avisos compartidos con el médico",
   "avisos.title": "Avisos compartidos",
   "avisos.hint": "Solo el médico de a bordo los ve, y solo mientras no retires tu consentimiento. Nunca salen hacia la Tierra.",
@@ -69,21 +66,6 @@
   "avisos.tipo.crisis": "Apoyo en crisis",
   "avisos.tipo.tamizaje_positivo": "Tamizaje positivo",
   "avisos.withdraw": "Retirar consentimiento",
-
-  "prefs.title": "Tu asistente",
-  "prefs.hint": "Elige cómo quieres que te hable. Solo se guarda lo que eliges.",
-  "prefs.tone": "Tono",
-  "prefs.tone.directo": "Directo",
-  "prefs.tone.calido": "Cálido",
-  "prefs.detail": "Detalle",
-  "prefs.detail.breve": "Breve",
-  "prefs.detail.completo": "Completo",
-  "prefs.reminders": "Recordatorios",
-  "prefs.reminders.minimo": "Mínimos",
-  "prefs.reminders.normal": "Normales",
-  "prefs.reminders.frecuente": "Frecuentes",
-  "prefs.saved": "Guardado. Las recomendaciones usarán este estilo.",
-
   "tamizaje.title": "Tamizaje de ánimo (PHQ-2) y protocolo de crisis",
   "tamizaje.hint": "Últimas dos semanas. Resultado privado: no se transmite. Es un tamizaje, no un diagnóstico.",
   "tamizaje.crisisProtocol": "Protocolo de crisis",

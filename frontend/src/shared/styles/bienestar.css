@@ -100,7 +100,7 @@
 .rango.fuera .rango-txt { color: var(--estado-rojo); font-weight: 500; }
 .captura-enviar { width: 100%; min-height: 60px; margin-top: auto; font-size: var(--text-body-lg); }
 
-@media (max-width: 1000px) { .bienestar-rejilla { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1180px) { .bienestar-rejilla { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 520px) { .animo-caras { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--spacing-4); } .cara span { font-size: 10px; } .nota { grid-template-columns: minmax(0, 1fr); gap: var(--spacing-4); } .nota-hora { text-align: left; padding-top: 0; } }
 @media (prefers-reduced-motion: reduce) { .cara, .cara svg, .rango-marca { transition: none; } }
 
@@ -108,4 +108,7 @@
 .btn-secundario { display: inline-flex; align-items: center; justify-content: center; min-height: var(--control-alto, 40px); padding: 0 var(--spacing-20); white-space: nowrap; background: transparent; border: 1px solid var(--color-border-button); color: var(--color-ink); font-weight: 500; }
 .btn-secundario:hover { border-color: var(--color-ink); background: color-mix(in srgb, var(--color-ink) 6%, transparent); }
 .pieza-cab > button { flex: none; }
-@media (max-width: 520px) { .pieza-cab { flex-wrap: wrap; } }
+/* Encabezado de tarjeta: el titulo cede espacio y el control baja debajo cuando no cabe (nunca se parte en filas) */
+.pieza-cab { flex-wrap: wrap; }
+.pieza-cab > div:first-child { flex: 1 1 260px; min-width: 0; }
+.pieza-cab > .segmentado, .pieza-cab > .selector { flex: none; }

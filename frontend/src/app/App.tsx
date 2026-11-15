@@ -18,6 +18,8 @@ import AsistenteFlotante from "./AsistenteFlotante";
 const BienestarPage = lazy(() => import("../features/bienestar").then((m) => ({ default: m.BienestarPage })));
 const HistorialPage = lazy(() => import("../features/historial").then((m) => ({ default: m.HistorialPage })));
 const SistemaPage = lazy(() => import("../features/sistema").then((m) => ({ default: m.SistemaPage })));
+const BurbujaVoz = lazy(() => import("../features/voz").then((m) => ({ default: m.BurbujaVoz })));
+const AsistentePage = lazy(() => import("../features/asistente").then((m) => ({ default: m.AsistentePage })));
 const BandaPage = lazy(() => import("../features/banda").then((m) => ({ default: m.BandaPage })));
 const RiesgosPage = lazy(() => import("../features/peligros").then((m) => ({ default: m.RiesgosPage })));
 const EnlacePage = lazy(() => import("../features/enlace").then((m) => ({ default: m.EnlacePage })));
@@ -43,7 +45,7 @@ export default function App() {
     estado?.indicadores.find((i) => i.indicador === "dosis_pct") ?? null,
   );
   // Direccion del cambio de vista: el contenido entra desde el lado hacia el que se movio la pestana
-  const orden = ["monitor", "banda", "historial", "bienestar", "riesgos", "enlace", "sistema"];
+  const orden = ["monitor", "banda", "historial", "bienestar", "asistente", "riesgos", "enlace", "sistema"];
   const previa = useRef(orden.indexOf(vista));
   const dx = orden.indexOf(vista) >= previa.current ? 32 : -32;
   useEffect(() => { previa.current = orden.indexOf(vista); });
@@ -55,6 +57,7 @@ export default function App() {
   return (
     <>
       <FondoEstrellas />
+      {tid && !auth.requiereAcceso && <Suspense fallback={null}><BurbujaVoz tripulanteId={tid} /></Suspense>}
       <CambioIdioma />
       <div className="app">
       <BarraLateral vista={vista} alCambiarVista={setVista} aviso={aviso} />
@@ -98,6 +101,7 @@ export default function App() {
           )}
           <Suspense fallback={<span className="esqueleto" style={{ height: 120 }} aria-busy="true" />}>
             {tid && vista === "bienestar" && <BienestarPage tripulanteId={tid} />}
+            {tid && vista === "asistente" && <AsistentePage tripulanteId={tid} />}
             {tid && vista === "banda" && <BandaPage tripulanteId={tid} estado={estado} refrescar={refrescar} />}
             {tid && vista === "historial" && <HistorialPage tripulanteId={tid} estado={estado} />}
             {vista === "riesgos" && <RiesgosPage />}

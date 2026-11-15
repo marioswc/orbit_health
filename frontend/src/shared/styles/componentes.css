@@ -43,6 +43,6 @@
 @keyframes opcion { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 @keyframes marcar { from { opacity: 0; transform: scale(.4) rotate(-20deg); } to { opacity: 1; transform: none; } }
 /* En la barra el menu cuelga del boton con su mismo ancho (se lee como una sola pieza, no partida) */
-.barra .selector-lista { left: 0; right: 0; min-width: 100%; max-width: none; top: calc(100% + 4px); border-radius: 18px; padding: 4px; }
-.barra .selector-lista li { padding-block: 7px; }
+.barra .selector-lista { left: auto; right: 0; width: max-content; min-width: 100%; max-width: min(420px, calc(100vw - 24px)); top: calc(100% + 4px); border-radius: 18px; padding: 4px; }
+.barra .selector-lista li { padding-block: 7px; white-space: nowrap; }
 .barra .selector-boton[aria-expanded="true"] { border-color: var(--color-ink); }
