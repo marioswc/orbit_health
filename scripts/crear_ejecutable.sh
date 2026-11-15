@@ -24,6 +24,11 @@ if [ "${ORBIT_SIN_IA:-0}" != "1" ]; then
          --extra-index-url "https://abetlen.github.io/llama-cpp-python/whl/$INDICE_IA"; then IA=1; EXTRA_IA=(--collect-all llama_cpp); break; fi
     echo "  (intento $intento de instalar el motor de IA falló)"; sleep 5
   done
+  if [ "$IA" != 1 ]; then          # la última versión puede traer una rueda dañada en algún sistema: se prueba con la anterior
+    echo "  (probando una versión anterior del motor de IA)"
+    if "$PY" -m pip install -q --no-cache-dir "llama-cpp-python<$(echo "${ULTIMA_IA:-0.3.36}")" --only-binary=:all: \
+         --extra-index-url "https://abetlen.github.io/llama-cpp-python/whl/$INDICE_IA"; then IA=1; EXTRA_IA=(--collect-all llama_cpp); fi
+  fi
 fi
 [ "$IA" = 1 ] || echo "  (sin motor de IA incrustado en este ejecutable)"
 
