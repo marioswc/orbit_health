@@ -21,6 +21,9 @@ from ..dominio import crisis, guardia_ia
 from . import explicador_local
 
 
+IDIOMAS = ("es", "en")
+
+
 class VozNoDisponible(RuntimeError):
     """La capacidad de voz no está instalada o configurada."""
 
@@ -80,6 +83,12 @@ def _decodificar_audio(ruta: str):
 
 
 def transcribir(audio: bytes, extension: str = ".wav") -> str:
+    """Transcribe en español (compatibilidad). Para elegir o detectar el idioma, usa transcribir_con_idioma."""
+    return transcribir_con_idioma(audio, extension, "es")[0]
+
+
+def transcribir_con_idioma(audio: bytes, extension: str = ".wav", idioma: str | None = None) -> tuple[str, str]:
+    """Transcribe y devuelve (texto, idioma). Con idioma=None se detecta solo, entre español e inglés."""
     if not config.VOZ_ACTIVA:
         raise VozNoDisponible("La voz local está desactivada")
     if not audio or len(audio) > config.VOZ_MAX_AUDIO_BYTES:
@@ -89,11 +98,13 @@ def transcribir(audio: bytes, extension: str = ".wav") -> str:
         archivo.write(audio)
         ruta = archivo.name
     try:
-        segmentos, _ = _modelo_stt().transcribe(_decodificar_audio(ruta), language="es", vad_filter=True, beam_size=1)
+        segmentos, info = _modelo_stt().transcribe(_decodificar_audio(ruta), language=idioma if idioma in IDIOMAS else None,
+                                                   vad_filter=True, beam_size=1)
         texto = " ".join(s.text.strip() for s in segmentos if s.text.strip()).strip()
         if not texto:
             raise ValueError("No se pudo reconocer voz")
-        return texto[:2000]
+        detectado = idioma if idioma in IDIOMAS else getattr(info, "language", "es")
+        return texto[:2000], detectado if detectado in IDIOMAS else "es"
     finally:
         Path(ruta).unlink(missing_ok=True)
 
@@ -114,10 +125,17 @@ def _contexto_voz(estado: dict) -> dict:
     }
 
 
-def _toque_personal(nombre: str, perfil: str, tono: str) -> str:
+def _toque_personal(nombre: str, perfil: str, tono: str, idioma: str = "es") -> str:
     """Frase de trato personal armada con plantillas (sin modelo): garantiza que el asistente se dirija a la persona por su
     nombre y recuerde lo que ella contó, aunque el modelo no esté disponible o su respuesta se descarte."""
     partes = []
+    if idioma == "en":
+        if nombre:
+            partes.append(f"{nombre}, I'm here with you." if tono == "calido" else f"{nombre}.")
+        if perfil:
+            partes.append(f"I know you like: {perfil}. If you feel like it, spend a little time on it; it helps you unwind."
+                          if tono == "calido" else f"Remember your interests ({perfil}): use them to clear your head for a while.")
+        return " ".join(partes)
     if nombre:
         partes.append(f"{nombre}, aquí estoy contigo." if tono == "calido" else f"{nombre}.")
     if perfil:
@@ -126,15 +144,23 @@ def _toque_personal(nombre: str, perfil: str, tono: str) -> str:
     return " ".join(partes)
 
 
-def responder(texto: str, estado: dict, preferencias: dict, perfil: str = "", nombre: str = "") -> dict:
+def _fallback_en(estado: dict) -> str:
+    niveles = {"verde": "green", "amarillo": "yellow", "rojo": "red"}
+    nivel = niveles.get(estado.get("nivel_general", "verde"), "green")
+    return (f"The overall status is {nivel}, according to the system's rules. This is not a diagnosis and it does not change "
+            "the alert; follow the procedures shown.")
+
+
+def responder(texto: str, estado: dict, preferencias: dict, perfil: str = "", nombre: str = "", idioma: str = "es") -> dict:
     """Responde usando el LLM local, sin permitirle producir decisiones clínicas.
 
     Una frase de crisis NUNCA llega al modelo: se responde siempre con el protocolo escrito. La respuesta del modelo
     se valida; si no pasa, se usa el texto determinista.
     """
     if guardia_ia.detectar_crisis(texto):
-        protocolo = crisis.protocolo_crisis("crisis", preferencias.get("tono", "directo"))
-        return {"fuente": "protocolo_crisis", "generado_por_ia": False, "protocolo": protocolo,
+        tono = preferencias.get("tono", "directo")
+        protocolo = crisis.protocolo_crisis("crisis", tono) if idioma != "en" else crisis.protocolo_crisis_voz("en", tono)
+        return {"fuente": "protocolo_crisis", "generado_por_ia": False, "protocolo": protocolo, "idioma": idioma,
                 "texto": " ".join([protocolo["titulo"] + "."] + protocolo["pasos"])}
     contexto = _contexto_voz(estado)
     nivel_actual = contexto.get("nivel_general") or "verde"
@@ -146,7 +172,8 @@ def responder(texto: str, estado: dict, preferencias: dict, perfil: str = "", no
         "en texto plano (sin asteriscos ni markdown, porque se leerá en voz alta) y en máximo 80 palabras. "
         "Si saluda, bromea o habla de un tema general, contéstale con naturalidad y comenta brevemente cómo va su estado; "
         "si pregunta por su salud o síntomas, apóyate en «Estado» y recuerda que las acciones del sistema tienen prioridad. "
-        "REGLAS ESTRICTAS DE VALIDACIÓN (si las incumples, tu respuesta será descartada automáticamente):\n"
+        + ("IDIOMA: responde SIEMPRE en inglés claro y natural (la pregunta está en inglés). " if idioma == "en" else "")
+        + "REGLAS ESTRICTAS DE VALIDACIÓN (si las incumples, tu respuesta será descartada automáticamente):\n"
         "1. NO escribas ningún dígito (0-9) salvo los que ya aparecen exactamente en «Estado» o «Pregunta» (escribe cantidades con palabras: uno, dos, seis).\n"
         "2. PROHIBIDO escribir las palabras: medicamento, fármaco, dosis, pastilla, tableta, inyección, receta, antibiótico, analgésico, ibuprofeno, paracetamol o aspirina (ni siquiera para decir que no los recetas).\n"
         f"3. El único color de alerta que puedes mencionar es «{nivel_actual}»; no menciones los otros colores del semáforo.\n"
@@ -159,11 +186,14 @@ def responder(texto: str, estado: dict, preferencias: dict, perfil: str = "", no
         f"Pregunta: {json.dumps(texto, ensure_ascii=False)}"
     )
     respuesta = explicador_local.consultar_modelo(prompt)
-    toque = _toque_personal(nombre, perfil, preferencias.get("tono", "directo"))
+    toque = _toque_personal(nombre, perfil, preferencias.get("tono", "directo"), idioma)
     fallback = {
         "fuente": "reglas_locales", "generado_por_ia": False,
         # Sin modelo no se puede conversar, pero sí explicar el estado ya calculado con el texto determinista.
-        "texto": (f"{toque} " if toque else "") + f"Recibí: «{texto}». {explicador_local._fallback(estado)} "
+        "idioma": idioma,
+        "texto": ((f"{toque} " if toque else "") + f"I got: «{texto}». {_fallback_en(estado)} "
+                  "To chat freely the local conversation model is needed.") if idioma == "en"
+        else (f"{toque} " if toque else "") + f"Recibí: «{texto}». {explicador_local._fallback(estado)} "
                   "Para conversar con libertad hace falta el modelo de conversación local.",
     }
     if respuesta is None:
@@ -174,18 +204,19 @@ def responder(texto: str, estado: dict, preferencias: dict, perfil: str = "", no
         explicador_local.log.warning("Respuesta de voz descartada: %s", motivo)
         return {**fallback, "descartado_por": motivo}
     fuente = "deepseek" if explicador_local._usar_deepseek() else "modelo_local"
-    return {"fuente": fuente, "generado_por_ia": True, "aviso": explicador_local.aviso_para(fuente), "texto": respuesta}
+    return {"fuente": fuente, "generado_por_ia": True, "idioma": idioma, "aviso": explicador_local.aviso_para(fuente), "texto": respuesta}
 
 
-def sintetizar(texto: str) -> str:
+def sintetizar(texto: str, idioma: str = "es") -> str:
     """Devuelve audio WAV codificado, sin guardar el resultado permanentemente."""
-    if not config.VOZ_PIPER_MODELO:
+    modelo = config.VOZ_PIPER_MODELO_EN if idioma == "en" and config.VOZ_PIPER_MODELO_EN else config.VOZ_PIPER_MODELO
+    if not modelo:
         raise VozNoDisponible("Configura ORBIT_VOZ_PIPER_MODELO")
     with tempfile.TemporaryDirectory() as directorio:
         salida = os.path.join(directorio, "respuesta.wav")
         try:
             subprocess.run(
-                [config.VOZ_PIPER_BIN, "--model", config.VOZ_PIPER_MODELO, "--output_file", salida],
+                [config.VOZ_PIPER_BIN, "--model", modelo, "--output_file", salida],
                 input=texto, text=True, capture_output=True, check=True, timeout=30,
             )
         except (OSError, subprocess.SubprocessError) as error:

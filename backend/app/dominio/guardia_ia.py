@@ -31,7 +31,11 @@ RAICES_DE_MEDICACION = (
     "medicament", "farmac", "dosis", "pastilla", "tableta", "inyecc", "receta", "antibiotic", "analgesic",
     "ibuprofen", "paracetamol", "aspirin", "antidepresiv", "ansiolitic", "sedante", "antihistamin", "insulina",
     "oxigeno suplementario", "antiinflamator",
+    "medication", "medicine", "prescri", "painkiller", "antibiotic", "antidepress", "sedative", "tranquiliz", "pill", "dosage",
 )
+
+# Colores de alerta en inglés -> el equivalente en español que usa el sistema.
+NIVELES_EN = {"green": "verde", "yellow": "amarillo", "red": "rojo"}
 
 
 def normalizar(texto: str) -> str:
@@ -73,8 +77,20 @@ def validar_respuesta(texto: str | None, contexto, pregunta: str = "") -> tuple[
     inventados = _numeros(texto) - permitidos
     if inventados:
         return False, f"contiene números que no están en el estado: {', '.join(sorted(inventados))}"
-    usados = {n for n in NIVELES if re.search(rf"\b{n}\b", t)}
+    usados = {n for n in NIVELES if re.search(rf"\b{n}\b", t)} | {es for en, es in NIVELES_EN.items() if re.search(rf"\b{en}\b", t)}
     ajenos = usados - _niveles_permitidos(contexto)
     if ajenos:
         return False, f"menciona un nivel de alerta que no corresponde: {', '.join(sorted(ajenos))}"
     return True, "ok"
+
+
+_PALABRAS_EN = {"the", "and", "you", "are", "how", "what", "is", "my", "me", "i", "feel", "feeling", "hello", "hi", "today", "am", "with", "this", "that", "not", "do", "can", "want", "need", "help", "tired", "alone", "lonely"}
+_PALABRAS_ES = {"el", "la", "los", "las", "y", "que", "qué", "como", "cómo", "estoy", "me", "mi", "hola", "hoy", "con", "esto", "no", "puedo", "quiero", "necesito", "ayuda", "cansado", "solo", "sola", "siento", "estás", "esta", "está"}
+
+
+def detectar_idioma(texto: str) -> str:
+    """'en' si el texto parece inglés; en cualquier otro caso (o si hay duda) 'es'. Heurística simple, sin red."""
+    palabras = re.findall(r"[a-záéíóúñü']+", (texto or "").lower())
+    en = sum(1 for p in palabras if p in _PALABRAS_EN)
+    es = sum(1 for p in palabras if p in _PALABRAS_ES)
+    return "en" if en > es else "es"

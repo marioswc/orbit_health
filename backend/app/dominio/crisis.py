@@ -175,3 +175,33 @@ def protocolo_crisis(nivel: str = "crisis", tono: str = "directo",
         "estado_validacion": ESTADO_VALIDACION,
         "aviso": AVISO_PROTOCOLO,
     }
+
+
+# Misma orientación que PASOS_CRISIS, en inglés, para quien conversa en ese idioma. Traducción fiel de los pasos escritos;
+# pendiente de la misma validación por un especialista en salud mental.
+PROTOCOLO_CRISIS_EN = {
+    "titulo": "Psychological crisis and onboard safety protocol",
+    "pasos": {
+        "directo": [
+            "Do not stay alone: go to a common module now, or call the commander or a trusted crewmate on the intercom.",
+            "Secure your immediate surroundings: move away from tools, medication or equipment that could be used to hurt yourself.",
+            "Start immediate calming: controlled breathing (inhale 4 s, exhale 6 s) and the 5-4-3-2-1 sensory grounding exercise until help arrives.",
+            "Ask for company: with your confirmation you can send a priority notice to the commander without exposing your journal or sending anything to Earth.",
+        ],
+        "calido": [
+            "You do not have to go through this alone: go to a common module now, or call the commander or a trusted crewmate on the intercom.",
+            "Take care of your surroundings: stay in a safe space, away from tools, medication or equipment you could hurt yourself with.",
+            "Take a pause to steady yourself: breathe slowly (inhale 4 s, exhale 6 s) and use the 5-4-3-2-1 grounding exercise until your crewmate arrives.",
+            "Ask for company: if you allow it, we will send a priority notice to the commander, keeping your journal private and sending nothing to Earth.",
+        ],
+    },
+}
+
+
+def protocolo_crisis_voz(idioma: str, tono: str) -> dict:
+    """Protocolo de crisis para la conversación: en inglés si ese es el idioma, y en español en cualquier otro caso."""
+    if idioma == "en":
+        t = tono if tono in TONOS else "directo"
+        return {"titulo": PROTOCOLO_CRISIS_EN["titulo"], "pasos": PROTOCOLO_CRISIS_EN["pasos"][t], "idioma": "en"}
+    p = protocolo_crisis("crisis", tono)
+    return {"titulo": p["titulo"], "pasos": p["pasos"], "idioma": "es"}

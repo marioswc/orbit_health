@@ -114,3 +114,10 @@ def test_auditoria_registra_y_su_cadena_es_verificable(conn):
     conn.execute("UPDATE auditoria SET tipo_evento='login' WHERE tipo_evento='login_fallido'")
     conn.commit()
     assert auditoria.verificar(conn)["valida"] is False                  # manipular el registro se detecta
+
+
+def test_solo_puede_haber_un_comandante(conn):
+    auth.inscribir(conn, "T1", "comandante", pin="111111")
+    with pytest.raises(ValueError, match="solo puede haber uno"):
+        auth.inscribir(conn, "T2", "comandante", pin="222222")
+    assert auth.inscribir(conn, "T2", "tripulante", pin="222222")["rol"] == "tripulante"
