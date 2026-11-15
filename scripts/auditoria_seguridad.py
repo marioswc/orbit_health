@@ -78,6 +78,13 @@ def entorno() -> None:
             r(OK, "DeepSeek", "sin clave: todo queda en la estación")
         r(AVISO if re.search(r"^ORBIT_AUTH=0", texto, re.M) else OK, "Autenticación",
           "apagada (ORBIT_AUTH=0): aceptable solo en demo local" if re.search(r"^ORBIT_AUTH=0", texto, re.M) else "activa")
+        auth_on = re.search(r"^ORBIT_AUTH=1", texto, re.M) is not None
+        siembra_off = re.search(r"^ORBIT_SEED_DEMO=0", texto, re.M) is not None
+        if auth_on and not siembra_off:
+            r(AVISO, "Cuentas demo con PIN público", "con ORBIT_AUTH=1 y ORBIT_SEED_DEMO=1 el arranque crea T1 a T4 con PIN 111111 a 444444: "
+              "en una instalación real pon ORBIT_SEED_DEMO=0 y da de alta cuentas con scripts/inscribir_tripulante.sh")
+        else:
+            r(OK, "Cuentas demo con PIN público", "no se crean solas con la autenticación activa" if siembra_off else "autenticación apagada")
         r(AVISO if re.search(r"^ORBIT_DEMO_API=1", texto, re.M) else OK, "API de demostración",
           "encendida (ORBIT_DEMO_API=1): apágala fuera de la demo" if re.search(r"^ORBIT_DEMO_API=1", texto, re.M) else "apagada")
         host = re.search(r"^ORBIT_HOST=(\S+)", texto, re.M)
