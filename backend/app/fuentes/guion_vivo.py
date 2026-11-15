@@ -73,15 +73,37 @@ def interpolar(puntos: list[tuple[float, float]], minuto: float) -> float:
     return puntos[-1][1]
 
 
+def _innovacion(semilla: int, tid: str, signo: str, tick: int, amplitud: float) -> float:
+    return random.Random(f"{semilla}|{tid}|{signo}|{max(0, tick)}").uniform(-amplitud, amplitud)
+
+
+PESOS_TEMPORALES = (0.50, 0.35, 0.15)
+# Artefacto puntual de movimiento (1 solo tick en T4): sube el pulso a 124 lpm (no extremo),
+# para demostrar que la ventana de mediana del flujo continuo lo absorbe sin generar falsa alarma.
+ARTEFACTOS_MOVIMIENTO: dict[tuple[str, str, int], float] = {
+    ("T4", "frecuencia_cardiaca", 9): 124.0,
+}
+
+
 def _ruido(semilla: int, tid: str, signo: str, tick: int, amplitud: float) -> float:
-    return random.Random(f"{semilla}|{tid}|{signo}|{tick}").uniform(-amplitud, amplitud)
+    """Ruido temporalmente autocorrelacionado (filtro ponderado de 3 ticks) y acotado en [-amplitud, +amplitud]."""
+    return sum(peso * _innovacion(semilla, tid, signo, tick - k, amplitud)
+               for k, peso in enumerate(PESOS_TEMPORALES))
 
 
 def valor_en(tid: str, signo: str, minuto: float, tick: int, semilla: int) -> float:
     """Valor que mide la banda de `tid` para `signo` en ese minuto de misión (con ruido acotado y repetible)."""
+    if (tid, signo, tick) in ARTEFACTOS_MOVIMIENTO:
+        return ARTEFACTOS_MOVIMIENTO[(tid, signo, tick)]
     puntos = CURVAS.get(tid, {}).get(signo)
     base = interpolar(puntos, minuto) if puntos else BASE_PERSONAL[tid][signo]
-    v = base + _ruido(semilla, tid, signo, tick, RUIDO[signo])
+    ruido_propio = _ruido(semilla, tid, signo, tick, RUIDO[signo])
+    if signo == "frecuencia_cardiaca":
+        # Acoplamiento cardiorrespiratorio (arritmia sinusal respiratoria) acotado en [-RUIDO['frecuencia_cardiaca'], +RUIDO['frecuencia_cardiaca']]
+        ruido_resp = _ruido(semilla, tid, "frecuencia_respiratoria", tick, RUIDO[signo])
+        v = base + (0.80 * ruido_propio + 0.20 * ruido_resp)
+    else:
+        v = base + ruido_propio
     return round(v, 1) if signo == "temperatura" else float(round(v))
 
 

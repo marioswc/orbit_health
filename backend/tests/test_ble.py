@@ -117,3 +117,45 @@ def test_con_mas_cercana_elige_la_de_senal_mas_fuerte():
 def test_una_senal_desconocida_no_gana_a_una_conocida():
     estado, item = ble.elegir_coincidencia([_c("X", None, "N"), _c("X", -80, "K")], mas_cercana=True)
     assert item[2] == "K"
+
+
+# ---------- aprovechamiento de intervalos RR para variabilidad cardíaca (RMSSD) ----------
+def test_calcular_rmssd_desde_intervalos_rr_y_filtrado_de_artefactos():
+    # Diferencias sucesivas: +40, -30, +40 -> media cuadrática = (1600 + 900 + 1600)/3 = 1366.67 -> sqrt = 37.0 ms
+    assert ble.calcular_rmssd([800.0, 840.0, 810.0, 850.0]) == 37.0
+    # Un salto ectópico/artefacto (>35%) entre 820 y 1600 se descarta sin contaminar el RMSSD
+    assert ble.calcular_rmssd([800.0, 820.0, 1600.0, 810.0]) == 20.0
+    # Menos de 2 intervalos válidos o fuera del rango humano devuelve None
+    assert ble.calcular_rmssd([800.0]) is None
+    assert ble.calcular_rmssd([100.0, 3500.0]) is None
+
+
+def test_extraer_muestras_acumula_rr_entre_paquetes_y_limpia_al_perder_contacto():
+    ventana: list[float] = []
+    # Primer paquete con 2 intervalos RR: con min_rr=4 aún solo emite frecuencia_cardiaca
+    m1 = ble.parsear_medicion_fc(bytes([0x16, 72, 0x40, 0x03, 0x60, 0x03]))
+    s1 = ble.extraer_muestras(m1, ventana, min_rr=4)
+    assert s1 == [{"indicador": "frecuencia_cardiaca", "valor": 72.0}]
+    assert len(ventana) == 2
+
+    # Segundo paquete con otros 2 intervalos RR: ya suma 4 y emite frecuencia_cardiaca + variabilidad_cardiaca
+    m2 = ble.parsear_medicion_fc(bytes([0x16, 71, 0x38, 0x03, 0x58, 0x03]))
+    s2 = ble.extraer_muestras(m2, ventana, min_rr=4)
+    assert [x["indicador"] for x in s2] == ["frecuencia_cardiaca", "variabilidad_cardiaca"]
+    assert 10.0 <= s2[1]["valor"] <= 60.0
+
+    # Si se pierde el contacto con la piel (bandera 0x04), no emite muestras y limpia la ventana RR
+    sin_contacto = ble.parsear_medicion_fc(bytes([0x04, 72]))
+    assert ble.extraer_muestras(sin_contacto, ventana, min_rr=4) == []
+    assert ventana == []
+
+
+def test_variabilidad_cardiaca_solo_avisa_cuando_cae_bajo_la_linea_base(cliente):
+    for v in (48, 50, 46, 49, 47, 50):
+        cliente.post("/api/sensores/lectura", json={"tripulante_id": "T1", "indicador": "variabilidad_cardiaca", "valor": v})
+    # Subir la variabilidad cardíaca (mejor tono vagal) nunca es alerta
+    alta = cliente.post("/api/sensores/lectura", json={"tripulante_id": "T1", "indicador": "variabilidad_cardiaca", "valor": 75}).json()
+    assert alta["aviso_linea_base"] is False and alta["nivel"] == "verde"
+    # Una caída pronunciada por debajo de la base sí activa el aviso amarillo de seguimiento
+    baja = cliente.post("/api/sensores/lectura", json={"tripulante_id": "T1", "indicador": "variabilidad_cardiaca", "valor": 24}).json()
+    assert baja["aviso_linea_base"] is True and baja["nivel"] == "amarillo"

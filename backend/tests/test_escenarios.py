@@ -27,5 +27,19 @@ def test_co2_colectivo_dispara_la_alerta(cliente):
     assert a and a[0]["afectados"] == 2
 
 
+def test_o2_colectivo_dispara_alerta_hipoxia_ambiental(cliente):
+    cliente.post("/api/demo/escenarios/o2_colectivo")
+    res = cliente.get("/api/alertas/colectivas").json()
+    ids = {a["id"] for a in res["alertas"]}
+    assert "alerta_hipoxia_ambiental_colectiva" in ids
+    assert res["o2_nivel"] == "amarillo"
+
+
+def test_escenario_proceso_infeccioso_activa_regla_combinada(cliente):
+    cliente.post("/api/demo/escenarios/proceso_infeccioso")
+    estado = cliente.get("/api/estado/T2").json()
+    assert "posible_proceso_infeccioso" in {r["id"] for r in estado["reglas_combinadas"]}
+
+
 def test_escenario_desconocido_404(cliente):
     assert cliente.post("/api/demo/escenarios/nada").status_code == 404

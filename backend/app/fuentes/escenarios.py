@@ -31,6 +31,20 @@ ESCENARIOS: dict[str, dict] = {
                   ("lectura", "T2", "spo2", 92),
                   ("lectura", "T2", "frecuencia_respiratoria", 26)],
     },
+    "o2_colectivo": {
+        "descripcion": "Caída de O2 en cabina con dos tripulantes afectados: dispara la alerta colectiva de hipoxia ambiental.",
+        "pasos": [("lectura", "T3", "o2_cabina", 19.1),
+                  ("lectura", "T1", "spo2", 90),
+                  ("lectura", "T2", "spo2", 92),
+                  ("lectura", "T2", "frecuencia_respiratoria", 25)],
+    },
+    "proceso_infeccioso": {
+        "descripcion": "Fiebre con taquicardia e hipotensión diastólica en T2: activa la regla combinada infecciosa y observación de perfusión.",
+        "pasos": [("lectura", "T2", "temperatura", 38.4),
+                  ("lectura", "T2", "frecuencia_cardiaca", 98),
+                  ("lectura", "T2", "presion_sistolica", 114),
+                  ("lectura", "T2", "presion_diastolica", 56)],
+    },
 }
 
 
