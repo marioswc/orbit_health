@@ -2,13 +2,19 @@ import { Suspense, lazy, useEffect, useRef, useState, type CSSProperties } from 
 import { api } from "../shared/api/client";
 import Alerta from "../shared/components/Alerta";
 import FondoEstrellas from "../shared/components/FondoEstrellas";
+import tierra from "../shared/assets/tierra.webp";
+import tierraMapa from "../shared/assets/tierra-mapa.jpg";
+import Tierra3D from "../shared/components/Tierra3D";
+import logoSpaceApps from "../shared/assets/spaceapps.png";
 import { useTema } from "../shared/hooks/useTema";
 import { SelectorTripulante, useTripulantes } from "../features/tripulantes";
 import { MonitorPage, useEstadoTripulante } from "../features/monitor";
 import { MonitorCabina, resolverAmbiente, useAlertasColectivas } from "../features/cabina";
-import { AccesoTripulante, useAuth } from "../features/seguridad";
+import { AccesoTripulante, PerfilMenu, useAuth } from "../features/seguridad";
 import { useTranslation } from "../i18n";
 import CambioIdioma from "../shared/components/CambioIdioma";
+import ToggleIdioma from "../shared/components/ToggleIdioma";
+import ToggleTema from "../shared/components/ToggleTema";
 import BarraLateral, { VISTAS } from "./BarraLateral";
 import { useRuta } from "./useRuta";
 import BarraSuperior from "./BarraSuperior";
@@ -61,7 +67,12 @@ export default function App() {
       <>
         <FondoEstrellas />
         <CambioIdioma />
+        <div className="acceso-barra"><ToggleIdioma /><ToggleTema tema={tema} alternar={alternar} /></div>
         <main className="acceso-pantalla">
+          <div className="acceso-escena" aria-hidden="true">
+            <Tierra3D className="acceso-esfera" mapa={tierraMapa} respaldo={tierra} />
+            <img className="acceso-logo" src={logoSpaceApps} alt="" width="440" height="172" decoding="async" />
+          </div>
           <AccesoTripulante
             tripulantes={tripulantes.map((t) => ({ valor: t.id, etiqueta: `${t.nombre} · ${t.rol}` }))}
             alEntrar={auth.login}
@@ -83,16 +94,15 @@ export default function App() {
       <BarraSuperior
         titulo={VISTAS.some((v) => v.id === vista) ? t(`nav.${vista}`) : undefined}
         tema={tema} alAlternarTema={alternar}
-        selector={
-          <>
-            <SelectorTripulante tripulantes={tripulantes} valor={tid} alCambiar={setTid} />
-            {auth.actor && (
-              <button type="button" className="ghost" onClick={auth.logout} aria-label={t("topbar.logoutAria", { rol: auth.actor.rol })}>
-                {t("topbar.logout")}
-              </button>
-            )}
-          </>
-        }
+        selector={!auth.actor ? <SelectorTripulante tripulantes={tripulantes} valor={tid} alCambiar={setTid} /> : undefined}
+        perfil={auth.actor ? (
+          <PerfilMenu
+            nombre={tripulantes.find((x) => x.id === tid)?.nombre ?? auth.actor.nombre ?? auth.actor.tripulante_id ?? ""}
+            rol={tripulantes.find((x) => x.id === tid)?.rol ?? auth.actor.rol}
+            id={tid}
+            alSalir={auth.logout}
+          />
+        ) : undefined}
       />
       <main className="pantalla">
         <div className="avisos">

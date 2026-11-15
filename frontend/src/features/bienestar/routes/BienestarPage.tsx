@@ -15,13 +15,15 @@ export default function BienestarPage({ tripulanteId }: { tripulanteId: string }
           {t("page.private")}
         </span>
       </EncabezadoPagina>
+      <AnimoDiario tripulanteId={tripulanteId} />
       <div className="bienestar-rejilla">
         <div className="bienestar-col">
-          <AnimoDiario tripulanteId={tripulanteId} />
-          <Tamizaje tripulanteId={tripulanteId} />
+          <DiarioTripulante tripulanteId={tripulanteId} />
           <AvisosCompartidos tripulanteId={tripulanteId} />
         </div>
-        <DiarioTripulante tripulanteId={tripulanteId} />
+        <div className="bienestar-col apoyo">
+          <Tamizaje tripulanteId={tripulanteId} />
+        </div>
       </div>
     </div>
   );

@@ -17,6 +17,8 @@
   "nav.collapse": "Contraer menú",
   "nav.expand": "Expandir menú",
   "nav.collapseShort": "Contraer",
+  "topbar.profile": "Perfil",
+  "topbar.profileAria": "Perfil de {{nombre}}",
   "topbar.logout": "Salir",
   "topbar.logoutAria": "Cerrar sesión ({{rol}})",
   "topbar.language": "Idioma",

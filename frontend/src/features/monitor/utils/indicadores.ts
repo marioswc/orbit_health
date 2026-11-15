@@ -8,6 +8,7 @@ const NOMBRES: Record<string, string> = {
   frecuencia_respiratoria: "Frecuencia respiratoria",
   presion_sistolica: "Presión sistólica",
   presion_diastolica: "Presión diastólica",
+  variabilidad_cardiaca: "Variabilidad cardíaca (RMSSD)",
   temperatura: "Temperatura",
   sueno_horas: "Horas de sueño",
 };

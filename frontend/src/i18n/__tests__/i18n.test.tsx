@@ -47,13 +47,12 @@ describe("cambio de idioma", () => {
     expect(result.current.locale).toBe("en-US");
   });
 
-  it("el conmutador ES | EN muestra el modal de cambio y luego aplica el idioma", async () => {
+  it("el boton de idioma muestra el modal de cambio y luego aplica el idioma", async () => {
     render(<><ToggleIdioma /><CambioIdioma /></>);
-    expect(screen.getByRole("button", { name: "ES" })).toHaveAttribute("aria-pressed", "true");
-    await act(async () => { screen.getByRole("button", { name: "EN" }).click(); });
+    expect(screen.getByRole("button")).toHaveTextContent("ES");
+    await act(async () => { screen.getByRole("button").click(); });
     await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Switching to English"));
-    await waitFor(() => expect(screen.getByRole("button", { name: "EN" })).toHaveAttribute("aria-pressed", "true"));
-    expect(screen.getByRole("group", { name: "Language" })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button")).toHaveTextContent("EN"));
     await waitFor(() => expect(screen.queryByRole("status")).toBeNull(), { timeout: 2500 }); // el modal se retira solo
   });
 });
