@@ -18,6 +18,16 @@ Cada persona elige **tono** (directo o cálido), **detalle** (breve o completo) 
 ### Tu asistente personal (conversación y perfil)
 Como a bordo **no hay médico**, cada astronauta tiene su propio asistente de apoyo: `POST /api/asistente/chat/{id}` conversa por texto (no requiere la voz) y `PUT /api/perfil-ia/{id}` guarda lo que la persona cuenta de sí (hasta 160 caracteres: intereses, lo que la motiva). Reglas: **solo su dueño** puede leerlo, escribirlo o conversar (ni el comandante); el texto se entrega al modelo como dato entre comillas; **solo se usa con el modelo local**: con DeepSeek no se envía; una frase de crisis nunca llega al modelo; y el asistente no cambia alertas ni da tratamientos. Es adaptación a lo que la persona dice, no un perfil psicológico aprendido.
 
+### Voz sin internet (oír y hablar)
+`scripts/instalar_voz_local.sh` instala **faster-whisper** (oír) y **Piper** con una voz en español de México (hablar) y deja los modelos en `backend/models/` (fuera de git; ~0.5 GB en total). Se necesita internet una sola vez. Medido en la laptop de desarrollo (CPU, sin GPU): hablar una frase tarda unos 2 s, oír unos 4 s, y el ciclo completo audio → asistente → audio unos 11 s. La transcripción de una frase de prueba fue correcta. Las voces de Piper son sintéticas pero claras; **no se probó con un micrófono real ni con otras personas hablando**. La voz del navegador (Web Speech) no se usa a propósito: en Chrome envía el audio a Google y no funciona sin internet.
+
+### Calidad de la conversación (medición, misma laptop)
+| Modelo | Tiempo | Resultado de la prueba de acompañamiento |
+|---|---|---|
+| `qwen2.5:0.5b` | 1 a 3 s | Malo: repite o confunde la pregunta |
+| `qwen2.5:1.5b` | unos 2 s tras cargar (la primera vez 10 s) | Aceptable: saluda por su nombre y responde con empatía; no siempre menciona los intereses |
+Sin modelo, o si su respuesta se descarta, el asistente igual se dirige a la persona por su nombre y recuerda sus intereses con plantillas (`_toque_personal`), ajustadas al tono que eligió.
+
 ## Instalar el modelo local (una vez, con internet)
 `scripts/instalar_ia_local.sh [modelo]` descarga Ollama en `~/.local/ollama` **sin sudo**, verifica su hash contra el publicado en la release y al final imprime cómo arrancarlo y bajar el modelo (por defecto `qwen2.5:1.5b`, unos 1 GB, en CPU). Después funciona sin internet. Para usarlo en lugar de DeepSeek: `ORBIT_IA_PROVEEDOR=local` en `.env`.
 
