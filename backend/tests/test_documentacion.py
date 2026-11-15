@@ -57,7 +57,10 @@ def test_las_rutas_citadas_en_los_documentos_existen():
     patrones = [re.compile("^" + re.sub(r"\\\{[^}]*\\\}", "[^/]+", re.escape(r)) + "$") for r in reales]
     inexistentes = []
     for doc in DOCS_PROPIOS:
-        for m in re.finditer(r"(/api/[A-Za-z0-9_/{}\-]+)", doc.read_text(encoding="utf-8")):
+        # No confundir referencias a módulos (`backend/app/api/auth.py`) con rutas HTTP.
+        for m in re.finditer(r"(/api/[A-Za-z0-9_/{}\-]+(?:\.py)?)", doc.read_text(encoding="utf-8")):
+            if m.group(1).endswith(".py"):
+                continue
             ruta = re.sub(r"\{[^}]*\}", "x", m.group(1)).rstrip("/")
             if not any(p.match(ruta) for p in patrones):
                 inexistentes.append((doc.name, m.group(1)))
