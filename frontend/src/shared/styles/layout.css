@@ -29,7 +29,7 @@
 
 /* Colapsado: solo iconos, centrados en una columna de 48 px, con etiqueta flotante al pasar el cursor */
 .lateral.colapsada { padding-inline: var(--spacing-8); overflow: visible; }
-.lateral.colapsada .texto-nav { display: none; }
+
 .lateral.colapsada .lateral-cab { justify-content: center; padding: var(--spacing-4) 0 var(--spacing-12); border-bottom: 1px solid var(--glass-line); }
 .lateral .marca { margin: 0; }
 .lateral.colapsada .marca { width: 100%; justify-content: center; gap: 0; }
@@ -144,3 +144,16 @@ textarea { border-radius: 18px; line-height: 1.5; }
 .barra { border-bottom: 1px solid var(--color-stone); }
 .lateral { border-right: 1px solid var(--color-stone); }
 @media (max-width: 800px) { .lateral, .lateral.colapsada { border-right: 0; border-top: 1px solid var(--color-stone); } }
+
+/* ---- Abrir y cerrar el menu lateral con animacion: el ancho se desliza, las etiquetas se desvanecen y el indicador cambia de forma ---- */
+.lateral .texto-nav { display: inline-block; max-width: 180px; overflow: hidden; white-space: nowrap; opacity: 1; transition: opacity .22s ease .1s, max-width .38s var(--ease-out); }
+.lateral.colapsada .texto-nav { max-width: 0; opacity: 0; transition: opacity .12s ease, max-width .38s var(--ease-out); }
+.lateral-aviso .texto-nav { display: block; white-space: normal; max-width: 220px; }
+.lateral.colapsada .lateral-aviso .texto-nav { max-width: 0; }
+.lateral-item { width: 100%; transition: color .25s ease, background-color .15s ease, padding .38s var(--ease-out), gap .38s var(--ease-out), width .38s var(--ease-out); }
+.lateral-aviso { width: 100%; transition: width .38s var(--ease-out), padding .38s var(--ease-out), gap .38s var(--ease-out); }
+.lateral-indicador { left: 0; right: auto; width: 100%; margin-left: 0; transition: transform .5s var(--ease-out), height .3s var(--ease-out), opacity .2s ease, width .38s var(--ease-out), margin-left .38s var(--ease-out); }
+.lateral.colapsada .lateral-indicador { left: 0; right: auto; width: 48px; margin-left: calc(50% - 24px); }
+.lateral-colapsar svg { transition: transform .38s var(--ease-out); }
+.lateral.colapsada .lateral-colapsar { padding: 0; }
+@media (max-width: 800px) { .lateral .texto-nav, .lateral.colapsada .texto-nav { display: none; } }

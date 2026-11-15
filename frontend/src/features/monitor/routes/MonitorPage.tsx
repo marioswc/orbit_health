@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "../../../i18n";
 import Contador from "../../../shared/components/Contador";
 import AccionCaptura from "../../../shared/components/AccionCaptura";
+import Selector from "../../../shared/components/Selector";
 import Titular from "../../../shared/components/Titular";
 import AccionesClinicas from "../components/AccionesClinicas";
 import DetalleZona from "../components/DetalleZona";
@@ -110,42 +111,40 @@ export default function MonitorPage({ tripulanteId = "", estado, cabina, ambient
         </div>
 
         <div className="panel t-fig">
-          <div className="fig-controles">
-            <span className="fig-etiqueta">{t("page.zonas")}</span>
-            <div className="zonas-lista fig-zonas" role="group" aria-label={t("page.zonasAria")}>
-              {ZONAS.map((z) => (
-                <button key={z.id} type="button" className={`tab ${nivelZona(z.indicadores, lecturas)} ${zona === z.id ? "activo" : ""}`} aria-pressed={zona === z.id} onClick={() => elegir(z.id)}>
-                  {t(`zona.${z.id}.etiqueta`)}
-                </button>
-              ))}
-            </div>
-            <span className="fig-etiqueta">{t("page.capas")}</span>
-            <div className="capas" role="group" aria-label={t("page.capasAria")}>
-              {CAPAS.map((c) => (
-                <button key={c.id} type="button" className={capa === c.id ? "activo" : ""} aria-pressed={capa === c.id} onClick={() => setCapa(c.id)}>{t(`capa.${c.id}`)}</button>
-              ))}
-            </div>
-            {entornos && (
-              <>
-                <span className="fig-etiqueta">Entorno</span>
-                <div className="capas" role="group" aria-label="Entorno de la misión">
-                  {Object.entries(entornos.entornos).map(([clave, ent]) => (
-                    <button
-                      key={clave}
-                      type="button"
-                      className={entornoId === clave ? "activo" : ""}
-                      aria-pressed={entornoId === clave}
-                      onClick={() => setEntornoId(clave)}
-                    >
-                      {ent.nombre}{ent.gravedad_g !== null ? ` (${ent.gravedad_g} g)` : ""}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
           <div className="centro">
             <FiguraHumana lecturas={lecturas} seleccionada={zona} acercado={acercado} capa={capa} meses={meses} alSeleccionar={elegir} alAlejar={alejar} ambiente={ambiente} />
+          </div>
+          {/* Controles debajo de la figura, compactos: la figura siempre queda a la vista */}
+          <div className="fig-controles">
+            <div className="fig-grupo">
+              <span className="fig-etiqueta">{t("page.zonas")}</span>
+              <div className="zonas-lista fig-zonas" role="group" aria-label={t("page.zonasAria")}>
+                {ZONAS.map((z) => (
+                  <button key={z.id} type="button" className={`tab ${nivelZona(z.indicadores, lecturas)} ${zona === z.id ? "activo" : ""}`} aria-pressed={zona === z.id} onClick={() => elegir(z.id)}>
+                    {t(`zona.${z.id}.etiqueta`)}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="fig-fila">
+              <div className="fig-grupo">
+                <span className="fig-etiqueta">{t("page.capas")}</span>
+                <div className="capas" role="group" aria-label={t("page.capasAria")}>
+                  {CAPAS.map((c) => (
+                    <button key={c.id} type="button" className={capa === c.id ? "activo" : ""} aria-pressed={capa === c.id} onClick={() => setCapa(c.id)}>{t(`capa.${c.id}`)}</button>
+                  ))}
+                </div>
+              </div>
+              {entornos && (
+                <div className="fig-grupo">
+                  <span className="fig-etiqueta">Entorno</span>
+                  <Selector
+                    etiqueta="Entorno de la misión" valor={entornoId ?? ""} alCambiar={setEntornoId}
+                    opciones={Object.entries(entornos.entornos).map(([clave, ent]) => ({ valor: clave, etiqueta: `${ent.nombre}${ent.gravedad_g !== null ? ` (${ent.gravedad_g} g)` : ""}` }))}
+                  />
+                </div>
+              )}
+            </div>
           </div>
           <ul className="leyenda leyenda-pie" aria-label={t("page.leyendaAria")}>
             {LEYENDA.map((k) => <li key={k}><span className={`badge ${k}`}>{t(`page.leyenda.${k}`)}</span></li>)}

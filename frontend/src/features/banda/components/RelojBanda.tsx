@@ -29,22 +29,22 @@ const ANCHO = 10;
 const CY = 180;
 const circ = (r: number) => 2 * Math.PI * r;
 const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
-const PROF = 20;            // grosor de la caja en unidades del lienzo (300 de ancho)
 const PROF_CORREA = 6;
-const CENTRO = { x: -6, y: -14 };
+const PERIMETRO_CORREA_ARRIBA: Pt[] = [[96, 30], [150, 26], [204, 30], [226, 78], [74, 78]];
+const PERIMETRO_CORREA_ABAJO: Pt[] = [[74, 302], [226, 302], [212, 352], [150, 362], [88, 352]];
+const PROF = 20;            // grosor de la caja en unidades del lienzo (300 de ancho)
+const CENTRO = { x: -4, y: 0 };   // de frente y centrado; solo una ligera inclinacion para que se note el volumen
 type Pt = [number, number];
 interface Pared { cx: number; cy: number; l: number; a: number; luz: number }
 
-/** Perimetro del rectangulo redondeado de la caja (x 46..254, y 62..318, radio 58) en sentido horario, con `n` tramos por esquina. */
+/** Perimetro del rectangulo redondeado de la caja (x 46..254, y 62..318, radio 26) en sentido horario, con `n` tramos por esquina. */
 function perimetroCaja(n: number): Pt[] {
-  const R = 58;
-  const esquinas: [number, number, number][] = [[104, 120, 180], [196, 120, 270], [196, 260, 0], [104, 260, 90]];
+  const R = 26;
+  const esquinas: [number, number, number][] = [[72, 88, 180], [228, 88, 270], [228, 292, 0], [72, 292, 90]];
   const pts: Pt[] = [];
   for (const [cx, cy, a0] of esquinas) for (let i = 0; i <= n; i++) { const a = ((a0 + (90 * i) / n) * Math.PI) / 180; pts.push([cx + R * Math.cos(a), cy + R * Math.sin(a)]); }
   return pts;
 }
-const PERIMETRO_CORREA_ARRIBA: Pt[] = [[92, 6], [150, 0], [208, 6], [226, 78], [74, 78]];
-const PERIMETRO_CORREA_ABAJO: Pt[] = [[74, 302], [226, 302], [208, 374], [150, 380], [92, 374]];
 
 /** Paredes (una por tramo) de un perimetro: cada una es un rectangulo vertical al plano de la cara, asi el canto es continuo desde cualquier angulo. */
 function paredes(pts: Pt[]): Pared[] {
@@ -123,7 +123,7 @@ function RelojBanda({ fc, spo2, news2, ventana, signosHoy, simulada, fcSerie, sp
 
   // Rendimiento: menos tramos en las esquinas (menos elementos) segun el nivel; la geometria se calcula una sola vez
   const [{ cajaP, arribaP, abajoP }] = useState(() => {
-    const n = { alto: 5, medio: 3, bajo: 2 }[nivelActual()];
+    const n = { alto: 4, medio: 3, bajo: 2 }[nivelActual()];
     return { cajaP: paredes(perimetroCaja(n)), arribaP: paredes(PERIMETRO_CORREA_ARRIBA), abajoP: paredes(PERIMETRO_CORREA_ABAJO) };
   });
   // Pausa las animaciones cuando el reloj no se ve
@@ -311,23 +311,30 @@ function RelojBanda({ fc, spo2, news2, ventana, signosHoy, simulada, fcSerie, sp
         <div className="reloj-pose" style={{ transform: `rotateX(${rot.x}deg) rotateY(${rot.y}deg)` }}>
           <div className="reloj-idle">
             <div className="reloj-3d" style={{ ["--u" as string]: `${unidad}px` }}>
-              {/* correas: cara delantera, cara trasera y paredes (espesor) */}
-              <svg className="rl-capa rl-correas" style={{ transform: `translateZ(calc(var(--u) * ${PROF_CORREA / 2}))` }} viewBox="0 0 300 380" aria-hidden="true">
-                <defs><linearGradient id="rb-correa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#3d3d42" /><stop offset="1" stopColor="#222226" /></linearGradient></defs>
-                <path d="M92 6 Q150 -4 208 6 L226 78 L74 78 Z" fill="url(#rb-correa)" stroke="#55555b" strokeWidth="1.5" />
-                <path d="M74 302 L226 302 L208 374 Q150 384 92 374 Z" fill="url(#rb-correa)" stroke="#55555b" strokeWidth="1.5" />
-                <g stroke="#5c5c63" strokeWidth="1.5" strokeLinecap="round" opacity=".8">{[330, 342, 354].map((y) => <path key={y} d={`M138 ${y}h24`} />)}</g>
-              </svg>
-              <svg className="rl-capa rl-correas" style={{ transform: `translateZ(calc(var(--u) * ${-PROF_CORREA / 2})) rotateY(180deg)` }} viewBox="0 0 300 380" aria-hidden="true">
-                <path d="M92 6 Q150 -4 208 6 L226 78 L74 78 Z" fill="#2a2a2e" stroke="#4a4a50" strokeWidth="1.5" />
-                <path d="M74 302 L226 302 L208 374 Q150 384 92 374 Z" fill="#2a2a2e" stroke="#4a4a50" strokeWidth="1.5" />
-              </svg>
-              {[...arribaP, ...abajoP].map((p, k) => <span key={`c${k}`} className="rl-pared" style={estiloPared(p, PROF_CORREA, 12, 30)} />)}
               {/* caja: paredes continuas que forman el canto de aluminio */}
               {cajaP.map((p, k) => <span key={`k${k}`} className="rl-pared" style={estiloPared(p, PROF, 42, 86)} />)}
+              {/* correas: cara delantera, cara trasera y paredes (espesor) */}
+              <svg className="rl-capa rl-correas" style={{ transform: `translateZ(calc(var(--u) * ${PROF_CORREA / 2}))` }} viewBox="0 0 300 380" aria-hidden="true">
+                <defs>
+                  <linearGradient id="rb-correa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#3d3d42" /><stop offset="1" stopColor="#222226" /></linearGradient>
+                  <linearGradient id="rb-hebilla" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#e6e6ea" /><stop offset=".55" stopColor="#a9a9b0" /><stop offset="1" stopColor="#6e6e75" /></linearGradient>
+                </defs>
+                <path d="M96 30 L204 30 L226 78 L74 78 Z" fill="url(#rb-correa)" stroke="#55555b" strokeWidth="1.5" />
+                <rect x="88" y="14" width="124" height="26" rx="8" fill="url(#rb-hebilla)" stroke="#4a4a50" strokeWidth="1.5" />
+                <rect x="98" y="21" width="104" height="12" rx="4" fill="#2a2a2e" />
+                <rect x="146" y="12" width="8" height="30" rx="3" fill="url(#rb-hebilla)" stroke="#4a4a50" />
+                <g stroke="#5c5c63" strokeWidth="1.2" strokeDasharray="3 4" opacity=".7"><path d="M92 46h116M88 62h124" /></g>
+                <path d="M74 302 L226 302 L212 346 Q210 362 150 364 Q90 362 88 346 Z" fill="url(#rb-correa)" stroke="#55555b" strokeWidth="1.5" />
+                <g fill="#101012" stroke="#55555b" strokeWidth="1">{[318, 331, 344].map((y) => <circle key={y} cx="150" cy={y} r="4.2" />)}</g>
+              </svg>
+              <svg className="rl-capa rl-correas" style={{ transform: `translateZ(calc(var(--u) * ${-PROF_CORREA / 2})) rotateY(180deg)` }} viewBox="0 0 300 380" aria-hidden="true">
+                <path d="M96 30 L204 30 L226 78 L74 78 Z" fill="#2a2a2e" stroke="#4a4a50" strokeWidth="1.5" />
+                <path d="M74 302 L226 302 L212 346 Q210 362 150 364 Q90 362 88 346 Z" fill="#2a2a2e" stroke="#4a4a50" strokeWidth="1.5" />
+              </svg>
+              {[...arribaP, ...abajoP].map((p, k) => <span key={`c${k}`} className="rl-pared" style={estiloPared(p, PROF_CORREA, 12, 30)} />)}
               <svg className="rl-capa rl-dorso" viewBox="0 0 300 380" aria-hidden="true" style={{ transform: `translateZ(calc(var(--u) * ${-PROF / 2})) rotateY(180deg)` }}>
-                <rect x="46" y="62" width="208" height="256" rx="58" fill="#3a3a40" stroke="#4a4a50" strokeWidth="1.5" />
-                <rect x="62" y="78" width="176" height="224" rx="46" fill="#1d1d21" />
+                <rect x="46" y="62" width="208" height="256" rx="26" fill="#3a3a40" stroke="#4a4a50" strokeWidth="1.5" />
+                <rect x="62" y="78" width="176" height="224" rx="16" fill="#1d1d21" />
                 <circle cx="150" cy="190" r="56" fill="#0c0c0e" stroke="#55555b" strokeWidth="2" />
                 <g fill="#30d158" opacity=".9">{[0, 1, 2, 3].map((k) => <circle key={k} cx={150 + 26 * Math.cos((k * Math.PI) / 2 + Math.PI / 4)} cy={190 + 26 * Math.sin((k * Math.PI) / 2 + Math.PI / 4)} r="6" />)}</g>
                 <circle cx="150" cy="190" r="12" fill="#222" stroke="#55555b" />
@@ -336,11 +343,11 @@ function RelojBanda({ fc, spo2, news2, ventana, signosHoy, simulada, fcSerie, sp
               <svg className="rl-capa rl-cara" style={{ transform: `translateZ(calc(var(--u) * ${PROF / 2}))` }} viewBox="0 0 300 380" role="img" aria-label={t("watch.aria", { fc: fc !== undefined ? num(fc) : "—", spo2: spo2 !== undefined ? num(spo2) : "—", hoy: signosHoy })}>
                 <defs>
                   <linearGradient id="rb-aluminio" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#e6e6ea" /><stop offset=".5" stopColor="#a9a9b0" /><stop offset="1" stopColor="#6e6e75" /></linearGradient>
-                  <clipPath id="rb-pantalla"><rect x="54" y="70" width="192" height="240" rx="51" /></clipPath>
+                  <clipPath id="rb-pantalla"><rect x="54" y="70" width="192" height="240" rx="20" /></clipPath>
                 </defs>
                 <rect x="244" y="190" width="8" height="26" rx="4" fill="url(#rb-aluminio)" stroke="#55555b" />
-                <rect x="46" y="62" width="208" height="256" rx="58" fill="url(#rb-aluminio)" stroke="#4a4a50" strokeWidth="1.5" />
-                <rect x="54" y="70" width="192" height="240" rx="51" fill="#000" />
+                <rect x="46" y="62" width="208" height="256" rx="26" fill="url(#rb-aluminio)" stroke="#4a4a50" strokeWidth="1.5" />
+                <rect x="54" y="70" width="192" height="240" rx="20" fill="#000" />
                 <g clipPath="url(#rb-pantalla)">
                   {saliente && <g key={`s${saliente.i}-${pag}`} className={`rl-pg rl-sale-${saliente.dir > 0 ? "izq" : "der"}`}>{pagina(PAGINAS[saliente.i])}</g>}
                   <g key={`e${pag}`} className={saliente ? `rl-pg rl-entra-${dir > 0 ? "der" : "izq"}` : "rl-pg"}>{pagina(PAGINAS[pag])}</g>
