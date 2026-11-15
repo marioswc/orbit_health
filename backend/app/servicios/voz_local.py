@@ -74,8 +74,11 @@ def _modelo_stt():
 
 def _decodificar_audio(ruta: str):
     """Decodifica y normaliza audio sin usar la API incompatible de PyAV."""
-    import av
-    import numpy as np
+    try:
+        import av
+        import numpy as np
+    except ImportError as error:          # la voz es opcional: sin sus librerías se avisa con claridad en vez de fallar con un traceback
+        raise VozNoDisponible("Instala backend/requirements-voice.txt para activar voz") from error
 
     muestras = []
     try:

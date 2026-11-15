@@ -1,3 +1,5 @@
+import pytest
+
 from app import config
 from app.servicios import voz_local
 
@@ -77,7 +79,15 @@ def test_contexto_de_voz_incluye_mision_y_escalamiento(monkeypatch):
     assert "no inventes que fue enviado" in sistema
 
 
+def test_sin_las_librerias_de_voz_se_avisa_con_claridad(tmp_path, monkeypatch):
+    import sys
+    monkeypatch.setitem(sys.modules, "av", None)                     # simula que PyAV no está instalado
+    with pytest.raises(voz_local.VozNoDisponible, match="requirements-voice"):
+        voz_local._decodificar_audio(str(tmp_path / "x.wav"))
+
+
 def test_audio_invalido_se_expone_como_error_de_validacion(tmp_path):
+    pytest.importorskip("av")                                        # necesita PyAV (requirements-voice.txt)
     ruta = tmp_path / "audio.wav"
     ruta.write_bytes(b"no es audio")
 
