@@ -12,6 +12,9 @@ Es **opcional** y funciona sin internet: un modelo de lenguaje que corre en la p
 | El modelo no puede mandar la consulta a otro sitio | La conexión no sigue redirecciones |
 | Lo generado por IA **se marca** | `generado_por_ia: true` y un `aviso` en la respuesta |
 
+## Instalar el modelo local (una vez, con internet)
+`scripts/instalar_ia_local.sh [modelo]` descarga Ollama en `~/.local/ollama` **sin sudo**, verifica su hash contra el publicado en la release y al final imprime cómo arrancarlo y bajar el modelo (por defecto `qwen2.5:1.5b`, unos 1 GB, en CPU). Después funciona sin internet. Para usarlo en lugar de DeepSeek: `ORBIT_IA_PROVEEDOR=local` en `.env`.
+
 ## Proveedor externo opcional: DeepSeek (decisión del equipo)
 Si se define `ORBIT_DEEPSEEK_API_KEY`, las explicaciones y la voz usan **DeepSeek, un servicio en internet**, en vez del modelo local (`ORBIT_IA_PROVEEDOR=local` lo fuerza de vuelta a lo local).
 
