@@ -15,12 +15,16 @@
   "error.sinMicrofono": "Este navegador no puede usar el micrófono. Abre la app desde localhost o con HTTPS.",
   "error.permiso": "No hay permiso para usar el micrófono. Actívalo en el navegador y vuelve a intentarlo.",
   "error.vacio": "No se escuchó nada. Mantén la grabación un poco más.",
-  "error.desactivada": "La voz local está desactivada. Configura ORBIT_VOZ_ACTIVA=1 y un modelo Whisper local en el backend.",
+  "error.desactivada": "La voz no está disponible ahora. Puedes escribirle a Nova en la pestaña Asistente.",
   "error.ocupada": "El asistente está atendiendo otra consulta. Inténtalo en unos segundos.",
   "error.grande": "El audio es demasiado largo. Haz una pregunta más corta.",
   "error.noEntendi": "No se pudo entender el audio. Inténtalo de nuevo.",
   "error.tiempo": "El procesamiento tardó demasiado. Comprueba que el servicio de voz local esté activo e inténtalo de nuevo.",
   "error.sesion": "Tu sesión no permite usar la voz.",
   "error.red": "No se pudo conectar con el asistente.",
-  "error.general": "El asistente no pudo responder ahora."
+  "error.general": "El asistente no pudo responder ahora.",
+  "estado.desactivada": "La voz no está activada en esta instalación. Puedes escribirle a Nova en la pestaña Asistente. Para activarla: ORBIT_VOZ_ACTIVA=1 y scripts/instalar_voz_local.sh.",
+  "estado.faltan_librerias": "Faltan las librerías de voz (faster-whisper y av). Instálalas con backend/requirements-voice.txt o usa la imagen/instalación completa. Mientras, escríbele a Nova en la pestaña Asistente.",
+  "estado.sin_modelo": "La voz está activada pero no hay un modelo de reconocimiento de voz configurado (ORBIT_VOZ_STT_MODELO). Mientras, escríbele a Nova en la pestaña Asistente.",
+  "estado.modelo_no_existe": "La voz está activada pero el modelo de reconocimiento de voz no está en la ruta configurada. Ejecuta scripts/instalar_voz_local.sh o revisa ORBIT_VOZ_STT_MODELO. Mientras, escríbele a Nova en la pestaña Asistente."
 }

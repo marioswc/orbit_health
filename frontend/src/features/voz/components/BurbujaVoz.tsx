@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { registrarEspanol, useTranslation } from "../../../i18n";
 import esVoz from "../../../i18n/locales/ES/features/voz/voz.json";
-import { getToken } from "../../../shared/api/client";
+import { api, getToken } from "../../../shared/api/client";
 
 registrarEspanol("voz", esVoz);
 
 interface Props { tripulanteId: string }
 interface Respuesta { texto: string; transcripcion: string; nivel_general?: string; fuente?: string; idioma?: "es" | "en"; audio_base64?: string; audio_media_type?: string }
 type Fase = "reposo" | "grabando" | "procesando";
+interface EstadoVoz { lista: boolean; motivo: string; detalle: string }
+const MOTIVOS_CONOCIDOS = ["desactivada", "faltan_librerias", "sin_modelo", "modelo_no_existe"];
 
 const MAX_GRABACION_MS = 20_000;
 const MAX_PROCESAMIENTO_MS = 60_000;
@@ -85,8 +87,19 @@ export default function BurbujaVoz({ tripulanteId }: Props) {
     }
   }
 
+  /** Pregunta al backend si la voz puede usarse y, si no, muestra QUÉ falta (en vez de un error genérico). */
+  async function vozNoDisponible(): Promise<string | null> {
+    try {
+      const e = await api<EstadoVoz>("/voz/estado");
+      if (e.lista !== false) return null;                 // si el backend no dice claramente que no, se intenta (compatibilidad con versiones sin este aviso)
+      return MOTIVOS_CONOCIDOS.includes(e.motivo) ? t(`estado.${e.motivo}`) : e.detalle;
+    } catch { return null; }                                // si no se puede consultar, se intenta grabar y el error real saldrá después
+  }
+
   async function empezar() {
     setAviso(""); setAbierta(true);
+    const razon = await vozNoDisponible();
+    if (razon) { setAviso(razon); return; }
     if (respuesta) setPrevios((p) => [...p, respuesta].slice(-3));
     setRespuesta(null);
     callar();
@@ -132,7 +145,11 @@ export default function BurbujaVoz({ tripulanteId }: Props) {
         body: blob,
         signal: controlador.signal,
       });
-      if (!r.ok) { setAviso(t(ERRORES[r.status] ?? "error.general")); return; }
+      if (!r.ok) {
+        const razon = r.status === 503 ? await vozNoDisponible() : null;      // un 503 puede ser "voz apagada", "falta el modelo"… se dice cuál
+        setAviso(razon ?? t(ERRORES[r.status] ?? "error.general"));
+        return;
+      }
       const d = (await r.json()) as Respuesta;
       setRespuesta(d);
       reproducir(d);

@@ -15,12 +15,16 @@
   "error.sinMicrofono": "This browser cannot use the microphone. Open the app from localhost or over HTTPS.",
   "error.permiso": "Microphone permission is missing. Enable it in the browser and try again.",
   "error.vacio": "Nothing was heard. Record a little longer.",
-  "error.desactivada": "Local voice is disabled. Set ORBIT_VOZ_ACTIVA=1 and configure a local Whisper model in the backend.",
+  "error.desactivada": "Voice is not available right now. You can type to Nova in the Assistant tab.",
   "error.ocupada": "The assistant is handling another request. Try again in a few seconds.",
   "error.grande": "The audio is too long. Ask a shorter question.",
   "error.noEntendi": "The audio could not be understood. Try again.",
   "error.tiempo": "Processing took too long. Check that the local voice service is running and try again.",
   "error.sesion": "Your session cannot use voice.",
   "error.red": "Could not reach the assistant.",
-  "error.general": "The assistant could not answer right now."
+  "error.general": "The assistant could not answer right now.",
+  "estado.desactivada": "Voice is not enabled in this installation. You can type to Nova in the Assistant tab. To enable it: ORBIT_VOZ_ACTIVA=1 and scripts/instalar_voz_local.sh.",
+  "estado.faltan_librerias": "The voice libraries (faster-whisper and av) are missing. Install backend/requirements-voice.txt or use the full image/installation. Meanwhile, type to Nova in the Assistant tab.",
+  "estado.sin_modelo": "Voice is enabled but no speech-recognition model is configured (ORBIT_VOZ_STT_MODELO). Meanwhile, type to Nova in the Assistant tab.",
+  "estado.modelo_no_existe": "Voice is enabled but the speech-recognition model is not at the configured path. Run scripts/instalar_voz_local.sh or check ORBIT_VOZ_STT_MODELO. Meanwhile, type to Nova in the Assistant tab."
 }

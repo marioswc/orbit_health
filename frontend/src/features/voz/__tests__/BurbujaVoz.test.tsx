@@ -95,7 +95,10 @@ describe("BurbujaVoz", () => {
       { texto: "Segunda respuesta.", transcripcion: "Segunda pregunta", fuente: "reglas_locales" },
     ];
     let n = 0;
-    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(respuestas[n++]), { status: 200 })));
+    vi.stubGlobal("fetch", vi.fn(async (url: RequestInfo | URL) =>
+      String(url).includes("/voz/estado")
+        ? new Response(JSON.stringify({ lista: true, motivo: "lista", detalle: "La voz está lista." }), { status: 200 })
+        : new Response(JSON.stringify(respuestas[n++]), { status: 200 })));
     vi.stubGlobal("speechSynthesis", undefined);
 
     const { container } = render(<BurbujaVoz tripulanteId="T1" />);
@@ -113,5 +116,58 @@ describe("BurbujaVoz", () => {
     expect(hilo).toBeInTheDocument();
     expect(hilo).toHaveTextContent("Primera pregunta");
     expect(hilo).toHaveTextContent("Primera respuesta.");
+  });
+
+  describe("cuando la voz no está disponible dice QUÉ falta, no un error genérico", () => {
+    const preparar = (estado: object | null, chat: Response | null = null) => {
+      const getUserMedia = vi.fn(async () => ({ getTracks: () => [{ stop: vi.fn() }] }));
+      vi.stubGlobal("MediaRecorder", GrabadorFalso);
+      Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: { getUserMedia } });
+      vi.stubGlobal("speechSynthesis", undefined);
+      vi.stubGlobal("fetch", vi.fn(async (url: RequestInfo | URL) => {
+        if (String(url).includes("/voz/estado")) return estado ? new Response(JSON.stringify(estado), { status: 200 }) : new Response("{}", { status: 404 });
+        return chat ?? new Response(JSON.stringify({ texto: "Hola", transcripcion: "hola", fuente: "reglas_locales" }), { status: 200 });
+      }));
+      return getUserMedia;
+    };
+
+    it("faltan las librerías: lo explica y no pide el micrófono", async () => {
+      const getUserMedia = preparar({ lista: false, motivo: "faltan_librerias", detalle: "x" });
+      render(<BurbujaVoz tripulanteId="T1" />);
+      await act(async () => { fireEvent.click(screen.getByRole("button", { pressed: false })); });
+      expect(await screen.findByRole("alert")).toHaveTextContent(/Faltan las librerías de voz/);
+      expect(getUserMedia).not.toHaveBeenCalled();
+    });
+
+    it("voz apagada: manda a escribirle a Nova en vez de decir que configure variables", async () => {
+      preparar({ lista: false, motivo: "desactivada", detalle: "x" });
+      render(<BurbujaVoz tripulanteId="T1" />);
+      await act(async () => { fireEvent.click(screen.getByRole("button", { pressed: false })); });
+      const aviso = await screen.findByRole("alert");
+      expect(aviso).toHaveTextContent(/pestaña Asistente/);
+    });
+
+    it("un 503 al enviar el audio vuelve a preguntar el motivo real", async () => {
+      let consultas = 0;
+      preparar(null);
+      vi.stubGlobal("fetch", vi.fn(async (url: RequestInfo | URL) => {
+        if (String(url).includes("/voz/estado")) {
+          consultas++;
+          return new Response(JSON.stringify(consultas === 1 ? { lista: true, motivo: "lista", detalle: "" } : { lista: false, motivo: "modelo_no_existe", detalle: "x" }), { status: 200 });
+        }
+        return new Response("{}", { status: 503 });
+      }));
+      render(<BurbujaVoz tripulanteId="T1" />);
+      await act(async () => { fireEvent.click(screen.getByRole("button", { pressed: false })); });
+      await act(async () => { fireEvent.click(screen.getByRole("button", { pressed: true })); });
+      expect(await screen.findByRole("alert")).toHaveTextContent(/modelo de reconocimiento de voz no está/);
+    });
+
+    it("si el backend no tiene el aviso de estado (404), igual intenta grabar", async () => {
+      const getUserMedia = preparar(null);
+      render(<BurbujaVoz tripulanteId="T1" />);
+      await act(async () => { fireEvent.click(screen.getByRole("button", { pressed: false })); });
+      await waitFor(() => expect(getUserMedia).toHaveBeenCalled());
+    });
   });
 });
