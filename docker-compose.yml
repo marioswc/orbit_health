@@ -1,0 +1,18 @@
+# docker compose up --build      ->  http://127.0.0.1:3000   (solo accesible desde este equipo)
+services:
+  orbit:
+    build: .
+    image: orbit-health:latest
+    ports:
+      - "127.0.0.1:3000:3000"          # a propósito solo loopback: los datos de salud no se exponen en la red
+    environment:
+      ORBIT_AUTH: "0"                    # 1 = pedir PIN (ver docs/CUENTAS_DEMO.md)
+      ORBIT_SEED_DEMO: "1"               # tripulación ficticia; en una instalación real, 0
+    env_file:
+      - path: .env                       # opcional: si no existe, se ignora
+        required: false
+    volumes:
+      - orbit-data:/app/data
+    restart: unless-stopped
+volumes:
+  orbit-data:
