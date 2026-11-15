@@ -1,0 +1,32 @@
+# Construye el ejecutable de ORBIT Health en Linux, Windows y macOS. Se lanza a mano (Actions > Ejecutables > Run workflow)
+# o al subir una etiqueta v*. Deja los archivos como "artefactos" de la ejecución; NO publica nada por sí solo.
+name: Ejecutables
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+jobs:
+  construir:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Construir
+        shell: bash
+        run: scripts/crear_ejecutable.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit-health-${{ matrix.os }}
+          path: dist-ejecutable/*
+          if-no-files-found: error
