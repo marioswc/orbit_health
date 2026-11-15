@@ -61,7 +61,7 @@ def test_el_lanzador_solo_escucha_en_loopback():
 def test_elige_un_navegador_chromium_si_lo_hay(monkeypatch, sistema, esperado):
     monkeypatch.setattr(lanzador.platform, "system", lambda: sistema)
     monkeypatch.setattr(lanzador.shutil, "which", lambda n: "/usr/bin/microsoft-edge" if n == "microsoft-edge" else None)
-    monkeypatch.setattr(lanzador.Path, "is_file", lambda self: str(self) == esperado)
+    monkeypatch.setattr(lanzador.Path, "is_file", lambda self: str(self).replace("\\", "/") == esperado)
     assert lanzador.navegador_de_ventana() == esperado
 
 
@@ -168,7 +168,7 @@ def test_instalar_el_acceso_crea_menu_escritorio_e_icono_solo_en_la_carpeta_del_
     icono = hogar_linux / "datos" / "orbit-health" / "icono.png"
     assert menu.is_file() and (hogar_linux / "Escritorio" / "orbit-health.desktop").is_file() and icono.is_file()
     assert icono.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"                                  # el icono real, no un archivo vacío
-    assert menu.stat().st_mode & 0o111                                                      # ejecutable: el escritorio lo acepta como lanzador
+    assert sys.platform == "win32" or menu.stat().st_mode & 0o111                                                      # ejecutable: el escritorio lo acepta como lanzador
     assert str(exe) in menu.read_text() and all(str(c).startswith(str(hogar_linux)) for c in creados)
     lanzador.instalar_acceso(str(exe))                                                      # repetirlo no falla ni duplica
     assert len(list((hogar_linux / "datos" / "applications").glob("*.desktop"))) == 1
@@ -239,7 +239,7 @@ def test_en_mac_crea_una_app_valida_que_lanza_el_programa_sin_terminal(tmp_path,
     plist = plistlib.loads((app / "Contents" / "Info.plist").read_bytes())
     assert plist["CFBundleExecutable"] == "orbit-health" and plist["CFBundlePackageType"] == "APPL" and plist["CFBundleIconFile"] == "orbit.icns"
     arranque = app / "Contents" / "MacOS" / "orbit-health"
-    assert arranque.stat().st_mode & 0o111 and arranque.read_text().startswith("#!/bin/bash")
+    assert (sys.platform == "win32" or arranque.stat().st_mode & 0o111) and arranque.read_text().startswith("#!/bin/bash")
     assert "'" + str(exe) + "'" in arranque.read_text()                                         # la ruta con espacios va entre comillas
     assert (app / "Contents" / "Resources" / "orbit.icns").is_file()
     lanzador.instalar_acceso(str(exe))                                                          # repetirlo no falla

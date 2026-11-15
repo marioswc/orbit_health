@@ -52,6 +52,8 @@ def test_una_clave_leida_de_la_entrada_estandar_no_se_imprime(tmp_path):
 
 # ---------- el asistente de inicio ----------
 def _correr(*args, entrada=""):
+    if sys.platform == "win32":
+        pytest.skip("el asistente es un script de bash (en Windows `bash` es el stub de WSL)")
     return subprocess.run(["bash", str(RAIZ / "scripts" / "asistente_inicio.sh"), *args], cwd=RAIZ, input=entrada,
                           capture_output=True, text=True, timeout=60)
 
