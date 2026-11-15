@@ -9,12 +9,11 @@ Plan completo: [PLAN_DE_DESARROLLO.md](backend/docs/PLAN_DE_DESARROLLO.md).
 
 ## Producción local (un solo servidor, sin internet)
 
+En una máquina nueva (necesita internet una sola vez; requiere Python 3.10+ y Node.js con npm):
+
 ```bash
-cp .env.example .env
-cd frontend && npm install && npm run build && cd ..
-cd backend && python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
-set -a; . ../.env; set +a
-uvicorn app.main:app --port 3000      # sirve API y frontend en http://localhost:3000
+scripts/preparar.sh      # entorno de Python, dependencias, compilación de la interfaz y .env
+./run.sh                 # API y frontend en http://127.0.0.1:3000, sin internet
 ```
 
 ## Arranque y verificación rápidos
