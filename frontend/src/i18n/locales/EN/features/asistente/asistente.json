@@ -35,5 +35,7 @@
   "chat.enviando": "Thinking…",
   "chat.yo": "You",
   "chat.asistente": "Assistant",
-  "chat.escrito": "Answer from local rules, no generative AI. Not a diagnosis."
+  "chat.escrito": "Answer from local rules, no generative AI. Not a diagnosis.",
+  "chat.rasgos": "How you are (optional, max. 160 characters)",
+  "chat.rasgosEjemplo": "For example: calm, I need breaks, I cheer up with company"
 }

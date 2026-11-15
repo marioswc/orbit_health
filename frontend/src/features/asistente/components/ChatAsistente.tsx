@@ -12,6 +12,7 @@ const MAX_INTERESES = 160;
 function ChatAsistente({ tripulanteId }: { tripulanteId: string }) {
   const { t } = useTranslation("asistente");
   const [intereses, setIntereses] = useState("");
+  const [rasgos, setRasgos] = useState("");
   const [guardado, setGuardado] = useState<{ ok: boolean; texto: string } | null>(null);
   const [mensajes, setMensajes] = useState<Mensaje[]>([]);
   const [texto, setTexto] = useState("");
@@ -20,13 +21,16 @@ function ChatAsistente({ tripulanteId }: { tripulanteId: string }) {
   useEffect(() => {
     setGuardado(null);
     setMensajes([]);
-    api<{ intereses: string }>(`/perfil-ia/${tripulanteId}`).then((p) => setIntereses(p.intereses)).catch(() => setIntereses(""));
+    api<{ intereses: string; rasgos: string }>(`/perfil-ia/${tripulanteId}`)
+      .then((p) => { setIntereses(p.intereses); setRasgos(p.rasgos ?? ""); })
+      .catch(() => { setIntereses(""); setRasgos(""); });
   }, [tripulanteId]);
 
   async function guardarIntereses() {
     try {
-      const p = await api<{ intereses: string }>(`/perfil-ia/${tripulanteId}`, { method: "PUT", body: JSON.stringify({ intereses }) });
+      const p = await api<{ intereses: string; rasgos: string }>(`/perfil-ia/${tripulanteId}`, { method: "PUT", body: JSON.stringify({ intereses, rasgos }) });
       setIntereses(p.intereses);
+      setRasgos(p.rasgos ?? "");
       setGuardado({ ok: true, texto: t("chat.saved") });
     } catch (e) { setGuardado({ ok: false, texto: (e as Error).message }); }
   }
@@ -53,6 +57,11 @@ function ChatAsistente({ tripulanteId }: { tripulanteId: string }) {
           <label className="campo-etiqueta" htmlFor="chat-intereses">{t("chat.intereses")}</label>
           <input id="chat-intereses" className="redactor-titulo" value={intereses} maxLength={MAX_INTERESES}
                  onChange={(e) => setIntereses(e.target.value)} onBlur={guardarIntereses} placeholder={t("chat.interesesEjemplo")} />
+        </div>
+        <div className="campo">
+          <label className="campo-etiqueta" htmlFor="chat-rasgos">{t("chat.rasgos")}</label>
+          <input id="chat-rasgos" className="redactor-titulo" value={rasgos} maxLength={MAX_INTERESES}
+                 onChange={(e) => setRasgos(e.target.value)} onBlur={guardarIntereses} placeholder={t("chat.rasgosEjemplo")} />
         </div>
         {guardado && <Alerta tono={guardado.ok ? "ok" : "error"}>{guardado.texto}</Alerta>}
         <div role="log" aria-live="polite" aria-label={t("chat.title")}>

@@ -35,5 +35,7 @@
   "chat.enviando": "Pensando…",
   "chat.yo": "Tú",
   "chat.asistente": "Asistente",
-  "chat.escrito": "Respuesta con reglas locales, sin IA generativa. No es un diagnóstico."
+  "chat.escrito": "Respuesta con reglas locales, sin IA generativa. No es un diagnóstico.",
+  "chat.rasgos": "Cómo eres (opcional, máx. 160 caracteres)",
+  "chat.rasgosEjemplo": "Por ejemplo: tranquila, necesito pausas, me animo con compañía"
 }
