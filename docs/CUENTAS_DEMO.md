@@ -20,3 +20,13 @@ El PIN debe tener de 6 a 10 dígitos. Un PIN equivocado repetido bloquea la cuen
 1. En `.env`: `ORBIT_AUTH=1` y `ORBIT_IA_PROVEEDOR=local` (con Ollama corriendo).
 2. `scripts/cuentas_demo.sh`, luego `./run.sh` y abre `http://127.0.0.1:3000`.
 3. Entra como T3 (`333333`), abre **Asistente**: cuéntale tus intereses y conversa. El perfil y el chat son privados: T4 o el comandante no pueden verlos.
+
+## Tripulación ficticia (todo simulado, no son personas reales)
+| Id | Nombre | Profesión | Cómo es (resumen que usa su asistente) | Trato |
+|---|---|---|---|---|
+| T1 | Valeria Montoya | Comandante | Serena y disciplinada; le cuesta pedir ayuda. Le gustan el ajedrez y correr | Directo, completo |
+| T2 | Mateo Ríos | Especialista de misión | Curioso y bromista; se apaga si se siente aislado. Guitarra, cocina, su familia | Cálido, completo |
+| T3 | Camila Ortega | Ingeniero | Analítica y tranquila; necesita pausas. Ciencia ficción, astronomía, rompecabezas | Directo, breve |
+| T4 | Andrés Leal | Piloto | Sociable y competitivo; el encierro le pesa. Fútbol, música, retos | Cálido, breve |
+
+Cada persona puede cambiar su perfil y su trato desde la pantalla **Asistente**; lo sembrado solo se aplica a quien aún no tiene el suyo, y en bases anteriores solo reemplaza los nombres genéricos ("Tripulante Uno"…). Los rasgos y los intereses solo se usan con el modelo **local**, nunca con DeepSeek.
