@@ -88,6 +88,10 @@ Para que la demo no sea manual: `POST /api/demo/simulacion/iniciar` pone a una t
 
 La frecuencia cardíaca puede llegar sola desde un dispositivo BLE que anuncie el servicio estándar; ver [docs/BANDA_BLE.md](docs/BANDA_BLE.md). El puente está probado con una banda simulada. Con una banda real de consumo (IDW26, app Veryfit) se conectó, pero habla un protocolo propio y **no está soportada**; solo funcionarían dispositivos con el servicio estándar.
 
+## Instalable como app (PWA)
+
+La interfaz trae manifiesto y service worker: en un navegador moderno se puede **instalar** y abre aunque el servidor tarde en responder. Funciona en `localhost` o con HTTPS; **por HTTP simple en la red de la cabina el navegador no la instala**, y para eso haría falta TLS (pendiente). El service worker nunca guarda respuestas de `/api`, así que los datos clínicos siempre vienen del servidor. Verificado: el servidor sirve el manifiesto, el service worker y el icono; **no probado** el flujo de instalación en un navegador real.
+
 ## IA local (opcional)
 
 Un modelo local sin internet puede explicar una alerta o responder por voz, pero nunca decide el nivel: una crisis la atiende siempre el protocolo escrito y todo texto del modelo se valida y se marca como IA. Ver [docs/IA_LOCAL.md](docs/IA_LOCAL.md).
