@@ -48,11 +48,12 @@ def comparativa_con_y_sin_orbit(entorno: str = "marte", respuesta_tierra_min: fl
 
 @router.post("/sensor/{tid}")
 def dispositivo_simulado_en_marcha(tid: str, perfil: str = "deterioro_respiratorio", ticks: int = 12, semilla: int | None = 7,
+                                   artefactos: bool = False,
                                    conn=Depends(conexion), _: dict = Depends(requiere("demo:ejecutar"))) -> dict:
     """Un dispositivo portátil simulado envía `ticks` rondas de constantes vitales (origen 'sensor'). Escribe datos de demo."""
     requerir_tripulante(conn, tid)
     try:
-        serie = dispositivo_simulado.generar(perfil, ticks, semilla)
+        serie = dispositivo_simulado.generar(perfil, ticks, semilla, artefactos=artefactos)
     except ValueError as e:
         raise HTTPException(422, str(e))
     rondas, primero = [], {"amarillo": None, "rojo": None}

@@ -87,6 +87,10 @@
     ],
     "sueno_despertares_min": [
       "aislamiento_confinamiento"
+    ],
+    "variabilidad_cardiaca": [
+      "campos_gravedad",
+      "aislamiento_confinamiento"
     ]
   },
   "riesgos": [

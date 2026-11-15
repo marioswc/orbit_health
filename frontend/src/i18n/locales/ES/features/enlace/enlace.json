@@ -77,6 +77,11 @@
   "demo.sensor.desc": "Envía 12 rondas de signos vitales continuos sobre T1 con origen simulado.",
   "demo.sensor.worsen": "Simular deterioro",
   "demo.sensor.stable": "Simular estable",
+  "demo.sensor.infection": "Proceso infeccioso",
+  "demo.sensor.orthostatic": "Intolerancia ortostática",
+  "demo.sensor.radiation": "Exposición radiación",
+  "demo.sensor.hypoglycemia": "Hipoglucemia",
+  "demo.sensor.o2": "Hipoxia O₂ cabina",
   "demo.sensor.rounds": "{{n}} rondas ({{perfil}})",
   "demo.sensor.first": "Primer amarillo: {{y}} · Primer rojo: {{r}}",
   "demo.error": "No se pudo cargar el simulador"

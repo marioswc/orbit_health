@@ -195,7 +195,8 @@
       "o2_cabina": 0.5,
       "animo": 0.5,
       "sueno_eficiencia_pct": 3,
-      "sueno_despertares_min": 10
+      "sueno_despertares_min": 10,
+      "variabilidad_cardiaca": 8
     },
     "nota_piso": "Variación mínima que se considera un cambio real. Evita que una serie muy estable (desviación casi cero) convierta una diferencia insignificante en un aviso. Supuestos de diseño pendientes de validación clínica."
   },
@@ -344,6 +345,12 @@
       "unidad": "min",
       "min": 0,
       "max": 600
+    },
+    "variabilidad_cardiaca": {
+      "etiqueta": "Variabilidad cardíaca (RMSSD)",
+      "unidad": "ms",
+      "min": 5,
+      "max": 250
     }
   }
 }

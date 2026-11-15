@@ -126,17 +126,17 @@ async def transmitir(args) -> int:
     bleak = _bleak()
     token = os.environ.get("ORBIT_TOKEN")
     pendientes: list[dict] = []
+    ventana_rr: list[float] = []
     dispositivo = await _buscar(bleak, args)
     if dispositivo is None:
         return 1
 
     def al_recibir(_, datos: bytearray):
         try:
-            fc = ble.muestra_valida(ble.parsear_medicion_fc(bytes(datos)))
+            medicion = ble.parsear_medicion_fc(bytes(datos))
         except ValueError:
             return
-        if fc is not None:
-            pendientes.append({"indicador": "frecuencia_cardiaca", "valor": fc})
+        pendientes.extend(ble.extraer_muestras(medicion, ventana_rr, min_rr=4))
 
     async with bleak.BleakClient(dispositivo) as cliente:
         await cliente.start_notify(ble.CARACTERISTICA_FC, al_recibir)

@@ -155,3 +155,23 @@ def test_un_ritmo_mayor_que_la_ventana_de_sensores_avisa_en_vez_de_perder_picos_
     r = cliente.post("/api/demo/simulacion/iniciar?ritmo=300&tick_s=0.01").json()
     assert r["aviso"] and "mayor que la ventana" in r["aviso"]
     esperar_fin(cliente)
+
+
+def test_artefacto_de_movimiento_en_guion_vivo_es_filtrado_por_la_mediana(cliente):
+    from datetime import datetime, timedelta, timezone
+    from app.repositorios.conexion import get_conn
+    from app.servicios import flujo
+    flujo.reiniciar()
+    # El tick 9 de T4 tiene un artefacto puntual de movimiento (124 lpm), rodeado de lecturas normales (~68 lpm)
+    assert g.valor_en("T4", "frecuencia_cardiaca", 2.25, 9, 7) == 124.0
+    t0 = datetime(2026, 11, 14, 12, 0, tzinfo=timezone.utc)
+    conn = get_conn()
+    try:
+        for idx, tick in enumerate((8, 9, 10, 11, 12)):
+            v = g.valor_en("T4", "frecuencia_cardiaca", tick * 0.25, tick, 7)
+            flujo.ingresar(conn, "T4", "frecuencia_cardiaca", v, ahora=t0 + timedelta(seconds=idx * 15), origen="simulado")
+    finally:
+        conn.close()
+    puntos = cliente.get("/api/historial/T4?indicador=frecuencia_cardiaca").json()["puntos"]
+    assert len(puntos) == 1
+    assert 66.0 <= puntos[0]["valor"] <= 70.0 and puntos[0]["nivel"] == "verde"
