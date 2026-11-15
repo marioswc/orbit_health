@@ -13,7 +13,7 @@ TRIPULANTES = [
 
 CREDENCIALES_DEMO = [
     ("T1", "comandante", "111111"),
-    ("T2", "medico", "222222"),
+    ("T2", "tripulante", "222222"),
     ("T3", "tripulante", "333333"),
     ("T4", "tripulante", "444444"),
 ]
