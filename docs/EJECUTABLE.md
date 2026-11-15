@@ -24,12 +24,21 @@ En **tu** carpeta de usuario, nunca dentro del programa: Linux `~/.local/share/o
 ## Seguridad al empaquetar
 Dentro del ejecutable el programa **no busca nunca un `.env`** fuera de tu carpeta de datos (una carpeta temporal compartida podría tener uno ajeno). Hay una prueba que lo verifica y se comprobó con el ejecutable real.
 
-## Para quien lo construye
+## Cómo obtener los ejecutables de los tres sistemas
+Un ejecutable solo corre en el sistema donde se construyó, así que los de Windows y Mac los construye GitHub:
+1. En el repositorio: **Actions → Ejecutables → Run workflow** (rama `main`). Tarda unos 5 minutos.
+2. Al terminar, en la página de la ejecución, sección **Artifacts**, se descargan `orbit-health-linux` (`.tar.gz`), `orbit-health-macos` (`.tar.gz`, **solo Apple Silicon**) y `orbit-health-windows` (`.zip`). Cada uno trae el programa y su `.sha256`. Los `.tar.gz` conservan el permiso de ejecución.
+3. Cada sistema **construye y prueba su propio ejecutable** (`scripts/probar_ejecutable.sh`): lo arranca con una carpeta de datos aislada y comprueba API, interfaz, manifiesto, service worker, iconos, saludo de Nova, que crea sus datos en la carpeta del usuario y que no lee un `.env` ajeno. Si algo falla, el flujo se pone en rojo.
+
+Los artefactos los puede descargar quien tenga acceso al repositorio y **caducan** (90 días por defecto). Para entregarlos a otras personas (por ejemplo, a los jueces) hay que subirlos a mano a un *Release* de GitHub: es una decisión del equipo y este flujo **no publica nada**.
+
+## Para quien lo construye en su máquina
 ```bash
 scripts/crear_ejecutable.sh          # construye el de ESTE sistema: dist-ejecutable/orbit-health (+ .sha256)
+scripts/probar_ejecutable.sh         # prueba de humo del que acabas de construir
 ```
-Un ejecutable solo corre en el sistema donde se construyó. Para Windows y Mac está el flujo `.github/workflows/ejecutables.yml` (Actions → *Ejecutables* → *Run workflow*): construye los tres y los deja como artefactos; **no publica nada**.
 
 ## Comprobado y no comprobado
-- Hecho (Linux): se construyó; arrancó en 1.8 s con una carpeta de datos nueva; sirvió API, interfaz y manifiesto; creó la base y los respaldos en la carpeta del usuario; ignoró un `.env` ajeno del directorio temporal; leyó el `.env` propio; detectó una instancia ya abierta; pruebas automáticas del lanzador.
-- **No hecho:** el doble clic desde el explorador de archivos (se probó desde la terminal y sin abrir el navegador), el aspecto en Windows y Mac, el flujo de GitHub Actions, la firma de código y la notarización de Apple (cuestan dinero y cuentas de desarrollador), ni un instalador (`.msi`, `.dmg`, `.deb`).
+- **Comprobado en GitHub (ejecución del 15-nov-2026):** los tres sistemas (Linux, Windows y macOS) construyeron el ejecutable y **pasaron la prueba de humo** corriéndolo allí mismo. Linux es el más probado: además se descargó el artefacto de GitHub, se verificó su suma, conserva el permiso de ejecución y pasó la prueba de humo en una computadora real.
+- Hecho en Linux por mí: arranca en unos 2 s con una carpeta de datos nueva; creó la base y los respaldos en la carpeta del usuario; ignoró un `.env` ajeno; leyó el `.env` propio; detectó una instancia ya abierta.
+- **No hecho:** abrir el ejecutable de **Windows o Mac con doble clic en una computadora real** (la prueba de humo en GitHub lo arranca por línea de comandos y sin navegador); ver cómo se ve la interfaz en esos sistemas; Macs con procesador Intel (el construido es Apple Silicon); firma de código y notarización de Apple (cuestan dinero y cuentas de desarrollador); instaladores (`.msi`, `.dmg`, `.deb`). Los avisos de seguridad de la primera ejecución en Windows y Mac son esperables.
