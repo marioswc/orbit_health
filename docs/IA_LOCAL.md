@@ -43,6 +43,9 @@ Medido en la laptop de desarrollo (CPU, sin GPU, `qwen2.5:1.5b`): primera pregun
 | `qwen2.5:1.5b` | unos 2 s tras cargar (la primera vez 10 s) | Aceptable: saluda por su nombre y responde con empatía; no siempre menciona los intereses |
 Sin modelo, o si su respuesta se descarta, el asistente igual se dirige a la persona por su nombre y recuerda sus intereses con plantillas (`_toque_personal`), ajustadas al tono que eligió.
 
+## IA incrustada: sin Ollama
+Alternativa a Ollama: el motor llama.cpp **dentro del propio programa** (`backend/requirements-ia.txt` y `ORBIT_IA_MODELO_GGUF=/ruta/modelo.gguf`). Tiene prioridad sobre Ollama, solo funciona en esta computadora y puede usar perfil, rasgos y conversación porque nunca salen del proceso. El ejecutable de doble clic lo trae y busca solo el modelo (ver `docs/EJECUTABLE.md`). Si el modelo falla (archivo dañado o poca memoria), se desactiva hasta reiniciar y Nova usa textos escritos; la guardia valida su salida igual que la de cualquier otro proveedor.
+
 ## Instalar el modelo local (una vez, con internet)
 `scripts/instalar_ia_local.sh [modelo]` descarga Ollama en `~/.local/ollama` **sin sudo**, verifica su hash contra el publicado en la release y al final imprime cómo arrancarlo y bajar el modelo (por defecto `qwen2.5:1.5b`, unos 1 GB, en CPU). Después funciona sin internet. Para usarlo en lugar de DeepSeek: `ORBIT_IA_PROVEEDOR=local` en `.env`.
 

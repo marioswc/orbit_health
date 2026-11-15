@@ -17,12 +17,26 @@ Un solo archivo (≈ 24 MB en Linux) que lleva dentro el servidor, la interfaz y
 | **Mac** | Gatekeeper lo bloquea por no estar firmado: clic derecho → *Abrir* → *Abrir* |
 | **Linux** | Primero hay que darle permiso: `chmod +x orbit-health` (o clic derecho → Propiedades → Permisos → *Permitir ejecutar*) y luego doble clic o `./orbit-health` |
 
+## Paquete completo: la IA va dentro (sin Ollama, sin servidor aparte)
+El ejecutable lleva **el motor de IA incrustado** (llama.cpp, dentro del mismo proceso). Falta el modelo, que pesa ~1.1 GB (Qwen2.5 1.5B Instruct, licencia Apache-2.0). Hay dos formas de tenerlo:
+
+| Forma | Cómo |
+|---|---|
+| **Paquete completo** (todo en un archivo, sin internet) | `orbit-health-<sistema>-completo`: trae el ejecutable y la carpeta `modelos/`. Se descomprime y se abre. Se arma con `scripts/crear_paquete_completo.sh` |
+| **Ejecutable solo** + modelo después | Una vez, con internet: `orbit-health --descargar-modelo`. Queda en tu carpeta de datos (`modelos/`) y el programa lo encuentra solo |
+
+Qué hace el programa al arrancar: busca un `.gguf` en `modelos/` junto al programa y en tu carpeta de datos; si lo encuentra, **Nova responde con él, dentro del propio programa**, sin red, y **nada sale de la computadora** aunque haya una clave de nube configurada. Perfil, rasgos y conversación pueden usarse con él porque nunca salen del proceso. Si no hay modelo, Nova usa textos escritos.
+
+Medido en Linux (CPU, 8 núcleos, sin GPU), con el modelo de 1.5B y Ollama desactivado a propósito: la primera respuesta tarda unos 5 a 16 s (carga el modelo y procesa la instrucción fija) y las siguientes unos 4 s. El motor suma ~26 MB al ejecutable (≈ 50 MB en total). La calidad es la de un modelo pequeño: acompaña y hace una pregunta, pero es limitado.
+
+**Qué NO lleva todavía: la voz** (reconocimiento y síntesis). Eso es otra pila de librerías y modelos (≈ 0.6 GB) que no se pudo empaquetar ni probar dentro del ejecutable. La voz sigue necesitando la instalación normal (`scripts/instalar_voz_local.sh`).
+
 ## Dónde guarda tus datos
 En **tu** carpeta de usuario, nunca dentro del programa: Linux `~/.local/share/orbit-health`, Mac `~/Library/Application Support/ORBIT Health`, Windows `%LOCALAPPDATA%\ORBIT Health` (base de datos, respaldos y, si lo creas, un archivo `.env` con tu configuración). Actualizar el programa no toca tus datos. Para quitarlo todo: borra el archivo y esa carpeta.
 
 ## Qué trae y qué no
-- Trae: monitor, semáforo, enlace con la Tierra, bienestar, Nova con textos escritos, guía de bienvenida, y la app instalable (PWA) funciona desde `127.0.0.1`.
-- **No trae** la voz sin internet ni el modelo de IA local (pesan 0.5 GB y 1 GB). Si ya tienes Ollama instalado en tu computadora, el ejecutable lo usa solo si lo configuras en el `.env` de tu carpeta de datos. Para voz e IA: instalación normal con `scripts/asistente_inicio.sh`.
+- Trae: monitor, semáforo, enlace con la Tierra, bienestar, Nova (con la IA incrustada si hay modelo; con textos escritos si no), guía de bienvenida y la app instalable (PWA) desde `127.0.0.1`.
+- **No trae la voz** sin internet. Si ya tienes Ollama, el ejecutable lo usa si lo configuras en el `.env` de tu carpeta de datos (el modelo incrustado tiene prioridad). Para la voz: instalación normal con `scripts/asistente_inicio.sh`.
 - Solo escucha en `127.0.0.1`: nadie más en la red ve los datos. Si ya hay un ORBIT abierto, otro doble clic solo abre el navegador (no duplica).
 
 ## Seguridad al empaquetar
@@ -45,6 +59,7 @@ scripts/probar_ejecutable.sh         # prueba de humo del que acabas de construi
 ## Comprobado y no comprobado
 - **Comprobado en GitHub (ejecución del 15-nov-2026):** los tres sistemas (Linux, Windows y macOS) construyeron el ejecutable y **pasaron la prueba de humo** corriéndolo allí mismo. Linux es el más probado: además se descargó el artefacto de GitHub, se verificó su suma, conserva el permiso de ejecución y pasó la prueba de humo en una computadora real.
 - Hecho en Linux por mí: arranca en unos 2 s con una carpeta de datos nueva; creó la base y los respaldos en la carpeta del usuario; ignoró un `.env` ajeno; leyó el `.env` propio; detectó una instancia ya abierta.
+- **IA incrustada (comprobado en Linux):** se construyó el ejecutable con el motor, se armó el paquete completo, se descomprimió en una carpeta limpia y Nova respondió con el modelo de dentro y Ollama desactivado. En Windows y Mac **no se probó**: el motor incrustado depende de que exista una rueda precompilada para ese sistema; si no, el ejecutable sale sin él (el script lo avisa).
 - **Ventana de aplicación (comprobado en Linux con Edge):** se abre su propia ventana, y al cerrarla el servidor pasa de responder a apagado por sí solo.
 - **No hecho:** la ventana de aplicación en **Windows y Mac** (la lógica está probada con pruebas automáticas, pero ahí solo corrió la prueba de humo del servidor, sin ventana); abrir el ejecutable de **Windows o Mac con doble clic en una computadora real** (la prueba de humo en GitHub lo arranca por línea de comandos y sin navegador); ver cómo se ve la interfaz en esos sistemas; Macs con procesador Intel (el construido es Apple Silicon); firma de código y notarización de Apple (cuestan dinero y cuentas de desarrollador); instaladores (`.msi`, `.dmg`, `.deb`). Los avisos de seguridad de la primera ejecución en Windows y Mac son esperables.
 
