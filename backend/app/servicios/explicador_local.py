@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import ssl
 from contextvars import ContextVar
 from ipaddress import ip_address
@@ -126,9 +127,24 @@ def _usar_deepseek() -> bool:
     return config.IA_PROVEEDOR != "local" and bool(config.DEEPSEEK_API_KEY)
 
 
+def _en_contenedor() -> bool:
+    return Path("/.dockerenv").exists() or bool(os.environ.get("container"))
+
+
+def _url_ollama() -> str:
+    """ORBIT_IA_LOCAL_URL tal como se usa: dentro de un contenedor, 127.0.0.1 o localhost serían el propio contenedor y no tu computadora, así que
+    se traducen a host.docker.internal. Así el MISMO .env sirve en tu máquina y en Docker. Sigue siendo tu computadora, no internet."""
+    url = config.IA_LOCAL_URL
+    if url and _en_contenedor():
+        host = urlparse(url).hostname or ""
+        if host in ("127.0.0.1", "localhost"):
+            return url.replace(host, "host.docker.internal", 1)
+    return url
+
+
 def _local_listo() -> bool:
     """Hay un modelo LOCAL utilizable: el incrustado en el programa o uno de Ollama en esta misma computadora."""
-    url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
+    url, modelo = _url_ollama(), config.IA_LOCAL_MODELO
     return ia_embebida.disponible() or bool(url and modelo and _url_local(url))
 
 
@@ -242,7 +258,7 @@ def consultar_modelo(prompt: str, system: str | None = None, externo: tuple[str,
 def _consultar_local(prompt: str, system: str | None = None) -> str | None:
     if ia_embebida.disponible():                              # el modelo dentro del programa tiene prioridad sobre Ollama
         return ia_embebida.consultar(prompt, system)
-    url = config.IA_LOCAL_URL
+    url = _url_ollama()
     modelo = config.IA_LOCAL_MODELO
     if not url or not modelo or not _url_local(url):
         return None
@@ -278,7 +294,7 @@ def precalentar_modelo() -> bool:
     from .voz_local import SISTEMA_BASE                     # el mismo inicio que usa la conversación: queda ya procesado
     if ia_embebida.disponible():
         return ia_embebida.precalentar(SISTEMA_BASE)
-    url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
+    url, modelo = _url_ollama(), config.IA_LOCAL_MODELO
     cuerpo = json.dumps({"model": modelo, "system": SISTEMA_BASE, "prompt": "ok", "stream": False,
                          "keep_alive": config.IA_LOCAL_KEEP_ALIVE,
                          "options": {"num_predict": 1, "num_ctx": 2048}}).encode("utf-8")

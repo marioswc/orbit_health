@@ -7,7 +7,14 @@
 #   ./run.sh --sin-ventana solo el servidor uvicorn en terminal, sin abrir ventana
 set -euo pipefail
 cd "$(dirname "$0")"
-[ -f .env ] && { set -a; . ./.env; set +a; }
+# .env solo rellena lo que NO está ya en el entorno (igual que el backend: el entorno gana).
+if [ -f .env ]; then
+  while IFS= read -r _l || [ -n "$_l" ]; do
+    case "$_l" in ''|'#'*) continue;; esac
+    _k="${_l%%=*}"; _k="${_k#export }"
+    [ -z "${!_k+x}" ] && { set -a; eval "$_l"; set +a; }
+  done < .env
+fi
 PUERTO="${ORBIT_PUERTO:-3000}"
 HOST="${ORBIT_HOST:-127.0.0.1}"
 MODO_DOCKER=0
