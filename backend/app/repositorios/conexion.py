@@ -29,6 +29,9 @@ def init_db(db_path: str | None = None) -> None:
 
 def _migrar(conn: sqlite3.Connection) -> None:
     """Bases creadas antes de agregar columnas: las añade sin perder datos."""
+    col_perfil = {f["name"] for f in conn.execute("PRAGMA table_info(perfil_ia)")}
+    if col_perfil and "rasgos" not in col_perfil:
+        conn.execute("ALTER TABLE perfil_ia ADD COLUMN rasgos TEXT NOT NULL DEFAULT ''")
     columnas = {f["name"] for f in conn.execute("PRAGMA table_info(cola_salida)")}
     if "ack_estimado_ts" not in columnas:
         conn.execute("ALTER TABLE cola_salida ADD COLUMN ack_estimado_ts TEXT")

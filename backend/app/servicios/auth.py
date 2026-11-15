@@ -33,6 +33,8 @@ def inscribir(conn: sqlite3.Connection, tid: str, rol: str, pin: str | None = No
         raise ValueError(f"Rol inválido: {rol}")
     if repo.obtener_credencial(conn, tid):
         raise ValueError("El tripulante ya tiene credenciales; usa el reinicio de PIN")
+    if rol == "comandante" and repo.hay_comandante(conn):
+        raise ValueError("Ya hay un comandante en la tripulación: solo puede haber uno")
     generado = pin is None
     pin = pin or seg.generar_pin()
     if not seg.pin_valido(pin):

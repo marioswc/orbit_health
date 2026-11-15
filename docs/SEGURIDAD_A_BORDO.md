@@ -7,7 +7,7 @@ Principio: el sistema vive sin internet, con una tripulación pequeña y con la 
 | Realidad a bordo | Decisión |
 |---|---|
 | Sin internet ni correo | Sin recuperación por email ni identidad externa; todo local y con librería estándar |
-| 4 a 6 personas | Todos son astronautas y **no hay médico a bordo**: dos roles de acceso, `tripulante` y `comandante` (uno solo por tripulación, con permisos extra) |
+| 4 a 6 personas | Todos son astronautas y **no hay médico a bordo**: dos roles de acceso, `tripulante` y `comandante` (uno solo por tripulación, con permisos extra; el alta rechaza un segundo comandante) |
 | Un tripulante puede quedar incapacitado | Lo clínico lo **ven y registran todos** los autenticados; registrar a un compañero queda auditado |
 | Un bloqueo permanente podría impedir atender una emergencia | Bloqueos **temporales** (5 min tras 5 fallos), nunca permanentes |
 | Guantes y pantalla táctil | PIN numérico de 6 a 10 dígitos |

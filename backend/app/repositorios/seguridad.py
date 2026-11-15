@@ -13,6 +13,10 @@ def obtener_credencial(conn: sqlite3.Connection, tid: str) -> dict | None:
     return dict(f) if f else None
 
 
+def hay_comandante(conn: sqlite3.Connection) -> bool:
+    return conn.execute("SELECT 1 FROM credenciales WHERE rol='comandante'").fetchone() is not None
+
+
 def cambiar_pin(conn, tid, pin_salt, pin_hash, ts, recup_salt=None, recup_hash=None) -> None:
     if recup_salt:
         conn.execute(

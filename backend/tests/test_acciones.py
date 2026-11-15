@@ -37,4 +37,4 @@ def test_integrado_en_la_api(cliente):
     e = cliente.get("/api/estado/T1").json()
     assert any("Faltan signos" in x for x in e["acciones_sugeridas"])
     v = cliente.post("/api/lecturas", json={"tripulante_id": "T2", "indicador": "spo2", "valor": 98}).json()
-    assert v["acciones_sugeridas"] == ["Próxima captura recomendada en 60 min."]
+    assert v["acciones_sugeridas"] == ["Te sugiero volver a medir en 60 min."]      # T2 tiene sembrado el trato cálido

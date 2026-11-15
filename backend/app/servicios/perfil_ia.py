@@ -22,15 +22,19 @@ def limpiar(texto: str) -> str:
 
 
 def obtener(conn: sqlite3.Connection, tid: str) -> dict:
-    return {"intereses": repo.obtener(conn, tid)}
+    return repo.obtener(conn, tid)
 
 
-def guardar(conn: sqlite3.Connection, tid: str, intereses: str) -> dict:
-    repo.guardar(conn, tid, limpiar(intereses), datetime.now(timezone.utc).isoformat())
+def guardar(conn: sqlite3.Connection, tid: str, intereses: str | None = None, rasgos: str | None = None) -> dict:
+    """Guarda lo que se indique; lo que viene como None se conserva."""
+    actual = repo.obtener(conn, tid)
+    nuevo_i = actual["intereses"] if intereses is None else limpiar(intereses)
+    nuevo_r = actual["rasgos"] if rasgos is None else limpiar(rasgos)
+    repo.guardar(conn, tid, nuevo_i, nuevo_r, datetime.now(timezone.utc).isoformat())
     conn.commit()
     return obtener(conn, tid)
 
 
 def contexto(conn: sqlite3.Connection, tid: str) -> dict:
-    """Lo que el asistente puede saber de la persona: su nombre y los intereses que ella misma escribió."""
-    return {"nombre": tripulantes.nombre(conn, tid), "intereses": repo.obtener(conn, tid)}
+    """Lo que el asistente puede saber de la persona: su nombre y lo que ella misma escribió de sí."""
+    return {"nombre": tripulantes.nombre(conn, tid), **repo.obtener(conn, tid)}

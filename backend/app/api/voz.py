@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/voz", tags=["voz"])
 
 
 @router.post("/chat/{tid}")
-def chat_voz(tid: str, audio: bytes = Body(...), content_type: str | None = Header(default=None),
+def chat_voz(tid: str, audio: bytes = Body(...), idioma: str = "auto", content_type: str | None = Header(default=None),
              content_length: int | None = Header(default=None),
              conn=Depends(conexion), a: dict = Depends(actor), _: dict = Depends(requiere("clinico:leer"))) -> dict:
     """Transcribe audio localmente, responde con el LLM local y devuelve audio opcional."""
@@ -28,15 +28,15 @@ def chat_voz(tid: str, audio: bytes = Body(...), content_type: str | None = Head
     if not voz_local.adquirir_trabajo():
         raise HTTPException(429, "La capacidad de voz está ocupada; inténtalo de nuevo")
     try:
-        texto = voz_local.transcribir(audio, extension)
+        texto, idioma_real = voz_local.transcribir_con_idioma(audio, extension, None if idioma == "auto" else idioma)
         estado = servicio_estado.estado_tripulante(conn, tid)
         preferencias = servicio_preferencias.obtener(conn, tid)
         ctx = servicio_perfil.contexto(conn, tid)
-        respuesta = voz_local.responder(texto, estado, preferencias, perfil=ctx["intereses"], nombre=ctx["nombre"])
+        respuesta = voz_local.responder(texto, estado, preferencias, perfil=ctx["intereses"], rasgos=ctx["rasgos"], nombre=ctx["nombre"], idioma=idioma_real)
         respuesta["transcripcion"] = texto
         respuesta["nivel_general"] = estado["nivel_general"]
         if config.VOZ_PIPER_MODELO:
-            respuesta["audio_base64"] = voz_local.sintetizar(respuesta["texto"])
+            respuesta["audio_base64"] = voz_local.sintetizar(respuesta["texto"], idioma_real)
             respuesta["audio_media_type"] = "audio/wav"
         return respuesta
     except voz_local.VozNoDisponible as error:

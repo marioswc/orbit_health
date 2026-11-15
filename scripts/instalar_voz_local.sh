@@ -10,7 +10,8 @@ mkdir -p models
 from huggingface_hub import hf_hub_download, snapshot_download
 import shutil, pathlib
 d = pathlib.Path("models")
-for f in ("es/es_MX/claude/high/es_MX-claude-high.onnx", "es/es_MX/claude/high/es_MX-claude-high.onnx.json"):
+for f in ("es/es_MX/claude/high/es_MX-claude-high.onnx", "es/es_MX/claude/high/es_MX-claude-high.onnx.json",
+          "en/en_US/lessac/medium/en_US-lessac-medium.onnx", "en/en_US/lessac/medium/en_US-lessac-medium.onnx.json"):
     p = hf_hub_download("rhasspy/piper-voices", f, local_dir=str(d / "_tmp"))
     shutil.move(p, d / pathlib.Path(f).name)
 shutil.rmtree(d / "_tmp", ignore_errors=True)
@@ -23,4 +24,5 @@ ORBIT_VOZ_STT_MODELO=./models/whisper-small
 ORBIT_VOZ_STT_LOCAL_ONLY=1
 ORBIT_VOZ_PIPER_BIN=./.venv/bin/piper
 ORBIT_VOZ_PIPER_MODELO=./models/es_MX-claude-high.onnx
+ORBIT_VOZ_PIPER_MODELO_EN=./models/en_US-lessac-medium.onnx
 TXT
