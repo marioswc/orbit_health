@@ -52,3 +52,46 @@ def test_hay_orbit_es_falso_si_nadie_responde():
 def test_el_lanzador_solo_escucha_en_loopback():
     fuente = (RAIZ / "scripts" / "lanzador.py").read_text(encoding="utf-8")
     assert 'host="127.0.0.1"' in fuente and "0.0.0.0" not in fuente
+
+
+# ---------- ventana de aplicación (como una app nativa) ----------
+@pytest.mark.parametrize("sistema,esperado", [
+    ("Linux", "/usr/bin/microsoft-edge"), ("Darwin", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+])
+def test_elige_un_navegador_chromium_si_lo_hay(monkeypatch, sistema, esperado):
+    monkeypatch.setattr(lanzador.platform, "system", lambda: sistema)
+    monkeypatch.setattr(lanzador.shutil, "which", lambda n: "/usr/bin/microsoft-edge" if n == "microsoft-edge" else None)
+    monkeypatch.setattr(lanzador.Path, "is_file", lambda self: str(self) == esperado)
+    assert lanzador.navegador_de_ventana() == esperado
+
+
+def test_sin_chromium_devuelve_none_y_se_abre_el_navegador_normal(monkeypatch):
+    monkeypatch.setattr(lanzador.platform, "system", lambda: "Linux")
+    monkeypatch.setattr(lanzador.shutil, "which", lambda n: None)                  # p. ej. solo Firefox, que no tiene modo aplicación
+    assert lanzador.navegador_de_ventana() is None
+
+
+def test_en_windows_busca_edge_antes_que_chrome_en_su_carpeta_de_programas(monkeypatch):
+    monkeypatch.setattr(lanzador.platform, "system", lambda: "Windows")
+    monkeypatch.setenv("ProgramFiles(x86)", "C:/Program Files (x86)")
+    monkeypatch.delenv("ProgramFiles", raising=False)
+    monkeypatch.delenv("LOCALAPPDATA", raising=False)
+    monkeypatch.setattr(lanzador.Path, "is_file", lambda self: str(self).endswith(".exe"))      # todos "existen": gana el primero de la lista
+    elegido = lanzador.navegador_de_ventana()
+    assert elegido.endswith("msedge.exe") and "Edge" in elegido                                  # Edge viene con Windows 10 y 11
+
+
+def test_la_ventana_usa_un_perfil_propio_y_no_toca_el_del_usuario(tmp_path):
+    cmd = lanzador.comando_de_ventana("/usr/bin/chromium", "http://127.0.0.1:3000", tmp_path)
+    assert cmd[0] == "/usr/bin/chromium" and "--app=http://127.0.0.1:3000" in cmd
+    assert f"--user-data-dir={tmp_path / 'ventana'}" in cmd                        # perfil aparte: no mezcla pestañas ni sesiones
+    assert "--no-first-run" in cmd
+
+
+def test_sin_consola_la_salida_va_a_un_archivo_de_registro(tmp_path, monkeypatch):
+    monkeypatch.setattr(sys, "stdout", None)
+    monkeypatch.setattr(sys, "stderr", None)
+    lanzador._asegurar_salida(tmp_path)
+    print("hola desde el ejecutable sin consola")
+    sys.stdout.flush()
+    assert "hola desde el ejecutable" in (tmp_path / "orbit-health.log").read_text(encoding="utf-8")

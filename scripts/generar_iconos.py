@@ -36,7 +36,12 @@ def main() -> None:
     dibujar(512, redondeado=True).save(SALIDA / "icono-512.png")
     dibujar(512, escala=0.8).save(SALIDA / "icono-maskable-512.png")      # contenido dentro de la zona segura (80 %)
     dibujar(180, escala=0.9).convert("RGB").save(SALIDA / "apple-touch-icon.png")
-    print("Iconos generados en", SALIDA)
+    emp = SALIDA.parents[1] / "empaquetado"                           # iconos del ejecutable (Windows y Mac)
+    emp.mkdir(exist_ok=True)
+    base = dibujar(1024, redondeado=True)
+    base.save(emp / "orbit.ico", sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
+    base.save(emp / "orbit.icns")
+    print("Iconos generados en", SALIDA, "y", emp)
 
 
 if __name__ == "__main__":

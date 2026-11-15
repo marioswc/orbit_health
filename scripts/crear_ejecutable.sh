@@ -17,15 +17,19 @@ PY=.venv-build/bin/python; [ -x "$PY" ] || PY=.venv-build/Scripts/python.exe
 "$PY" -m pip install -q -r backend/requirements.txt pyinstaller
 
 echo "[3/4] Empaquetando"
-SEP=":"; ROOT="$PWD"
-case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) SEP=";"; ROOT="$(pwd -W)";; esac      # en Windows PyInstaller necesita rutas D:/...
+SEP=":"; ROOT="$PWD"; EXTRA=()
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) SEP=";"; ROOT="$(pwd -W)"                       # en Windows PyInstaller necesita rutas D:/...
+                        EXTRA=(--windowed --icon "$ROOT/empaquetado/orbit.ico");;   # sin ventana negra: solo la ventana de ORBIT
+  Darwin) EXTRA=(--icon "$PWD/empaquetado/orbit.icns");;                # en Mac se mantiene la terminal (un .app no se pudo probar)
+esac
 "$PY" -m PyInstaller --noconfirm --clean --onefile --name orbit-health \
   --distpath dist-ejecutable --workpath build/pyinstaller --specpath build \
   --paths backend \
   --add-data "$ROOT/backend/app/datos${SEP}app/datos" \
   --add-data "$ROOT/backend/app/repositorios/schema.sql${SEP}app/repositorios" \
   --add-data "$ROOT/frontend/dist${SEP}frontend/dist" \
-  --collect-submodules uvicorn --collect-submodules app \
+  --collect-submodules uvicorn --collect-submodules app ${EXTRA[@]+"${EXTRA[@]}"} \
   --exclude-module tkinter --exclude-module faster_whisper --exclude-module bleak \
   scripts/lanzador.py
 
