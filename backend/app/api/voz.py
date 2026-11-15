@@ -2,6 +2,7 @@ from fastapi import APIRouter, Body, Depends, Header, HTTPException
 
 from .. import config
 from ..servicios import estado as servicio_estado
+from ..servicios import limites
 from ..servicios import perfil_ia as servicio_perfil
 from ..servicios import preferencias as servicio_preferencias
 from ..servicios import voz_local
@@ -21,6 +22,10 @@ def chat_voz(tid: str, audio: bytes = Body(...), idioma: str = "auto", content_t
         raise HTTPException(413, "Audio demasiado grande")
     requerir_tripulante(conn, tid)
     exigir_propietario(a, tid)               # la conversación es personal: solo su dueño
+    try:
+        limites.contar_peticion(f"voz:{tid}")
+    except limites.LimiteExcedido as e:
+        raise HTTPException(429, e.motivo, headers={"Retry-After": str(e.espera_s)}) from e
     extension = ".wav" if not content_type else {
         "audio/wav": ".wav", "audio/webm": ".webm", "audio/ogg": ".ogg",
         "audio/mpeg": ".mp3", "audio/mp4": ".m4a",

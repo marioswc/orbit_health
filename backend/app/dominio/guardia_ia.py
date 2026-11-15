@@ -61,13 +61,15 @@ def _niveles_permitidos(contexto) -> set[str]:
     return {n for n in NIVELES if f'"{n}"' in json.dumps(contexto, ensure_ascii=False, default=str)}
 
 
-def validar_respuesta(texto: str | None, contexto, pregunta: str = "") -> tuple[bool, str]:
+def validar_respuesta(texto: str | None, contexto, pregunta: str = "", secretos: tuple[str, ...] = ()) -> tuple[bool, str]:
     """(ok, motivo). `contexto` es el estado ya calculado; `pregunta` es lo que dijo el usuario (si lo hubo)."""
     if not texto or not texto.strip():
         return False, "respuesta vacía"
     if len(texto) > MAX_CARACTERES:
         return False, "respuesta demasiado larga"
     t = normalizar(texto)
+    if _filtra_instrucciones(t, secretos):
+        return False, "filtra sus instrucciones internas"
     if "http://" in t or "https://" in t or "www." in t:
         return False, "contiene un enlace"
     for raiz in RAICES_DE_MEDICACION:
@@ -94,3 +96,46 @@ def detectar_idioma(texto: str) -> str:
     en = sum(1 for p in palabras if p in _PALABRAS_EN)
     es = sum(1 for p in palabras if p in _PALABRAS_ES)
     return "en" if en > es else "es"
+
+
+# ---------- saneado de lo que entra a un prompt ----------
+# Marcas con las que los modelos delimitan roles; dentro de un dato del usuario no tienen sentido y se quitan.
+_MARCAS_ESPECIALES = re.compile(r"<\|[^|>]{0,40}\|>|\[/?(?:INST|SYS)\]|<<\s*/?SYS\s*>>|</?s>|```+", re.I)
+_ENCABEZADO_DE_ROL = re.compile(r"(?im)^\s*(?:#{1,6}\s*)?(?:system|sistema|assistant|asistente|user|usuario|human|ai)\s*[:>]\s*")
+_INVISIBLES = re.compile("[\u200b-\u200f\u202a-\u202e\u2060-\u2064\ufeff]")
+_INTENTOS = re.compile(
+    r"(ignor[ae]\w*|olvid[ae]\w*|disregard|forget)\W+(\w+\W+){0,4}(instrucc|instruction|regla|rule|prompt)|"
+    r"(revela|muestra|repite|dime|reveal|show|print|repeat)\W+(\w+\W+){0,4}(prompt|instrucc|instruction|system)|"
+    r"(ahora\s+eres|you\s+are\s+now|act[uú]a\s+como|pretend\s+to\s+be)|jailbreak|\bDAN\b", re.I)
+
+
+def sanear_para_prompt(texto: str, maximo: int = 500) -> str:
+    """Limpia un texto del usuario antes de ponerlo en un prompt: normaliza Unicode, quita caracteres de control e
+    invisibles, marcas de plantilla de chat, encabezados que imitan un rol y bloques de código, colapsa espacios y recorta.
+    No cambia el sentido de una frase normal."""
+    t = unicodedata.normalize("NFKC", texto or "")
+    t = _INVISIBLES.sub("", t)
+    t = "".join(c for c in t if c in "\n\t" or (ord(c) >= 32 and ord(c) != 127))
+    t = _MARCAS_ESPECIALES.sub(" ", t)
+    t = _ENCABEZADO_DE_ROL.sub("", t)
+    return " ".join(t.split())[:maximo]
+
+
+def parece_inyeccion(texto: str) -> bool:
+    """True si el texto intenta cambiar las reglas o sacar las instrucciones. Solo sirve para registrar el intento (sin
+    guardar el texto): la defensa real es el saneado, el dato entre comillas y la validación de la salida."""
+    return bool(_INTENTOS.search(unicodedata.normalize("NFKC", texto or "")))
+
+
+def _filtra_instrucciones(salida_normalizada: str, secretos: tuple[str, ...], ventana: int = 6) -> bool:
+    """True si la salida contiene `ventana` palabras seguidas de alguno de los textos secretos (las instrucciones)."""
+    pal_salida = salida_normalizada.split()
+    if len(pal_salida) < ventana:
+        return False
+    huella = {" ".join(pal_salida[i:i + ventana]) for i in range(len(pal_salida) - ventana + 1)}
+    for secreto in secretos:
+        pal = normalizar(secreto).split()
+        for i in range(len(pal) - ventana + 1):
+            if " ".join(pal[i:i + ventana]) in huella:
+                return True
+    return False

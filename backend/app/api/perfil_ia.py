@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 
 from ..dominio import guardia_ia
 from ..servicios import estado as servicio_estado
+from ..servicios import limites
 from ..servicios import perfil_ia as servicio
 from ..servicios import preferencias as servicio_preferencias
 from ..servicios import voz_local
@@ -53,12 +54,25 @@ def chat_texto(tid: str, datos: ChatIn, conn=Depends(conexion), a: dict = Depend
     exigir_propietario(a, tid)
     estado = servicio_estado.estado_tripulante(conn, tid)
     ctx = servicio.contexto(conn, tid)
-    r = voz_local.responder(datos.texto, estado, servicio_preferencias.obtener(conn, tid),
+    if guardia_ia.detectar_crisis(datos.texto):          # la crisis nunca se frena: es texto escrito, no gasta el modelo
+        r = _responder(datos, estado, conn, tid, ctx)
+        r["nivel_general"] = estado["nivel_general"]
+        return r
+    try:
+        limites.contar_peticion(f"chat:{tid}")
+        with limites.lugar_en_el_modelo():
+            r = _responder(datos, estado, conn, tid, ctx)
+    except limites.LimiteExcedido as e:
+        raise HTTPException(429, e.motivo, headers={"Retry-After": str(e.espera_s)}) from e
+    r["nivel_general"] = estado["nivel_general"]
+    return r
+
+
+def _responder(datos, estado, conn, tid, ctx) -> dict:
+    return voz_local.responder(datos.texto, estado, servicio_preferencias.obtener(conn, tid),
                             perfil=ctx["intereses"], rasgos=ctx["rasgos"], nombre=(ctx["nombre"].split() or [""])[0],
                             idioma=datos.idioma or guardia_ia.detectar_idioma(datos.texto),
                             historial=[m.model_dump() for m in datos.historial])
-    r["nivel_general"] = estado["nivel_general"]
-    return r
 
 
 @router.get("/asistente/saludo/{tid}")

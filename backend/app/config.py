@@ -87,3 +87,7 @@ VOZ_MAX_RESPUESTA_CARACTERES = int(os.getenv("ORBIT_VOZ_MAX_RESPUESTA_CARACTERES
 # pregunta no pague la carga (unos 10 s en la laptop de desarrollo).
 IA_LOCAL_KEEP_ALIVE = os.getenv("ORBIT_IA_LOCAL_KEEP_ALIVE", "30m")
 PRECALENTAR = os.getenv("ORBIT_PRECALENTAR", "1") == "1"
+
+# Protección contra saturar el modelo local (CPU de la laptop de a bordo).
+IA_MAX_SIMULTANEAS = int(os.getenv("ORBIT_IA_MAX_SIMULTANEAS", "2"))
+IA_PETICIONES_POR_MIN = int(os.getenv("ORBIT_IA_PETICIONES_POR_MIN", "30"))        # por persona; 0 = sin límite

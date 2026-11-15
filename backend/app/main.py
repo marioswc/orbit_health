@@ -55,6 +55,22 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="ORBIT Health", version="0.1.0", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def cabeceras_de_seguridad(request, call_next):
+    """Cabeceras básicas en toda respuesta. Sin CSP estricta: index.html lleva un script en línea (tema claro/oscuro)."""
+    r = await call_next(request)
+    r.headers.setdefault("X-Content-Type-Options", "nosniff")
+    r.headers.setdefault("X-Frame-Options", "DENY")
+    r.headers.setdefault("Referrer-Policy", "no-referrer")
+    r.headers.setdefault("Permissions-Policy", "camera=(), geolocation=(), microphone=(self)")
+    r.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+    if request.url.path.startswith("/api"):
+        r.headers.setdefault("Cache-Control", "no-store")             # nada clínico se guarda en cachés del navegador
+    return r
+
+
 app.include_router(router)
 if config.DEMO_API:
     from .api import demo
