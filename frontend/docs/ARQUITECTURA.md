@@ -1,90 +1,58 @@
 # Arquitectura del frontend — Screaming Architecture
 
-La estructura de carpetas debe **gritar el dominio** (monitoreo de salud de astronautas), no el framework. Se organiza por **features**; cada feature es autocontenida.
+La estructura de carpetas **grita el dominio** (monitoreo de salud de astronautas), no el framework. Se organiza por **features** autocontenidas y módulos transversales en `shared/` e `i18n/`.
 
-## Estructura objetivo
+## Estructura actual (`frontend/src/`)
 
 ```text
 frontend/src/
-├── app/                          # Composición de la aplicación
-│   ├── App.tsx                   # Layout raíz
-│   ├── routes.tsx                # Tabla de rutas/vistas (une las rutas de cada feature)
-│   └── providers/                # Contextos globales (tripulante activo, etc.)
+├── app/                          # Composición: App.tsx, BarraLateral.tsx, AsistenteFlotante.tsx, rutas.ts
 ├── features/
-│   ├── monitor/                  # Vista principal: figura humana + resumen
-│   │   ├── components/           # FiguraHumana, ResumenNews2, TarjetaZona
-│   │   ├── hooks/                # useEstadoTripulante, useZonaSeleccionada
-│   │   ├── routes/               # MonitorPage.tsx
-│   │   ├── services/             # llamadas a /estado
-│   │   ├── types/                # Estado, LecturaEstado, Nivel
-│   │   └── index.ts              # API pública del feature
+│   ├── asistente/                # Chat privado con Nova (saludo, atajos, perfil IA, memoria corta)
+│   ├── banda/                    # Reloj 3D (RelojBanda), simulación de misión y racha de mediciones
+│   ├── bienestar/                # Ánimo diario, diario privado, tamizaje PHQ-2, protocolo de crisis
+│   ├── bienvenida/               # Guía inicial paso a paso
+│   ├── cabina/                   # Monitor ambiental de cabina (CO₂ y dosis de radiación)
+│   ├── enlace/                   # Consola de enlace, Modo Eclipse, cola SHA-256, Tierra e informes
+│   ├── historial/                # Registro histórico de lecturas por indicador
 │   ├── mediciones/               # Captura manual de signos vitales
-│   │   ├── components/           # PanelMedicion
-│   │   ├── hooks/                # useRegistrarLectura
-│   │   ├── services/             # POST /lecturas
-│   │   └── types/
-│   ├── bienestar/                # Tamizaje PHQ-2 + diario privado
-│   │   ├── components/           # Tamizaje, DiarioTripulante
-│   │   ├── hooks/
-│   │   ├── routes/               # BienestarPage.tsx
-│   │   ├── services/             # /tamizajes, /diario
-│   │   └── types/
-│   ├── enlace/                   # Enlace con la Tierra, modo Eclipse, cola
-│   │   ├── components/           # ConsolaEnlace, ColaPrioridad
-│   │   ├── hooks/                # useEnlace, useCola
-│   │   ├── routes/               # EnlacePage.tsx
-│   │   ├── services/             # /enlace, /cola, /cola/verificar
-│   │   └── types/
-│   └── tripulantes/              # Selector de tripulante
-│       ├── components/ · hooks/ · services/ · types/
-├── shared/                       # Solo lo que usan 2+ features
-│   ├── api/                      # client.ts (fetch base)
-│   ├── components/               # Boton, Etiqueta, Aviso, BadgeNivel
-│   ├── hooks/
-│   ├── styles/                   # tokens.css, globals.css
-│   └── types/                    # Nivel y tipos transversales
+│   ├── monitor/                  # Figura humana (.webp), NEWS2, signos vitales, acciones y series
+│   ├── peligros/                 # Marco de riesgos NASA HRP
+│   ├── seguridad/                # AccesoTripulante (Tierra 3D, login PIN, recuperación) y PerfilMenu
+│   ├── sistema/                  # Salud, respaldos, reinicio de PIN, avisos compartidos y auditoría
+│   ├── tripulantes/              # Selector de tripulante activo
+│   └── voz/                      # Burbuja de voz bilingüe ES/EN (Whisper/Piper local o Web Speech API)
+├── i18n/                         # Motor i18n y locales ES / EN por feature
+├── shared/                       # api/client.ts, components/, hooks/, styles/styles.css, types/, rendimiento.ts
 └── main.tsx
 ```
 
 ## Reglas
 
 1. **Una feature no importa de otra feature.** Si dos la necesitan, sube a `shared/` o se coordina desde `app/`.
-2. Cada feature expone su API pública solo por `index.ts`. Nadie importa rutas internas de otra feature.
-3. `components/` = UI sin lógica de red. `hooks/` = estado y efectos. `services/` = llamadas HTTP. `types/` = contratos.
+2. Cada feature expone su API pública por `index.ts`.
+3. `components/` = UI. `hooks/` = estado y efectos. `types/` = contratos. `routes/` = vistas cargadas en `app/App.tsx` con `React.lazy`.
 4. `shared/` no importa de `features/`. `app/` puede importar de ambos.
-5. Las llamadas a `/api` pasan siempre por `shared/api/client.ts`. Sin URLs ni secretos en componentes (usar variables de entorno de Vite, `import.meta.env`).
+5. Toda llamada a `/api` pasa por `shared/api/client.ts` (o `fetch` directo a `/api/voz/chat/{id}` para multipart de audio). Sin URLs externas ni secretos en cliente.
 6. Los umbrales clínicos viven en el backend. El frontend **no recalcula niveles**: solo muestra los que devuelve la API.
 
-## Mapa de migración (hecho el 2026-11-14)
+## Navegación y carga diferida
 
-| Hoy | Destino |
+- `app/rutas.ts` define la navegación por hash (`#/monitor`, `#/banda`, `#/historial`, `#/bienestar`, `#/asistente`, `#/riesgos`, `#/enlace`, `#/sistema`), y `app/App.tsx` carga las páginas de forma diferida (`React.lazy` + `Suspense`) para mantener bajo el bundle inicial.
+- En pantallas de acceso (`AccesoTripulante`) se muestra el escenario `Tierra3D` y los controles de idioma/tema hasta completar el login (o usar modo sin autenticación cuando `ORBIT_AUTH=0`).
+
+## Feature → riesgo NASA HRP / necesidad operativa
+
+| Feature | Riesgo o necesidad que atiende |
 |---|---|
-| `src/App.tsx` | `app/App.tsx` (+ vistas en `features/*/routes`) |
-| `src/components/FiguraHumana.tsx` | `features/monitor/components/FiguraHumana.tsx` |
-| `src/components/PanelMedicion.tsx` | `features/mediciones/components/` |
-| `src/components/Tamizaje.tsx` | `features/bienestar/components/` |
-| `src/components/DiarioTripulante.tsx` | `features/bienestar/components/` |
-| `src/components/ConsolaEnlace.tsx` | `features/enlace/components/` |
-| `src/api/client.ts` | `shared/api/client.ts` |
-| `src/api/tipos.ts` | Repartir por feature; `Nivel` a `shared/types/` |
-| `src/styles.css` | `shared/styles/` (tokens + globals), ver [DISENO.md](./DISENO.md) |
+| `monitor`, `mediciones`, `historial` | Cardiovascular, hipoxia, inmune, pérdida ósea y seguimiento longitudinal |
+| `cabina`, `banda` | Ambiente de cabina (CO₂, radiación) y telemetría continua de pulsera |
+| `bienestar`, `asistente`, `voz` | Salud conductual, aislamiento, confinamiento y apoyo privado con Nova |
+| `enlace` | Distancia a la Tierra: retardo, Modo Eclipse y cola priorizada SHA-256 |
+| `seguridad`, `sistema` | Privacidad a bordo (PIN, permisos por rol), respaldos y auditoría íntegra |
 
-Migración aplicada solo de ubicación, sin cambiar comportamiento; `pnpm build` en verde. Diferencias frente a la estructura objetivo:
+---
 
-- Aún no existen `app/routes.tsx`, `app/providers/` ni `features/*/services/`; las carpetas vacías (`services/`, `hooks/`, `shared/components`, `shared/hooks`) se crearán al usarlas.
-- Las llamadas HTTP siguen dentro de los componentes vía `shared/api/client.ts`; moverlas a `services/` es el siguiente paso.
-- `MonitorPage` recibe `children` para que `app/` componga `PanelMedicion` (feature `mediciones`) sin que `monitor` importe de otra feature.
-- `src/styles.css` pasó a `shared/styles/styles.css`; los tokens de [DISENO.md](./DISENO.md) aún no están aplicados.
+## Justificación del uso de IA
 
-## Navegación
-
-Hoy `App.tsx` alterna vistas con estado local (`monitor` / `bienestar` / `enlace`). Decisión pendiente (**Supuesto**: se mantiene así para el prototipo, ya que el plan pide pantalla única sin rutas anidadas). Si se adopta un router, cada feature declara sus rutas en `routes/` y `app/routes.tsx` las une.
-
-## Feature → riesgo HRP que atiende
-
-| Feature | Riesgos/peligros NASA HRP |
-|---|---|
-| `monitor` | Cardiovascular, hipoxia, inmune, nutrición (indicadores en la figura) |
-| `mediciones` | Captura manual cuando no hay sensores |
-| `bienestar` | Salud conductual, aislamiento y confinamiento |
-| `enlace` | Distancia de la Tierra: retardo, modo Eclipse, cola con prioridad |
+La arquitectura orientada a dominio (*Screaming Architecture*), la separación entre features y la regla de no recalcular umbrales en cliente fueron definidas por el equipo; la IA apoyó en la refactorización, tipado y pruebas unitarias bajo revisión humana. Ver [USO_IA_Y_DOCUMENTACION_FRONTEND.md](./USO_IA_Y_DOCUMENTACION_FRONTEND.md) y [docs/SI_DISCLOSURE.md](../../docs/SI_DISCLOSURE.md).
