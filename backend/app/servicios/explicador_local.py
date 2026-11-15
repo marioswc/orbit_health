@@ -179,7 +179,7 @@ def consultar_modelo(prompt: str) -> str | None:
         "model": modelo,
         "prompt": prompt,
         "stream": False,
-        "options": {"temperature": 0.1},
+        "options": {"temperature": 0.1, "num_predict": 220},     # tope de tokens: un modelo chico no debe quedarse generando
     }).encode("utf-8")
     request = Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
     try:
