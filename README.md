@@ -20,6 +20,9 @@ A Spanish version for the team is kept in `README.es.md` (internal, not part of 
 - Adapts its wording to each astronaut's chosen tone and level of detail, without changing any alert level.
 - Verifies and restores its own database and exports a report for Earth with an integrity fingerprint.
 
+## One-file executable (no Python or Node needed)
+`scripts/crear_ejecutable.sh` builds a single ~24 MB file for your OS that starts the server and opens the browser (double-click). Data is kept in the user's own folder and it only listens on 127.0.0.1. It is unsigned, so Windows and macOS show a security warning the first time. Details and limits: `docs/EJECUTABLE.md` (in Spanish).
+
 ## Install it as an app / run it in a container
 ORBIT Health is an installable web app (PWA): open it in Chrome or Edge and use the *Install* prompt. It opens in its own window and the interface loads even if the server is slow. Clinical data is never cached in the browser. Installing needs `localhost` or HTTPS. Or run it in Docker: `docker compose up --build` (http://127.0.0.1:3000, loopback only). Details and limits: `docs/INSTALAR_COMO_APP.md` (in Spanish).
 
