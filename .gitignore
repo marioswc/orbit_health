@@ -19,3 +19,5 @@ data/respaldos/
 .venv-build/
 build/
 dist-ejecutable/
+.coverage
+htmlcov/
