@@ -47,14 +47,20 @@ ORBIT Health is an offline clinical decision-support and wellbeing tool for a sm
 
 ## Use of Super Intelligence (SI)
 **Tools used in preparing the solution:**
-- **Claude (Anthropic), through Claude Code**, working in the repository: wrote the backend, frontend features, tests, scripts, packaging and most of the technical documentation. Work is traceable through the commit trailer `Co-Authored-By: Claude` in the Git history.
-- **Antigravity (Google DeepMind)**: used by a team member to organise the executive summary and the English structure of the presentation. **[TEAM TO CONFIRM exactly what it produced]**
+- **Claude (Anthropic), through Claude Code**, working in the repository: wrote the backend, frontend features, tests, scripts, packaging and most of the technical documentation. Work is traceable through the commit trailer `Co-Authored-By: Claude` in the Git history (146 commits by the backend author and 21 by Santiago Antonio Suárez Luna, at the time of writing).
+- **GitHub Copilot**: appears as co-author in 2 commits by vzdee, according to the Git trailers.
+- **Antigravity (Google DeepMind)**: used by a team member, as stated in his own documents, to organise the executive summary and the English structure of the 5-slide presentation from the team's decisions and implementation.
+
+Commits by the other team members carry no trailer. **[TEAM TO CONFIRM, each of Lourdes Ruiz, vzdee and Mauricio Martinez: whether any SI tool was used beyond what is listed above, including for the demo script or slides.]**
 
 **SI inside the product (optional and disclosed):** Nova can use a small local language model (offline). An optional cloud provider (DeepSeek) can be enabled with an API key; it is off by default, the response says when it was used, and personal data (profile, traits, conversation history, name) are never sent to it. Details: `docs/IA_LOCAL.md`.
 
-**How SI was and was not used for the idea:** **[TEAM TO CONFIRM, in the team's own words: what the team decided about the concept (offline decision support, explainable rules, mental-health privacy) and the choice of indicators before and independently of any SI suggestion. The guide states SI must not be used to come up with the idea of how to solve the challenge.]**
+**How SI was and was not used for the idea:** The concept and the approach come from the team's own analysis of the challenge statement and the resources linked to it (the NASA Human Research Program hazard and risk pages, the ARCHeR study description and related public documents). That analysis defined the problem: offline decision support for a crew without a doctor, explainable rules, and privacy of mental-health data. SI tools were used afterwards to help implement and document that approach. SI was not used to come up with the idea of how to solve the challenge.
 
-**Images and media:** **[TEAM TO CONFIRM whether any image, audio or video was generated with SI. If so, the guide requires a visible watermark on images and video, and an acknowledgement in descriptive text and metadata for audio.]** The astronaut illustration and the skeleton and muscle layers have unconfirmed origin and licence (see item 2 above). No NASA logos or branding were generated or modified.
+**Images and media:** No image or video in the project was generated with SI. Two points to disclose for completeness:
+- The **app icons** (the orbit and planet logo) were drawn by a small script (`scripts/generar_iconos.py`) written with Claude Code; it draws shapes programmatically and does not use an image-generation model.
+- **Nova's spoken replies** are synthesised at runtime by a neural text-to-speech model (Piper) when voice is switched on, and speech is recognised by a neural model (faster-whisper). No pre-generated audio is included in the repository. If the demo video features Nova's voice, say so in the video description.
+The origin and licence of the astronaut illustration and the skeleton and muscle layers are still to be confirmed (see item 2 above). No NASA logos or branding were generated or modified.
 
 **Code and data:** acknowledged here and in the repository (`docs/SI_DISCLOSURE.md`, commit trailers).
 
