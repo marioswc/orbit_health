@@ -101,3 +101,7 @@ PRECALENTAR = os.getenv("ORBIT_PRECALENTAR", "1") == "1"
 # Protección contra saturar el modelo local (CPU de la laptop de a bordo).
 IA_MAX_SIMULTANEAS = int(os.getenv("ORBIT_IA_MAX_SIMULTANEAS", "2"))
 IA_PETICIONES_POR_MIN = int(os.getenv("ORBIT_IA_PETICIONES_POR_MIN", "30"))        # por persona; 0 = sin límite
+
+# IA incrustada (llama.cpp dentro del programa, sin Ollama): ruta a un .gguf; 0 hilos = todos los núcleos.
+IA_MODELO_GGUF = os.getenv("ORBIT_IA_MODELO_GGUF", "").strip()
+IA_HILOS = int(os.getenv("ORBIT_IA_HILOS", "0"))

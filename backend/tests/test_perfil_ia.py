@@ -271,3 +271,105 @@ def test_con_la_nube_directa_tampoco_viaja_lo_personal(monkeypatch, local_listo)
     monkeypatch.setattr(explicador_local, "_consultar_deepseek", lambda p, s=None: enviados.update(nube=(p, s)) or None)
     voz_local.responder("hola", ESTADO, {"tono": "calido"}, perfil="ajedrez", rasgos="serena", nombre="Ana")
     assert not any(d in " ".join(x or "" for x in enviados["nube"]) for d in ("ajedrez", "serena", "Ana"))
+
+
+# ---------- IA incrustada (llama.cpp dentro del programa) ----------
+class _LlamaFalso:
+    llamadas: list = []
+
+    def __init__(self, **kw):
+        _LlamaFalso.llamadas.append(("init", kw))
+
+    def create_chat_completion(self, messages, max_tokens, temperature):
+        _LlamaFalso.llamadas.append(("chat", messages, max_tokens))
+        return {"choices": [{"message": {"content": "  Te escucho. ¿Qué extrañas hoy?  "}}]}
+
+
+@pytest.fixture
+def embebido(monkeypatch, tmp_path):
+    import sys
+    import types
+
+    from app.servicios import ia_embebida
+    modelo = tmp_path / "qwen-prueba.gguf"
+    modelo.write_bytes(b"GGUF")
+    _LlamaFalso.llamadas = []
+    monkeypatch.setitem(sys.modules, "llama_cpp", types.SimpleNamespace(Llama=_LlamaFalso))
+    monkeypatch.setattr(config, "IA_MODELO_GGUF", str(modelo))
+    monkeypatch.setattr(config, "IA_LOCAL_URL", "")
+    monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "")
+    ia_embebida.reiniciar()
+    yield ia_embebida
+    ia_embebida.reiniciar()
+
+
+def test_el_modelo_incrustado_responde_sin_ollama_ni_red(embebido):
+    assert embebido.disponible() and embebido.nombre() == "qwen-prueba"
+    r = voz_local.responder("hola, ¿cómo voy?", ESTADO, {"tono": "calido"}, nombre="Ana")
+    assert r["fuente"] == "modelo_local" and r["generado_por_ia"] is True and "Te escucho" in r["texto"]
+    chat = [x for x in _LlamaFalso.llamadas if x[0] == "chat"][0]
+    assert chat[1][0]["role"] == "system" and "Nova" in chat[1][0]["content"] and chat[1][1]["role"] == "user"
+    assert [x for x in _LlamaFalso.llamadas if x[0] == "init"].__len__() == 1        # se carga una sola vez
+
+
+def test_el_perfil_si_llega_al_modelo_incrustado_porque_nunca_sale_del_proceso(embebido):
+    voz_local.responder("hola", ESTADO, {"tono": "calido"}, perfil="ajedrez", rasgos="serena", nombre="Ana")
+    prompt = [x for x in _LlamaFalso.llamadas if x[0] == "chat"][0][1][1]["content"]
+    assert "ajedrez" in prompt and "serena" in prompt
+
+
+def test_el_incrustado_tiene_prioridad_sobre_ollama(embebido, monkeypatch):
+    monkeypatch.setattr(config, "IA_LOCAL_URL", "http://127.0.0.1:11434/api/generate")
+    monkeypatch.setattr(config, "IA_LOCAL_MODELO", "m")
+    monkeypatch.setattr(explicador_local, "_ABRIDOR", types_no_red())
+    assert explicador_local.consultar_modelo("hola") is not None                    # no se tocó la red: respondió el incrustado
+
+
+def types_no_red():
+    class Prohibido:
+        def open(self, *a, **k):
+            raise AssertionError("no debería llamar a Ollama")
+    return Prohibido()
+
+
+def test_sin_archivo_o_sin_libreria_no_esta_disponible(monkeypatch, tmp_path):
+    import sys
+
+    from app.servicios import ia_embebida
+    monkeypatch.setattr(config, "IA_MODELO_GGUF", str(tmp_path / "no-existe.gguf"))
+    ia_embebida.reiniciar()
+    assert ia_embebida.disponible() is False and ia_embebida.consultar("hola") is None
+    real = tmp_path / "m.gguf"
+    real.write_bytes(b"x")
+    monkeypatch.setattr(config, "IA_MODELO_GGUF", str(real))
+    monkeypatch.setitem(sys.modules, "llama_cpp", None)                             # simula que la librería no está instalada
+    assert ia_embebida.disponible() is False
+
+
+def test_si_el_modelo_falla_se_usa_el_texto_de_respaldo_y_no_se_reintenta_en_bucle(embebido, monkeypatch):
+    class Roto(_LlamaFalso):
+        def create_chat_completion(self, *a, **k):
+            raise RuntimeError("sin memoria")
+    import sys
+    import types
+    monkeypatch.setitem(sys.modules, "llama_cpp", types.SimpleNamespace(Llama=Roto))
+    r = voz_local.responder("hola", ESTADO, {"tono": "directo"})
+    assert r["fuente"] == "reglas_locales" and r["generado_por_ia"] is False
+    assert embebido.disponible() is False                                           # queda deshabilitado hasta reiniciar
+
+
+def test_la_guardia_tambien_vigila_al_modelo_incrustado(embebido, monkeypatch):
+    class Receta(_LlamaFalso):
+        def create_chat_completion(self, *a, **k):
+            return {"choices": [{"message": {"content": "Toma ibuprofeno y descansa."}}]}
+    import sys
+    import types
+    monkeypatch.setitem(sys.modules, "llama_cpp", types.SimpleNamespace(Llama=Receta))
+    embebido.reiniciar()
+    r = voz_local.responder("me duele", ESTADO, {"tono": "directo"})
+    assert r["generado_por_ia"] is False and "descartado_por" in r
+
+
+def test_precalentar_carga_el_modelo_incrustado(embebido):
+    assert explicador_local.precalentar_modelo() is True
+    assert any(x[0] == "init" for x in _LlamaFalso.llamadas)

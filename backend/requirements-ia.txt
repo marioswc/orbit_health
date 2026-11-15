@@ -1,0 +1,3 @@
+# IA incrustada: el motor llama.cpp dentro del propio programa (sin Ollama). Opcional; el ejecutable la trae.
+# Se necesita ademas un modelo .gguf (ORBIT_IA_MODELO_GGUF), por ejemplo Qwen2.5 1.5B Instruct (Apache-2.0).
+llama-cpp-python>=0.3

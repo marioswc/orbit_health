@@ -16,6 +16,7 @@ from urllib.parse import urlparse
 from urllib.request import HTTPRedirectHandler, HTTPSHandler, Request, build_opener
 
 from .. import config
+from . import ia_embebida
 from ..dominio import guardia_ia
 from ..dominio.acciones import DETALLES, ESTILO_POR_DEFECTO, TONOS
 
@@ -125,6 +126,16 @@ def _usar_deepseek() -> bool:
     return config.IA_PROVEEDOR != "local" and bool(config.DEEPSEEK_API_KEY)
 
 
+def _local_listo() -> bool:
+    """Hay un modelo LOCAL utilizable: el incrustado en el programa o uno de Ollama en esta misma computadora."""
+    url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
+    return ia_embebida.disponible() or bool(url and modelo and _url_local(url))
+
+
+def _nombre_local() -> str:
+    return ia_embebida.nombre() if ia_embebida.disponible() else config.IA_LOCAL_MODELO
+
+
 def _modo_automatico() -> bool:
     return config.IA_PROVEEDOR in {"automatico", "auto"}
 
@@ -132,17 +143,15 @@ def _modo_automatico() -> bool:
 def _modelo_activo() -> tuple[str, str] | None:
     """Devuelve (fuente, modelo) si hay un proveedor listo, o None si solo aplican reglas locales."""
     if _modo_automatico():
-        url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
-        if url and modelo and _url_local(url):
-            return "modelo_local", modelo
+        if _local_listo():
+            return "modelo_local", _nombre_local()
         if config.DEEPSEEK_API_KEY:
             return "deepseek", config.DEEPSEEK_MODELO
         return None
     if _usar_deepseek():
         return "deepseek", config.DEEPSEEK_MODELO
-    url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
-    if url and modelo and _url_local(url):
-        return "modelo_local", modelo
+    if _local_listo():
+        return "modelo_local", _nombre_local()
     return None
 
 
@@ -202,8 +211,7 @@ def _consultar_deepseek(prompt: str, system: str | None = None) -> str | None:
 def datos_personales_permitidos() -> bool:
     """True solo si la consulta puede ir a un modelo LOCAL: hay uno configurado y el proveedor no es solo la nube. Perfil,
     rasgos y conversación nunca se incluyen en lo que sale a un proveedor externo."""
-    url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
-    local_listo = bool(url and modelo and _url_local(url))
+    local_listo = _local_listo()
     return local_listo and (config.IA_PROVEEDOR == "local" or _modo_automatico() or not config.DEEPSEEK_API_KEY)
 
 
@@ -232,6 +240,8 @@ def consultar_modelo(prompt: str, system: str | None = None, externo: tuple[str,
 
 
 def _consultar_local(prompt: str, system: str | None = None) -> str | None:
+    if ia_embebida.disponible():                              # el modelo dentro del programa tiene prioridad sobre Ollama
+        return ia_embebida.consultar(prompt, system)
     url = config.IA_LOCAL_URL
     modelo = config.IA_LOCAL_MODELO
     if not url or not modelo or not _url_local(url):
@@ -263,10 +273,12 @@ def _consultar_local(prompt: str, system: str | None = None) -> str | None:
 def precalentar_modelo() -> bool:
     """Carga el modelo local en memoria con una petición mínima, para que la primera pregunta real no pague la carga.
     Nunca toca un proveedor externo ni lanza excepciones: si no hay modelo local, no hace nada."""
-    url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
-    if _usar_deepseek() or not url or not modelo or not _url_local(url):
+    if _usar_deepseek() or not _local_listo():
         return False
     from .voz_local import SISTEMA_BASE                     # el mismo inicio que usa la conversación: queda ya procesado
+    if ia_embebida.disponible():
+        return ia_embebida.precalentar(SISTEMA_BASE)
+    url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
     cuerpo = json.dumps({"model": modelo, "system": SISTEMA_BASE, "prompt": "ok", "stream": False,
                          "keep_alive": config.IA_LOCAL_KEEP_ALIVE,
                          "options": {"num_predict": 1, "num_ctx": 2048}}).encode("utf-8")

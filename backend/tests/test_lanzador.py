@@ -95,3 +95,45 @@ def test_sin_consola_la_salida_va_a_un_archivo_de_registro(tmp_path, monkeypatch
     print("hola desde el ejecutable sin consola")
     sys.stdout.flush()
     assert "hola desde el ejecutable" in (tmp_path / "orbit-health.log").read_text(encoding="utf-8")
+
+
+# ---------- modelo de IA incrustado: dónde se busca y cómo se baja ----------
+def test_encuentra_el_modelo_en_la_carpeta_de_datos_o_junto_al_programa(tmp_path, monkeypatch):
+    monkeypatch.setattr(lanzador, "BASE", tmp_path / "paquete")
+    monkeypatch.setattr(lanzador, "CONGELADO", False)
+    datos = tmp_path / "datos"
+    assert lanzador.buscar_modelo(datos) is None
+    (datos / "modelos").mkdir(parents=True)
+    pequeno = datos / "modelos" / "roto.gguf"
+    pequeno.write_bytes(b"x")                                                       # demasiado chico: un archivo a medias no cuenta
+    assert lanzador.buscar_modelo(datos) is None
+    monkeypatch.setattr(lanzador, "MODELO_MIN_BYTES", 10)
+    pequeno.write_bytes(b"x" * 20)
+    assert lanzador.buscar_modelo(datos) == pequeno
+    (tmp_path / "paquete" / "modelos").mkdir(parents=True)
+    junto = tmp_path / "paquete" / "modelos" / "completo.gguf"
+    junto.write_bytes(b"x" * 20)
+    assert lanzador.buscar_modelo(datos) == junto                                   # el del paquete completo gana
+
+
+def test_la_descarga_escribe_un_parcial_y_solo_al_terminar_lo_deja_listo(tmp_path, monkeypatch):
+    import http.server
+    import threading
+    cuerpo = b"G" * 4096
+
+    class H(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200); self.send_header("Content-Length", str(len(cuerpo))); self.end_headers(); self.wfile.write(cuerpo)
+        def log_message(self, *a): pass
+    s = http.server.HTTPServer(("127.0.0.1", 0), H)
+    threading.Thread(target=s.serve_forever, daemon=True).start()
+    try:
+        monkeypatch.setattr(lanzador, "MODELO_MIN_BYTES", 1000)
+        destino = lanzador.descargar_modelo(tmp_path, f"http://127.0.0.1:{s.server_port}/m.gguf")
+        assert destino.read_bytes() == cuerpo and not destino.with_suffix(".part").exists()
+        monkeypatch.setattr(lanzador, "MODELO_MIN_BYTES", 10_000)                  # ahora "queda incompleto": no se deja un archivo usable
+        with pytest.raises(SystemExit):
+            lanzador.descargar_modelo(tmp_path / "otro", f"http://127.0.0.1:{s.server_port}/m.gguf")
+        assert not list((tmp_path / "otro").rglob("*.gguf"))
+    finally:
+        s.shutdown()

@@ -55,6 +55,46 @@ def puerto_libre(inicio: int) -> int:
     raise SystemExit("No encontré un puerto libre entre %d y %d." % (inicio, inicio + 29))
 
 
+MODELO_URL = "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf"
+MODELO_ARCHIVO = "qwen2.5-1.5b-instruct-q4_k_m.gguf"      # Qwen2.5 1.5B Instruct, licencia Apache-2.0, ~1.1 GB
+MODELO_MIN_BYTES = 500_000_000
+
+
+def buscar_modelo(datos: Path) -> Path | None:
+    """Un modelo .gguf en `modelos/` junto al programa (paquete completo) o en la carpeta de datos del usuario."""
+    junto = Path(sys.executable).resolve().parent if CONGELADO else BASE
+    for carpeta in (junto / "modelos", datos / "modelos"):
+        if carpeta.is_dir():
+            encontrados = sorted(p for p in carpeta.glob("*.gguf") if p.is_file() and p.stat().st_size > MODELO_MIN_BYTES)
+            if encontrados:
+                return encontrados[0]
+    return None
+
+
+def descargar_modelo(datos: Path, url: str = MODELO_URL) -> Path:
+    """Baja el modelo una vez (necesita internet) a la carpeta de datos. Escribe en un .part y lo renombra al terminar, para que
+    nunca se use un archivo a medias."""
+    destino = datos / "modelos" / MODELO_ARCHIVO
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    parcial = destino.with_suffix(".part")
+    print(f"Descargando el modelo de IA (~1.1 GB, una sola vez) a {destino} ...")
+    with urllib.request.urlopen(url, timeout=60) as r, open(parcial, "wb") as f:
+        total = int(r.headers.get("Content-Length") or 0)
+        hecho, ultimo = 0, 0
+        while bloque := r.read(1 << 20):
+            f.write(bloque)
+            hecho += len(bloque)
+            if total and hecho - ultimo >= 50 << 20:
+                ultimo = hecho
+                print(f"  {hecho * 100 // total}%", flush=True)
+    if parcial.stat().st_size < MODELO_MIN_BYTES:
+        parcial.unlink(missing_ok=True)
+        raise SystemExit("La descarga quedó incompleta; vuelve a intentarlo.")
+    parcial.replace(destino)
+    print("Listo: el modelo quedó instalado.")
+    return destino
+
+
 def navegador_de_ventana() -> str | None:
     """Ruta de un navegador basado en Chromium (el único con modo aplicación fiable), o None."""
     sistema = platform.system()
@@ -94,9 +134,9 @@ def _asegurar_salida(datos: Path) -> None:
         registro = open(datos / "orbit-health.log", "a", encoding="utf-8", buffering=1)  # noqa: SIM115
         sys.stdout = sys.stdout or registro
         sys.stderr = sys.stderr or registro
-    for flujo in (sys.stdout, sys.stderr):                   # consola de Windows (cp1252): que un carácter raro nunca tumbe el programa
+    for flujo in (sys.stdout, sys.stderr):                   # línea por línea (si no, un archivo de registro se llena al salir) y consola de Windows (cp1252): que un carácter raro nunca tumbe el programa
         try:
-            flujo.reconfigure(encoding="utf-8", errors="replace")
+            flujo.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
         except Exception:  # noqa: BLE001
             pass
 
@@ -106,10 +146,14 @@ def main() -> int:
     ap.add_argument("--puerto", type=int, default=3000)
     ap.add_argument("--sin-navegador", action="store_true", help="solo el servidor: no abrir ninguna ventana")
     ap.add_argument("--navegador", action="store_true", help="abrir el navegador normal en vez de la ventana de aplicación")
+    ap.add_argument("--descargar-modelo", action="store_true", help="baja el modelo de IA una sola vez (necesita internet) y termina")
     args = ap.parse_args()
 
     datos = carpeta_de_datos()
     _asegurar_salida(datos)
+    if args.descargar_modelo:
+        descargar_modelo(datos)
+        return 0
     os.environ.setdefault("ORBIT_DB_PATH", str(datos / "orbit_health.db"))
     os.environ.setdefault("ORBIT_DIR_RESPALDOS", str(datos / "respaldos"))
     os.environ.setdefault("ORBIT_ENV_FILE", str(datos / ".env"))
@@ -118,6 +162,10 @@ def main() -> int:
         os.environ.setdefault("ORBIT_FRONTEND_DIST", str(dist))
     if not CONGELADO:
         sys.path.insert(0, str(BASE / "backend"))
+    modelo = buscar_modelo(datos)
+    if modelo and "ORBIT_IA_MODELO_GGUF" not in os.environ:
+        os.environ["ORBIT_IA_MODELO_GGUF"] = str(modelo)        # IA incrustada: el motor corre dentro del programa
+        os.environ.setdefault("ORBIT_IA_PROVEEDOR", "local")    # y nada sale de la computadora aunque haya una clave de nube
 
     navegador = None if (args.sin_navegador or args.navegador) else navegador_de_ventana()
 
@@ -139,6 +187,7 @@ def main() -> int:
     print(" ORBIT Health está arrancando")
     print(f" Se abrirá {'su ventana de aplicación' if navegador else 'el navegador'} en {url}")
     print(f" Tus datos se guardan en: {datos}")
+    print(f" IA incrustada: {modelo.name}" if modelo else " IA incrustada: no hay modelo (Nova usa textos escritos). Instálalo con --descargar-modelo")
     print(" Para detenerlo, cierra la ventana de ORBIT (o pulsa Ctrl+C aquí).")
     print(" Todo en esta demostración es SIMULADO; no sustituye a un médico.")
     print("=" * 60)

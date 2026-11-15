@@ -15,6 +15,10 @@ echo "[2/4] Entorno de construcción (aparte del de desarrollo)"
 PY=.venv-build/bin/python; [ -x "$PY" ] || PY=.venv-build/Scripts/python.exe
 "$PY" -m pip install -q --upgrade pip
 "$PY" -m pip install -q -r backend/requirements.txt pyinstaller
+IA=0   # motor de IA incrustado (llama.cpp): opcional; si no hay rueda precompilada para este sistema, el ejecutable sale sin él
+if [ "${ORBIT_SIN_IA:-0}" != "1" ] && "$PY" -m pip install -q -r backend/requirements-ia.txt --only-binary=:all: \
+     --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu; then IA=1; EXTRA_IA=(--collect-all llama_cpp)
+else echo "  (sin motor de IA incrustado en este ejecutable)"; EXTRA_IA=(); fi
 
 echo "[3/4] Empaquetando"
 SEP=":"; ROOT="$PWD"; EXTRA=()
@@ -29,10 +33,11 @@ esac
   --add-data "$ROOT/backend/app/datos${SEP}app/datos" \
   --add-data "$ROOT/backend/app/repositorios/schema.sql${SEP}app/repositorios" \
   --add-data "$ROOT/frontend/dist${SEP}frontend/dist" \
-  --collect-submodules uvicorn --collect-submodules app ${EXTRA[@]+"${EXTRA[@]}"} \
+  --collect-submodules uvicorn --collect-submodules app ${EXTRA[@]+"${EXTRA[@]}"} ${EXTRA_IA[@]+"${EXTRA_IA[@]}"} \
   --exclude-module tkinter --exclude-module faster_whisper --exclude-module bleak \
   scripts/lanzador.py
 
+echo "  motor de IA incrustado: $([ "$IA" = 1 ] && echo sí || echo no)"
 echo "[4/4] Huella de integridad"
 cd dist-ejecutable
 f=""; for c in orbit-health.exe orbit-health; do [ -f "$c" ] && f="$c" && break; done      # .exe primero: Git Bash en Windows resuelve "orbit-health" a ".exe"
