@@ -36,7 +36,7 @@ if [ "$faltan" = 1 ]; then
 fi
 
 echo; echo "2) $( [ "$EN" = 1 ] && echo 'Preparing ORBIT Health (needs internet once)' || echo 'Preparando ORBIT Health (necesita internet una vez)' )"
-if [ -x backend/.venv/bin/python ] && [ -f frontend/dist/index.html ]; then
+if [ "$SIM" = 1 ] || { [ -x backend/.venv/bin/python ] && [ -f frontend/dist/index.html ]; }; then   # en simulación no depende de la máquina
   m "   Ya estaba preparado." "   Already prepared."
 elif pregunta "   ¿Lo preparo ahora? (tarda unos minutos)" "   Prepare it now? (takes a few minutes)" s; then
   hacer scripts/preparar.sh || { m "   No se pudo preparar. Revisa el mensaje de arriba." "   Setup failed. Check the message above."; exit 1; }

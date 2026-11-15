@@ -27,6 +27,7 @@ def test_descomenta_una_variable_o_la_agrega_si_no_estaba(tmp_path):
     assert f.read_text() == "ORBIT_PRECALENTAR=0\nORBIT_VOZ_ACTIVA=1\n"
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="Windows no usa permisos POSIX")
 def test_el_archivo_queda_con_permisos_600(tmp_path):
     f = tmp_path / ".env"
     poner_env.poner(f, "ORBIT_AUTH", "1")
