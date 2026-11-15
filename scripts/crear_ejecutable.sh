@@ -17,13 +17,14 @@ PY=.venv-build/bin/python; [ -x "$PY" ] || PY=.venv-build/Scripts/python.exe
 "$PY" -m pip install -q -r backend/requirements.txt pyinstaller
 
 echo "[3/4] Empaquetando"
-SEP=":"; case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) SEP=";";; esac
+SEP=":"; ROOT="$PWD"
+case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) SEP=";"; ROOT="$(pwd -W)";; esac      # en Windows PyInstaller necesita rutas D:/...
 "$PY" -m PyInstaller --noconfirm --clean --onefile --name orbit-health \
   --distpath dist-ejecutable --workpath build/pyinstaller --specpath build \
   --paths backend \
-  --add-data "$PWD/backend/app/datos${SEP}app/datos" \
-  --add-data "$PWD/backend/app/repositorios/schema.sql${SEP}app/repositorios" \
-  --add-data "$PWD/frontend/dist${SEP}frontend/dist" \
+  --add-data "$ROOT/backend/app/datos${SEP}app/datos" \
+  --add-data "$ROOT/backend/app/repositorios/schema.sql${SEP}app/repositorios" \
+  --add-data "$ROOT/frontend/dist${SEP}frontend/dist" \
   --collect-submodules uvicorn --collect-submodules app \
   --exclude-module tkinter --exclude-module faster_whisper --exclude-module bleak \
   scripts/lanzador.py

@@ -1,5 +1,5 @@
-# Construye el ejecutable de ORBIT Health en Linux, Windows y macOS. Se lanza a mano (Actions > Ejecutables > Run workflow)
-# o al subir una etiqueta v*. Deja los archivos como "artefactos" de la ejecución; NO publica nada por sí solo.
+# Construye y PRUEBA el ejecutable de ORBIT Health en Linux, Windows y macOS. Se lanza a mano (Actions > Ejecutables >
+# Run workflow) o al subir una etiqueta v*. Deja los archivos como "artefactos" de la ejecución; NO publica nada por sí solo.
 name: Ejecutables
 on:
   workflow_dispatch:
@@ -9,11 +9,16 @@ permissions:
   contents: read
 jobs:
   construir:
+    name: ${{ matrix.nombre }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - { os: ubuntu-22.04,   nombre: linux,   archivo: orbit-health }
+          - { os: windows-latest, nombre: windows, archivo: orbit-health.exe }
+          - { os: macos-latest,   nombre: macos,   archivo: orbit-health }       # Apple Silicon
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -22,11 +27,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Construir
+      - name: Construir el ejecutable
         shell: bash
         run: scripts/crear_ejecutable.sh
+      - name: Prueba de humo (arranca el ejecutable y comprueba API, interfaz, Nova y datos)
+        shell: bash
+        run: scripts/probar_ejecutable.sh dist-ejecutable/${{ matrix.archivo }} 3650
+      - name: Empaquetar (conserva el permiso de ejecución en Linux y Mac)
+        shell: bash
+        run: |
+          cd dist-ejecutable
+          if [ "${{ matrix.nombre }}" = "windows" ]; then
+            7z a "orbit-health-windows.zip" orbit-health.exe orbit-health.exe.sha256
+          else
+            tar czf "orbit-health-${{ matrix.nombre }}.tar.gz" orbit-health orbit-health.sha256
+          fi
       - uses: actions/upload-artifact@v4
         with:
-          name: orbit-health-${{ matrix.os }}
-          path: dist-ejecutable/*
+          name: orbit-health-${{ matrix.nombre }}
+          path: |
+            dist-ejecutable/orbit-health-*.tar.gz
+            dist-ejecutable/orbit-health-*.zip
           if-no-files-found: error

@@ -59,6 +59,11 @@ def abrir_cuando_responda(url: str, puerto: int) -> None:
 
 
 def main() -> int:
+    for flujo in (sys.stdout, sys.stderr):                   # consola de Windows (cp1252): que un carácter raro nunca tumbe el programa
+        try:
+            flujo.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:  # noqa: BLE001
+            pass
     ap = argparse.ArgumentParser(description="ORBIT Health: servidor local y navegador")
     ap.add_argument("--puerto", type=int, default=3000)
     ap.add_argument("--sin-navegador", action="store_true", help="no abrir el navegador")
