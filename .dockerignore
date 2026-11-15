@@ -1,0 +1,14 @@
+.git
+.env
+**/__pycache__
+**/*.pyc
+**/node_modules
+frontend/dist
+backend/.venv
+backend/models
+backend/.pytest_cache
+.vite
+**/*.db
+**/*.db-wal
+**/*.db-shm
+data/respaldos
