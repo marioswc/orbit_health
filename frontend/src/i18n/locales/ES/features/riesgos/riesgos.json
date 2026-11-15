@@ -13,5 +13,20 @@
   "risks.aria": "Riesgos y cobertura",
   "cover.cubierto": "Cubierto",
   "cover.parcial": "Parcial",
-  "cover.no_cubierto": "No cubierto"
+  "cover.no_cubierto": "No cubierto",
+  "hazards.items.radiacion.nombre": "Radiación espacial",
+  "hazards.items.radiacion.resumen": "La radiación es invisible y la propia NASA la considera uno de los aspectos más peligrosos del vuelo espacial.",
+  "hazards.items.radiacion.como": "Registra la dosis acumulada como porcentaje del límite fijado para la misión y avisa al acercarse a él.",
+  "hazards.items.aislamiento_confinamiento.nombre": "Aislamiento y confinamiento",
+  "hazards.items.aislamiento_confinamiento.resumen": "Los grupos aislados en un espacio pequeño durante mucho tiempo muestran respuestas de conducta; por eso las tripulaciones se seleccionan, entrenan y apoyan con cuidado.",
+  "hazards.items.aislamiento_confinamiento.como": "Sigue las horas de sueño y el ánimo diario, ofrece un tamizaje privado y un diario personal que nunca sale de la nave.",
+  "hazards.items.distancia_tierra.nombre": "Distancia a la Tierra",
+  "hazards.items.distancia_tierra.resumen": "Cuanto más lejos viaja la tripulación, más difícil es recibir instrucciones, suministros y atención médica desde la Tierra. La NASA afirma que la planificación y la autosuficiencia serán clave.",
+  "hazards.items.distancia_tierra.como": "Decide a bordo sin esperar a Tierra, retiene los mensajes durante un apagón y envía primero lo más urgente cuando vuelve el enlace.",
+  "hazards.items.campos_gravedad.nombre": "Campos de gravedad",
+  "hazards.items.campos_gravedad.resumen": "El cuerpo debe adaptarse a distintos niveles de gravedad: la nave, la Luna o Marte, y de nuevo la Tierra al volver.",
+  "hazards.items.campos_gravedad.como": "Compara a cada persona con su propia línea base móvil, porque lo normal en un nivel de gravedad no lo es en otro.",
+  "hazards.items.entornos_hostiles_cerrados.nombre": "Entornos hostiles y cerrados",
+  "hazards.items.entornos_hostiles_cerrados.resumen": "Mantener un ecosistema seguro dentro de la nave es difícil: influyen la temperatura, la presión, la luz, el ruido, los microbios y las respuestas inmunitarias.",
+  "hazards.items.entornos_hostiles_cerrados.como": "Vigila el CO₂ de la cabina, la temperatura y la oxigenación, y cruza el aire con el estado de varios tripulantes a la vez."
 }

@@ -11,6 +11,10 @@ const NOMBRES: Record<string, string> = {
   variabilidad_cardiaca: "Variabilidad cardíaca (RMSSD)",
   temperatura: "Temperatura",
   sueno_horas: "Horas de sueño",
+  sueno_eficiencia_pct: "Eficiencia de sueño",
+  sueno_despertares_min: "Despertares nocturnos",
+  ejercicio_min: "Ejercicio diario",
+  o2_cabina: "O₂ de cabina",
 };
 
 /** Nombre legible de un indicador; si no esta en la lista, lo humaniza a partir de la clave. */

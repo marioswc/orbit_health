@@ -94,10 +94,15 @@
   "ind.largo.presion_diastolica": "Diastolic blood pressure",
   "ind.largo.temperatura": "Temperature",
   "ind.largo.sueno_horas": "Sleep hours",
+  "ind.largo.sueno_eficiencia_pct": "Sleep efficiency",
+  "ind.largo.sueno_despertares_min": "Night awakenings (min)",
+  "ind.largo.ejercicio_min": "Daily exercise",
+  "ind.largo.o2_cabina": "Cabin O₂",
 
   "acciones.aria": "Active actions and rules",
   "acciones.titulo": "Suggested actions",
   "acciones.repetir": "Repeat measurement every {{min}} min",
+  "acciones.proxima": "Next capture recommended in {{min}} min.",
   "acciones.reglasAria": "Active combined rules",
   "acciones.cruce": "Signal cross-check detected · {{nivel}} level (design assumption).",
 
@@ -179,5 +184,14 @@
   "page.leyenda.verde": "Green",
   "page.leyenda.amarillo": "Yellow",
   "page.leyenda.rojo": "Red",
-  "page.leyenda.sin_datos": "No data"
+  "page.leyenda.sin_datos": "No data",
+
+  "racha.aria": "Measurement consistency",
+  "racha.titulo": "Measurement consistency",
+  "racha.regla": "A day counts when all 5 vital signs are recorded; your streak stays intact while today is in progress.",
+  "racha.dias_one": "{{count}} day in a row",
+  "racha.dias_other": "{{count}} days in a row",
+  "racha.mejor": "Best: {{best}} · Complete days: {{days}}",
+  "racha.hoyCompleto": "Today: 5 of 5 vital signs complete.",
+  "racha.hoyFaltan": "Remaining today: {{lista}}."
 }

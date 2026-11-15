@@ -13,5 +13,20 @@
   "risks.aria": "Risks and coverage",
   "cover.cubierto": "Covered",
   "cover.parcial": "Partial",
-  "cover.no_cubierto": "Not covered"
+  "cover.no_cubierto": "Not covered",
+  "hazards.items.radiacion.nombre": "Space radiation",
+  "hazards.items.radiacion.resumen": "Radiation is invisible and NASA considers it one of the most dangerous aspects of spaceflight.",
+  "hazards.items.radiacion.como": "Logs cumulative dose as a percentage of the mission limit and alerts when approaching it.",
+  "hazards.items.aislamiento_confinamiento.nombre": "Isolation and confinement",
+  "hazards.items.aislamiento_confinamiento.resumen": "Groups isolated in a small space for long periods show behavioral responses; crews are carefully selected, trained, and supported.",
+  "hazards.items.aislamiento_confinamiento.como": "Tracks sleep hours and daily mood, offering private screening and a personal journal that never leaves the spacecraft.",
+  "hazards.items.distancia_tierra.nombre": "Distance from Earth",
+  "hazards.items.distancia_tierra.resumen": "The farther the crew travels, the harder it is to receive instructions, supplies, and medical care from Earth. NASA stresses planning and self-sufficiency.",
+  "hazards.items.distancia_tierra.como": "Decides on board without waiting for Earth, queues messages during a blackout, and sends the most urgent ones first when the link returns.",
+  "hazards.items.campos_gravedad.nombre": "Gravity fields",
+  "hazards.items.campos_gravedad.resumen": "The body must adapt to different gravity levels: the spacecraft, the Moon or Mars, and back to Earth on return.",
+  "hazards.items.campos_gravedad.como": "Compares each person against their own rolling baseline, because what is normal in one gravity level is not in another.",
+  "hazards.items.entornos_hostiles_cerrados.nombre": "Hostile and closed environments",
+  "hazards.items.entornos_hostiles_cerrados.resumen": "Keeping a safe ecosystem inside the spacecraft is hard: temperature, pressure, light, noise, microbes, and immune responses all interact.",
+  "hazards.items.entornos_hostiles_cerrados.como": "Monitors cabin CO₂, temperature, and oxygenation, and cross-checks cabin air with multiple crew members at once."
 }

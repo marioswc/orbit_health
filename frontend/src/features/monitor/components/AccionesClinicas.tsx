@@ -41,7 +41,10 @@ function AccionesClinicas({ nivel, proximaCapturaMin, reglas = [], acciones = []
 
       {acciones.length > 0 && (
         <ul className="acciones-lista">
-          {acciones.map((a) => <li key={a}>{a}</li>)}
+          {acciones.map((a) => {
+            const m = a.match(/^Próxima captura recomendada en (\d+) min\.$/);
+            return <li key={a}>{m ? t("acciones.proxima", { min: m[1] }) : a}</li>;
+          })}
         </ul>
       )}
     </section>

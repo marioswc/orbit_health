@@ -3,6 +3,7 @@ import type { ApexOptions } from "apexcharts";
 import { useTranslation } from "../../../i18n";
 import { num } from "../../../shared/formato";
 import Grafica, { colorNivel, usePaleta } from "../../../shared/components/Grafica";
+import { nombreIndicador } from "../utils/indicadores";
 import type { SerieHistorial } from "../types/estado";
 
 interface Props {
@@ -57,12 +58,13 @@ function GraficaSerie({ serie, cargando, error, alCerrar, compacta = false }: Pr
   }, [puntos, p, serie, locale, compacta, t]);
 
   if (!serie && !cargando && !error) return null;
+  const etiqueta = serie ? nombreIndicador(serie.indicador, t) : "";
 
   return (
     <section className="tarjeta grafica-serie" aria-label={t("serie.aria")}>
       <div className="grafica-cab">
         <div>
-          <h2>{serie ? t("serie.titulo", { etiqueta: serie.etiqueta, dias: serie.dias }) : t("serie.tituloVacio")}</h2>
+          <h2>{serie ? t("serie.titulo", { etiqueta, dias: serie.dias }) : t("serie.tituloVacio")}</h2>
           {serie && (
             <p className="suave">
               {t("serie.lecturas", { count: serie.resumen.n })}
@@ -79,9 +81,9 @@ function GraficaSerie({ serie, cargando, error, alCerrar, compacta = false }: Pr
       {!cargando && !error && puntos.length > 0 && (
         <Grafica
           className="serie-caja" tipo="area" altura={compacta ? 280 : 260}
-          series={[{ name: serie?.etiqueta ?? "", data: datos }]}
+          series={[{ name: etiqueta, data: datos }]}
           opciones={opciones}
-          etiqueta={t("serie.graficaAria", { nombre: serie?.etiqueta ?? t("serie.indicador"), n: puntos.length })}
+          etiqueta={t("serie.graficaAria", { nombre: etiqueta || t("serie.indicador"), n: puntos.length })}
         />
       )}
     </section>

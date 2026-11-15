@@ -28,14 +28,19 @@ export default function RiesgosPage() {
       {marco && (
         <>
           <section className="peligros-rejilla" aria-label={t("hazards.aria")}>
-            {Object.entries(marco.peligros).map(([id, p]) => (
-              <article key={id} className="tarjeta pieza peligro">
-                <h2>{p.nombre}</h2>
-                <p className="suave">{p.resumen}</p>
-                <p className="peligro-orbit"><strong>{t("hazards.how")}</strong>{p.como_responde_orbit}</p>
-                <a className="enlace" href={p.url} target="_blank" rel="noopener noreferrer">{t("hazards.nasa", { nombre: p.nombre_oficial })}</a>
-              </article>
-            ))}
+            {Object.entries(marco.peligros).map(([id, p]) => {
+              const nombre = t(`hazards.items.${id}.nombre`);
+              const resumen = t(`hazards.items.${id}.resumen`);
+              const como = t(`hazards.items.${id}.como`);
+              return (
+                <article key={id} className="tarjeta pieza peligro">
+                  <h2>{nombre !== `hazards.items.${id}.nombre` ? nombre : p.nombre}</h2>
+                  <p className="suave">{resumen !== `hazards.items.${id}.resumen` ? resumen : p.resumen}</p>
+                  <p className="peligro-orbit"><strong>{t("hazards.how")}</strong>{como !== `hazards.items.${id}.como` ? como : p.como_responde_orbit}</p>
+                  <a className="enlace" href={p.url} target="_blank" rel="noopener noreferrer">{t("hazards.nasa", { nombre: p.nombre_oficial })}</a>
+                </article>
+              );
+            })}
           </section>
           <section className="tarjeta pieza" aria-label={t("risks.aria")}>
             <h2>{t("risks.title")}</h2>

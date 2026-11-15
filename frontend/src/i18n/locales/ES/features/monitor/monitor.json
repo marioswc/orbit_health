@@ -94,10 +94,15 @@
   "ind.largo.presion_diastolica": "Presión diastólica",
   "ind.largo.temperatura": "Temperatura",
   "ind.largo.sueno_horas": "Horas de sueño",
+  "ind.largo.sueno_eficiencia_pct": "Eficiencia de sueño",
+  "ind.largo.sueno_despertares_min": "Despertares nocturnos",
+  "ind.largo.ejercicio_min": "Ejercicio diario",
+  "ind.largo.o2_cabina": "O₂ de cabina",
 
   "acciones.aria": "Acciones y reglas activas",
   "acciones.titulo": "Acciones sugeridas",
   "acciones.repetir": "Repetir medición cada {{min}} min",
+  "acciones.proxima": "Próxima captura recomendada en {{min}} min.",
   "acciones.reglasAria": "Reglas combinadas activas",
   "acciones.cruce": "Cruce de señales detectado · nivel {{nivel}} (supuesto de diseño).",
 
@@ -179,5 +184,14 @@
   "page.leyenda.verde": "Verde",
   "page.leyenda.amarillo": "Amarillo",
   "page.leyenda.rojo": "Rojo",
-  "page.leyenda.sin_datos": "Sin datos"
+  "page.leyenda.sin_datos": "Sin datos",
+
+  "racha.aria": "Racha de mediciones",
+  "racha.titulo": "Constancia de mediciones",
+  "racha.regla": "Un día cuenta cuando se registran los 5 signos vitales; la racha no se rompe mientras el día de hoy esté en curso.",
+  "racha.dias_one": "{{count}} día seguido",
+  "racha.dias_other": "{{count}} días seguidos",
+  "racha.mejor": "Mejor: {{best}} · Días completos: {{days}}",
+  "racha.hoyCompleto": "Hoy: 5 de 5 signos vitales completos.",
+  "racha.hoyFaltan": "Hoy faltan: {{lista}}."
 }

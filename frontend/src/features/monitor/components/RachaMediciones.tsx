@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "../../../i18n";
 import { useRecargaPorClave } from "../../../shared/hooks/useRecargaPorClave";
 import { api } from "../../../shared/api/client";
+import { nombreIndicador } from "../utils/indicadores";
 import type { Estado } from "../types/estado";
 
 interface LogroRacha { id: string; nombre: string; logrado: boolean }
@@ -22,6 +24,7 @@ interface Props {
 
 /** Racha de días con los 5 signos vitales registrados y logros ligeros, sin presión. */
 export default function RachaMediciones({ tripulanteId, estado }: Props) {
+  const { t } = useTranslation("monitor");
   const [racha, setRacha] = useState<DatosRacha | null>(null);
 
   useRecargaPorClave(() => {
@@ -36,22 +39,22 @@ export default function RachaMediciones({ tripulanteId, estado }: Props) {
   if (!racha) return null;
 
   return (
-    <section className="tarjeta racha-bloque" aria-label="Racha de mediciones">
+    <section className="tarjeta racha-bloque" aria-label={t("racha.aria")}>
       <div className="racha-cab">
         <div>
-          <h2>Constancia de mediciones</h2>
-          <p className="suave">{racha.regla}</p>
+          <h2>{t("racha.titulo")}</h2>
+          <p className="suave">{t("racha.regla")}</p>
         </div>
         <div className="racha-nums">
-          <span className="badge verde">{racha.racha_dias} {racha.racha_dias === 1 ? "día" : "días"} seguidos</span>
-          <span className="suave">Mejor: {racha.mejor_racha_dias} · Días completos: {racha.dias_completos}</span>
+          <span className="badge verde">{t("racha.dias", { count: racha.racha_dias })}</span>
+          <span className="suave">{t("racha.mejor", { best: racha.mejor_racha_dias, days: racha.dias_completos })}</span>
         </div>
       </div>
 
       <p className="racha-hoy">
         {racha.hoy_completo
-          ? "Hoy: 5 de 5 signos vitales completos."
-          : `Hoy faltan: ${racha.hoy_faltan.join(", ")}.`}
+          ? t("racha.hoyCompleto")
+          : t("racha.hoyFaltan", { lista: racha.hoy_faltan.map((k) => nombreIndicador(k, t)).join(", ") })}
       </p>
 
       <div className="racha-logros">
