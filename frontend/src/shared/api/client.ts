@@ -34,12 +34,14 @@ export function api<T>(ruta: string, init?: RequestInit): Promise<T> {
 
 async function pedir<T>(ruta: string, init?: RequestInit): Promise<T> {
   const token = getToken();
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (token) headers.Authorization = `Bearer ${token}`;
+  const headers = new Headers(init?.headers);
+  if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+  if (token) headers.set("Authorization", `Bearer ${token}`);
 
+  // headers va despues de ...init: si init trae sus propios headers ya estan mezclados arriba (y conservan el token)
   const r = await fetch(`/api${ruta}`, {
-    headers,
     ...init,
+    headers,
   });
   if (!r.ok) {
     if (r.status === 401 && listener401) listener401();
