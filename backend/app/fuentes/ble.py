@@ -51,3 +51,39 @@ def muestra_valida(medicion: dict) -> float | None:
     if medicion["contacto"] is False:
         return None
     return float(medicion["fc"]) if validar("frecuencia_cardiaca", medicion["fc"]) is None else None
+
+
+def describir_gatt(servicios) -> dict:
+    """Resume la tabla GATT de un dispositivo: qué servicios trae y si ofrece el estándar de frecuencia cardíaca.
+
+    `servicios` es cualquier iterable de objetos con `uuid` y `characteristics` (cada una con `uuid` y `properties`),
+    como el que entrega la librería BLE al conectar. Así se puede probar sin un dispositivo.
+    """
+    lineas, tiene_fc, notificables = [], False, []
+    for sv in servicios:
+        uuid = str(sv.uuid).lower()
+        es_fc = uuid == SERVICIO_FC
+        tiene_fc = tiene_fc or es_fc
+        lineas.append(f"Servicio {uuid}" + ("   <- frecuencia cardíaca ESTÁNDAR" if es_fc else ""))
+        for ch in sv.characteristics:
+            props = ",".join(sorted(ch.properties))
+            lineas.append(f"    {str(ch.uuid).lower()}  [{props}]")
+            if {"notify", "indicate"} & set(ch.properties):
+                notificables.append(str(ch.uuid).lower())
+    return {"lineas": lineas, "tiene_frecuencia_estandar": tiene_fc, "notificables": notificables,
+            "servicios": sum(1 for _ in lineas if _.startswith("Servicio"))}
+
+
+def elegir_coincidencia(coincidencias: list, mas_cercana: bool = False) -> tuple[str, object]:
+    """Decide qué dispositivo usar entre los que coinciden con un nombre, sin adivinar.
+
+    `coincidencias` son tuplas (nombre, señal_dbm, direccion, objeto). Devuelve ("ninguna", None), ("unica", item) o
+    ("ambigua", lista_ordenada_por_señal). Con varias coincidencias solo elige si se pide `mas_cercana` (la de señal
+    más fuerte, que suele ser la que llevas puesta); si no, devuelve la lista para que lo decida la persona.
+    """
+    ordenadas = sorted(coincidencias, key=lambda c: c[1] if c[1] is not None else -999, reverse=True)
+    if not ordenadas:
+        return "ninguna", None
+    if len(ordenadas) == 1 or mas_cercana:
+        return "unica", ordenadas[0]
+    return "ambigua", ordenadas

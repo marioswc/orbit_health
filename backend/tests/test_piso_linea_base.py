@@ -14,6 +14,12 @@ def test_sin_piso_una_serie_muy_estable_convierte_un_cambio_insignificante_en_av
     assert reglas.desviacion_linea_base(75, ESTABLE)["aviso"] is True
 
 
+def test_linea_base_explica_cuando_aun_no_hay_muestras_suficientes():
+    r = reglas.desviacion_linea_base(75, [70, 71])
+    assert r["estado"] == "insuficiente"
+    assert r["razon"]
+
+
 def test_con_piso_un_cambio_pequeno_ya_no_es_aviso_pero_uno_real_si():
     piso = reglas.piso_de("frecuencia_cardiaca")
     assert piso > 0
@@ -66,5 +72,9 @@ def test_en_la_api_un_cambio_pequeno_no_activa_el_aviso_pero_un_cambio_real_si(c
         cliente.post("/api/lecturas", json={"tripulante_id": "T1", "indicador": "frecuencia_cardiaca", "valor": v})
     pequeno = cliente.post("/api/lecturas", json={"tripulante_id": "T1", "indicador": "frecuencia_cardiaca", "valor": 75}).json()
     assert pequeno["aviso_linea_base"] is False
+    assert pequeno["linea_base_estado"] == "normal"
+    assert pequeno["estado_semaforo"] == "sin_alerta"
     real = cliente.post("/api/lecturas", json={"tripulante_id": "T1", "indicador": "frecuencia_cardiaca", "valor": 92}).json()
     assert real["aviso_linea_base"] is True
+    assert real["linea_base_estado"] == "aviso"
+    assert real["estado_semaforo"] == "seguimiento"

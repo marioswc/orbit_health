@@ -39,7 +39,28 @@ Un matiz: igual que con la captura manual, la **lectura más reciente es la que 
 - **Desde el navegador (Web Bluetooth)**, sin el puente: el frontend se conecta a la banda y envía a `/api/sensores/flujo/lote`. Funciona en Chrome o Edge desde `localhost`; en Linux puede requerir activar una opción del navegador. No se probó.
 - **App móvil**: no está hecha. Desde un teléfono, Web Bluetooth exige HTTPS, así que no basta con abrir la dirección de la laptop por la red.
 
+## Si tu banda es de consumo (Aolon y similares)
+Las bandas baratas casi siempre hablan **un protocolo propio con su app** (por ejemplo GloryFit o Da Fit en las Aolon, según el modelo), y no el estándar. Aolon aclara que sus lecturas son solo de referencia, no clínicas. Para saber qué ofrece **tu** modelo:
+
+1. **Desconéctala de la app del teléfono** (muchas bandas aceptan una sola conexión) y mantenla despierta y cerca.
+2. `backend/.venv/bin/python scripts/puente_ble.py --escanear --mostrar` y mira si aparece entre los que anuncian frecuencia cardíaca.
+3. Si no aparece, **inspecciónala**: `backend/.venv/bin/python scripts/puente_ble.py --inspeccionar --nombre "<parte del nombre>" --mas-cercana`. Si hay varios dispositivos con el mismo nombre (pasa en lugares con más bandas iguales), sin `--mas-cercana` el puente no elige: los lista y pide `--direccion`. Para ver solo los de un nombre sin listar dispositivos ajenos: `--escanear --filtrar <nombre>`. Lista sus servicios y dice si trae el estándar de frecuencia cardíaca. Con `--escuchar 20` muestra además, en crudo, lo que emite (son datos de tu dispositivo: no los compartas si no quieres).
+4. Según el resultado:
+
+| Resultado | Qué significa | Qué hacer |
+|---|---|---|
+| Trae el servicio estándar de frecuencia cardíaca | Funciona con el puente | `puente_ble.py --nombre ...` |
+| No lo trae, solo servicios propios | Protocolo del fabricante | Hay que descifrarlo para ese modelo: lento, incierto, y a veces exige autenticación. No lo prometas para la presentación |
+| No se deja conectar | Otra app la tiene tomada, o exige emparejar | Cierra la app del teléfono; si sigue, probablemente es protocolo propio |
+
+Conectarse a una banda ajena para descifrarla no es algo que haga esta herramienta: solo se conecta a un dispositivo que tú nombras.
+
 ## Qué hay que comprobar con una banda real
 - Que anuncie el servicio estándar (`--escanear`). Muchas bandas de muñeca no lo hacen, o solo si se activa un modo de transmisión de frecuencia cardíaca; un pulsómetro de pecho suele hacerlo.
 - Que `puente_ble.py` conecte y mantenga la conexión durante varios minutos.
 - Que el valor que muestra la interfaz coincida con el de la pantalla del dispositivo.
+
+## Resultado con una banda real (14-nov-2026): IDW26 (app Veryfit)
+- Se encontró por Bluetooth (nombre `IDW26`, servicio propio `0xAF0`, sin el estándar de frecuencia cardíaca `0x180D`).
+- La laptop se conecta, pero la banda **no expone ningún servicio** sin el handshake de su app: no se pudo leer nada.
+- Conclusión: **no soportada**. Usarla exigiría descifrar el protocolo propio de Veryfit; queda fuera del alcance. La demo usa la misión simulada (`origen = simulado`).

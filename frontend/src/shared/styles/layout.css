@@ -38,8 +38,6 @@
 .lateral.colapsada .lateral-nav { justify-items: center; gap: var(--spacing-8); padding-top: var(--spacing-4); }
 .lateral.colapsada .lateral-item { width: 48px; min-height: 48px; padding: 0; justify-content: center; border-radius: 16px; }
 .lateral.colapsada .lateral-indicador { left: 50%; right: auto; width: 48px; margin-left: -24px; }
-.lateral.colapsada .lateral-item::after { content: attr(aria-label); position: absolute; left: calc(100% + 14px); top: 50%; transform: translate(-6px, -50%); padding: 4px var(--spacing-12); border-radius: var(--radius-pill); font-size: var(--text-caption); font-weight: 500; color: var(--color-eggshell); background: var(--color-ink); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s ease, transform .2s var(--ease-out); z-index: 50; }
-.lateral.colapsada .lateral-item:hover::after, .lateral.colapsada .lateral-item:focus-visible::after { opacity: 1; transform: translate(0, -50%); }
 .lateral.colapsada .lateral-aviso { width: 48px; height: 48px; margin: 0 auto; padding: 0; align-items: center; justify-content: center; border-radius: 16px; }
 .lateral.colapsada .lateral-aviso svg { margin: 0; }
 

@@ -16,7 +16,8 @@ _ORDEN = {"verde": 0, "amarillo": 1, "rojo": 2}
 AVPU = "AVPU"
 ETIQUETAS = {k: v[0] for k, v in INDICADORES.items()}
 # Indicadores donde tener MÁS de lo habitual no es un problema: solo avisa la desviación hacia abajo.
-SOLO_BAJA = {"sueno_horas", "ejercicio_min"}
+SOLO_BAJA = {"sueno_horas", "ejercicio_min", "sueno_eficiencia_pct"}
+SOLO_ALTA = {"sueno_despertares_min"}      # más de lo habitual es lo que preocupa
 
 
 def signos_recientes(conn: sqlite3.Connection, tid: str, desde: str) -> dict:
@@ -52,7 +53,7 @@ def _clasificar(conn, tid: str, indicador: str, valor: float, ventana: str) -> d
         nivel, obs = reglas.evaluar_glucosa(valor)
     elif indicador == "sueno_horas":
         nivel, obs = reglas.evaluar_sueno(valor)
-    elif indicador == "ejercicio_min":
+    elif indicador in ("ejercicio_min", "sueno_eficiencia_pct", "sueno_despertares_min"):
         nivel, obs = "verde", False        # sin umbral absoluto: solo cuenta la comparación con la propia base
     else:  # presion_diastolica
         nivel, obs = reglas.evaluar_diastolica(valor)
@@ -72,7 +73,7 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
     try:
         c = _clasificar(conn, tid, indicador, valor, ventana)
         linea = reglas.desviacion_linea_base(valor, repo.historial(conn, tid, indicador, desde_base),
-                                             solo_baja=indicador in SOLO_BAJA, piso=reglas.piso_de(indicador))
+                                             solo_baja=indicador in SOLO_BAJA, solo_alta=indicador in SOLO_ALTA, piso=reglas.piso_de(indicador))
         nivel_lectura = "amarillo" if linea["aviso"] and c["nivel"] == "verde" else c["nivel"]
         nivel_evento = (max(nivel_lectura, c["nivel_global"], key=_ORDEN.__getitem__)
                         if c["puntos_ind"] > 0 else nivel_lectura)
@@ -95,11 +96,13 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
     estilo = {**acciones.ESTILO_POR_DEFECTO, **(estilo or {})}
     proxima = acciones.ajustar_intervalo(reglas.captura_recomendada_min(nivel_evento), nivel_evento, estilo["recordatorios"])
     return {"lectura_id": lectura_id, "nivel": nivel_evento,
+            "estado_semaforo": reglas.estado_semaforo(nivel_evento, c["observacion"]),
             "acciones_sugeridas": acciones.acciones_sugeridas(
                 nivel_evento, proxima, c["observacion"], linea["aviso"], c["faltantes"], activas, ETIQUETAS,
                 estilo["tono"], estilo["detalle"]),
             "estilo": {k: estilo[k] for k in ("tono", "detalle", "recordatorios")}, "puntos_news2": c["puntos"],
             "observacion": c["observacion"], "aviso_linea_base": linea["aviso"],
+            "linea_base_estado": linea["estado"],
             "peligros_relacionados": peligros.peligros_de([indicador]) if nivel_evento != "verde" else [],
             "faltantes_news2": c["faltantes"], "reglas_combinadas": activas, "cola_evento_id": evento_id,
             "prioridad": PRIORIDAD[nivel_evento],

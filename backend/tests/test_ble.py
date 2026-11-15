@@ -51,3 +51,69 @@ def test_el_puente_arranca_y_muestra_su_ayuda_sin_necesitar_bluetooth():
     script = Path(__file__).resolve().parents[2] / "scripts" / "puente_ble.py"
     r = subprocess.run([sys.executable, str(script), "--help"], capture_output=True, text=True, timeout=30)
     assert r.returncode == 0 and "--escanear" in r.stdout and "NO está probado con una banda real" in r.stdout
+
+
+# ---------- inspección de la tabla GATT (con servicios simulados, sin conectar a ningún dispositivo) ----------
+from types import SimpleNamespace as NS
+
+
+def _servicio(uuid, *caracteristicas):
+    return NS(uuid=uuid, characteristics=[NS(uuid=u, properties=p) for u, p in caracteristicas])
+
+
+def test_un_dispositivo_con_el_servicio_estandar_se_reconoce_y_marca_sus_notificaciones():
+    r = ble.describir_gatt([
+        _servicio(ble.SERVICIO_FC.upper(), (ble.CARACTERISTICA_FC, ["notify"]), ("00002a38-0000-1000-8000-00805f9b34fb", ["read"])),
+        _servicio("0000180f-0000-1000-8000-00805f9b34fb", ("00002a19-0000-1000-8000-00805f9b34fb", ["read", "notify"]))])
+    assert r["tiene_frecuencia_estandar"] is True and r["servicios"] == 2
+    assert ble.CARACTERISTICA_FC in r["notificables"] and any("ESTÁNDAR" in l for l in r["lineas"])
+
+
+def test_una_banda_de_consumo_con_protocolo_propio_se_reconoce_como_tal():
+    r = ble.describir_gatt([_servicio("0000fee7-0000-1000-8000-00805f9b34fb", ("0000fec8-0000-1000-8000-00805f9b34fb", ["indicate"])),
+                            _servicio("6e400001-b5a3-f393-e0a9-e50e24dcca9e", ("6e400003-b5a3-f393-e0a9-e50e24dcca9e", ["notify"]))])
+    assert r["tiene_frecuencia_estandar"] is False and r["servicios"] == 2
+    assert len(r["notificables"]) == 2 and not any("ESTÁNDAR" in l for l in r["lineas"])
+
+
+def test_las_propiedades_salen_en_orden_estable_y_sin_servicios_no_hay_nada():
+    r = ble.describir_gatt([_servicio("0000aaaa-0000-1000-8000-00805f9b34fb", ("0000bbbb-0000-1000-8000-00805f9b34fb", ["write", "read", "notify"]))])
+    assert "[notify,read,write]" in r["lineas"][1]
+    assert ble.describir_gatt([]) == {"lineas": [], "tiene_frecuencia_estandar": False, "notificables": [], "servicios": 0}
+
+
+def test_la_ayuda_del_puente_explica_como_inspeccionar_una_banda():
+    import subprocess, sys
+    from pathlib import Path
+    script = Path(__file__).resolve().parents[2] / "scripts" / "puente_ble.py"
+    r = subprocess.run([sys.executable, str(script), "--help"], capture_output=True, text=True, timeout=30)
+    assert r.returncode == 0 and "--inspeccionar" in r.stdout and "--escuchar" in r.stdout
+
+
+# ---------- elegir entre varios dispositivos con el mismo nombre, sin adivinar ----------
+def _c(nombre, rssi, direccion):
+    return (nombre, rssi, direccion, object())
+
+
+def test_sin_coincidencias_no_hay_dispositivo():
+    assert ble.elegir_coincidencia([]) == ("ninguna", None)
+
+
+def test_una_sola_coincidencia_se_usa():
+    estado, item = ble.elegir_coincidencia([_c("Aolon Curve", -60, "AA:05:27")])
+    assert estado == "unica" and item[2] == "AA:05:27"
+
+
+def test_con_varias_iguales_no_elige_solo_y_las_ordena_por_senal():
+    estado, lista = ble.elegir_coincidencia([_c("Aolon Curve", -72, "B"), _c("Aolon Curve", -58, "A"), _c("Aolon Curve", -90, "C")])
+    assert estado == "ambigua" and [x[2] for x in lista] == ["A", "B", "C"]
+
+
+def test_con_mas_cercana_elige_la_de_senal_mas_fuerte():
+    estado, item = ble.elegir_coincidencia([_c("Aolon Curve", -72, "B"), _c("Aolon Curve", -58, "A")], mas_cercana=True)
+    assert estado == "unica" and item[2] == "A"
+
+
+def test_una_senal_desconocida_no_gana_a_una_conocida():
+    estado, item = ble.elegir_coincidencia([_c("X", None, "N"), _c("X", -80, "K")], mas_cercana=True)
+    assert item[2] == "K"

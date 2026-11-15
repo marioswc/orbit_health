@@ -50,6 +50,7 @@
 - Un apagón largo acumula muchos eventos de rutina (147 en el apagón simulado). Resumirlos antes de enviar sigue pendiente.
 
 ## No verificado (hay que comprobarlo a mano)
+- **Banda Aolon (u otra de consumo):** falta saber si trae el servicio estándar de frecuencia cardíaca. Se comprueba en un minuto con `puente_ble.py --escanear` y `--inspeccionar` (ver `docs/BANDA_BLE.md`). Si habla un protocolo propio, queda fuera de lo que se puede prometer.
 - **Una banda real:** el puente BLE y el flujo continuo están probados con paquetes simulados, no con hardware. Ver `docs/BANDA_BLE.md`.
 - Cómo se ve y se siente la interfaz en el navegador, y el flujo completo con una persona usándola.
 - El video, las diapositivas y el formulario de envío.
@@ -64,7 +65,7 @@
 - **Menciones a NASA/HRP:** el reto invita a usar esos recursos y pide explicar cómo se usaron, así que no es un problema por sí mismo.
 
 ## Si sobra tiempo en el backend
-Tierra que responde con retraso, pérdida de paquetes con reintentos y resumir lo rutinario al enviar.
+Tierra que responde con retraso y pérdida de paquetes con reintentos. (Resumir lo rutinario al enviar ya está hecho.)
 
 ## Fuera de alcance, declarado como trabajo futuro
-Cifrado de la base, TLS en la red de la cabina, sensores y radio reales, y un modelo de lenguaje local.
+Cifrado de la base, TLS en la red de la cabina, sensores y radio reales. El explicador de modelo local ya está integrado de forma opcional, pero requiere instalar y validar un modelo en la estación. Sus protecciones están en [IA_LOCAL.md](IA_LOCAL.md); la lista de frases de crisis necesita revisión profesional.

@@ -240,6 +240,38 @@
           "fuente": "https://www.nasa.gov/reference/risk-of-reduced-cardiorespiratory-and-musculoskeletal-fitness/"
         }
       ]
+    },
+    "sueno_eficiencia_pct": {
+      "que_es": "El porcentaje del tiempo en cama que realmente dormiste.",
+      "por_que_se_mide": "Dos noches de las mismas horas pueden descansar distinto: una eficiencia baja suele indicar un sueño fragmentado. NASA estudia el sueño de la tripulación con relojes de actigrafía.",
+      "como_medirlo": "Lo calcula un reloj de actividad al dormir; también puedes anotarlo si tu equipo lo reporta.",
+      "en_el_espacio": "El aislamiento, la carga de trabajo y los cambios de luz pueden reducir y desordenar el sueño en misión.",
+      "cuando_avisar": "No hay un umbral absoluto: se marca un aviso cuando tu eficiencia baja claramente respecto a la habitual para ti. Una eficiencia mayor no es problema.",
+      "habitos_generales": [
+        "Mantén horarios regulares de descanso."
+      ],
+      "fuentes": [
+        "https://www.nasa.gov/reference/risk-from-inadequate-sleep-and-irregular-schedules/",
+        "https://www.nasa.gov/reference/archer"
+      ],
+      "medidas_nasa": [],
+      "habitos_generales_origen": "Consejo general de sentido común, no es una recomendación de la NASA. Pendiente de validación clínica."
+    },
+    "sueno_despertares_min": {
+      "que_es": "Los minutos que pasaste despierto después de haberte dormido.",
+      "por_que_se_mide": "Despertarte mucho durante la noche fragmenta el descanso aunque sumes buenas horas. Es una de las métricas de sueño que se estudian con actigrafía en tripulaciones.",
+      "como_medirlo": "Lo estima un reloj de actividad a partir del movimiento durante la noche.",
+      "en_el_espacio": "El aislamiento, la carga de trabajo y los cambios de luz pueden reducir y desordenar el sueño en misión.",
+      "cuando_avisar": "No hay un umbral absoluto: se marca un aviso cuando pasas claramente más tiempo despierto que lo habitual para ti. Menos tiempo despierto no es problema.",
+      "habitos_generales": [
+        "Mantén horarios regulares de descanso."
+      ],
+      "fuentes": [
+        "https://www.nasa.gov/reference/risk-from-inadequate-sleep-and-irregular-schedules/",
+        "https://www.nasa.gov/reference/archer"
+      ],
+      "medidas_nasa": [],
+      "habitos_generales_origen": "Consejo general de sentido común, no es una recomendación de la NASA. Pendiente de validación clínica."
     }
   },
   "nota_medidas": "`medidas_nasa` y `senales_a_vigilar` vienen de las páginas oficiales de la NASA, con su cita textual y su enlace. `habitos_generales` son consejos de sentido común nuestros y no se atribuyen a la NASA."

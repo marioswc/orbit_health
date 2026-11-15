@@ -1,6 +1,21 @@
 {
   "version": "0.1.0",
   "estado": "pendiente de validación clínica",
+  "perfil": {
+    "id": "adultos_tripulantes_general",
+    "nombre": "Adultos astronautas, perfil general",
+    "poblacion": "Adultos en misión espacial; no sustituye ajustes clínicos individuales",
+    "tipo": "experimental",
+    "responsable_validacion": "pendiente",
+    "ultima_revision": null
+  },
+  "semaforo": {
+    "niveles": ["verde", "amarillo", "rojo"],
+    "verde_significa": "sin alerta activada por las reglas disponibles; no equivale a diagnóstico normal",
+    "amarillo_significa": "requiere repetición, seguimiento o valoración según el indicador",
+    "rojo_significa": "requiere respuesta inmediata a bordo según el protocolo",
+    "nota": "El semáforo es un triaje operativo y no un diagnóstico ni una autorización médica."
+  },
   "nota": "Todos los valores son supuestos de diseño. Ver docs/VALIDACION_MEDICA.md. Cada banda se evalúa en orden: la primera cuyo 'hasta' (inclusive) contiene el valor aplica; la última no lleva 'hasta'.",
   "ventana_news2_min": 60,
   "captura_recomendada_min": {
@@ -162,7 +177,9 @@
   "linea_base": {
     "dias": 14,
     "min_muestras": 5,
+    "metodo": "media_desviacion_muestral",
     "desviaciones": 2.0,
+    "nota_muestras_insuficientes": "No se genera aviso de línea base hasta reunir el mínimo de muestras.",
     "piso_desviacion": {
       "frecuencia_cardiaca": 4,
       "frecuencia_respiratoria": 2,
@@ -176,7 +193,9 @@
       "co2": 0.2,
       "dosis_pct": 2,
       "o2_cabina": 0.5,
-      "animo": 0.5
+      "animo": 0.5,
+      "sueno_eficiencia_pct": 3,
+      "sueno_despertares_min": 10
     },
     "nota_piso": "Variación mínima que se considera un cambio real. Evita que una serie muy estable (desviación casi cero) convierta una diferencia insignificante en un aviso. Supuestos de diseño pendientes de validación clínica."
   },
@@ -310,6 +329,18 @@
     },
     "ejercicio_min": {
       "etiqueta": "Minutos de ejercicio",
+      "unidad": "min",
+      "min": 0,
+      "max": 600
+    },
+    "sueno_eficiencia_pct": {
+      "etiqueta": "Eficiencia del sueño",
+      "unidad": "%",
+      "min": 0,
+      "max": 100
+    },
+    "sueno_despertares_min": {
+      "etiqueta": "Tiempo despierto durante el sueño",
       "unidad": "min",
       "min": 0,
       "max": 600

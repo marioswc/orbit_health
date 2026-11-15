@@ -101,11 +101,14 @@ def test_una_mision_completa_se_ejecuta_sola_y_cuenta_la_historia(cliente):
     conn = sqlite3.connect(config.DB_PATH)
     origenes = {f[0] for f in conn.execute("SELECT DISTINCT origen FROM lecturas")}
     cola_p1 = conn.execute("SELECT COUNT(*) FROM cola_salida WHERE prioridad=1").fetchone()[0]
-    retenidos = conn.execute("SELECT COUNT(*) FROM cola_salida WHERE estado='retenido'").fetchone()[0]
+    retenidos = conn.execute("SELECT COUNT(*) FROM cola_salida WHERE estado='retenido' AND resumido=0").fetchone()[0]
+    resumidos = conn.execute("SELECT COUNT(*) FROM cola_salida WHERE resumido=1").fetchone()[0]
+    resumenes = conn.execute("SELECT COUNT(*) FROM cola_salida WHERE tipo_evento='resumen_rutina'").fetchone()[0]
     ind = {f[0] for f in conn.execute("SELECT DISTINCT indicador FROM lecturas")}
     conn.close()
     assert origenes == {"simulado"}                                            # entró por el canal de sensores, pero se declara simulado
     assert cola_p1 > 0 and retenidos == 0                                      # lo urgente salió al volver el enlace
+    assert resumidos > 0 and resumenes > 0                                    # lo rutinario del apagón salió resumido, no uno por uno
     assert {"sueno_horas", "ejercicio_min", "co2", "spo2"} <= ind
     assert cliente.get("/api/enlace").json()["activo"] is True                  # el enlace queda normal
     assert cliente.get("/api/cola/verificar").json()["valida"] is True

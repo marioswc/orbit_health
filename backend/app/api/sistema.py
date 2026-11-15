@@ -26,8 +26,19 @@ def salud(request: Request) -> dict:
 
 @router.get("/umbrales")
 def umbrales_estado() -> dict:
-    """Versión y estado de validación clínica de los umbrales en uso."""
-    return {"version": UMBRALES["version"], "estado": UMBRALES["estado"]}
+    """Perfil, versión y estado de validación clínica de los umbrales en uso."""
+    return {
+        "version": UMBRALES["version"],
+        "estado": UMBRALES["estado"],
+        "perfil": UMBRALES["perfil"],
+        "semaforo": UMBRALES["semaforo"],
+        "linea_base": {
+            "dias": UMBRALES["linea_base"]["dias"],
+            "min_muestras": UMBRALES["linea_base"]["min_muestras"],
+            "metodo": UMBRALES["linea_base"]["metodo"],
+            "desviaciones": UMBRALES["linea_base"]["desviaciones"],
+        },
+    }
 
 
 @router.get("/indicadores")

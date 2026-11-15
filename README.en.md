@@ -32,6 +32,6 @@ curl -X POST "localhost:3000/api/demo/escenarios/hipoxia_eclipse?reconectar=true
 ## Honest limitations
 - A prototype that supports decisions; it does not replace the flight surgeon.
 - **All clinical thresholds are design assumptions pending validation by a clinician.** The interface says so.
-- Vital signs are entered by hand, through a simulated device or, for heart rate only, through a Bluetooth bridge (see [docs/BANDA_BLE.md](docs/BANDA_BLE.md)) that is tested with simulated packets, **not yet with a real band**.
+- Vital signs are entered by hand, through a simulated device or, for heart rate only, through a Bluetooth bridge (see [docs/BANDA_BLE.md](docs/BANDA_BLE.md)) that is tested with simulated packets. A real consumer band (IDW26, Veryfit app) connected but uses a proprietary protocol, so it is **not supported**.
 - No encryption at rest and no TLS on the cabin network yet; local PIN authentication exists but is off by default.
 - The calibration data are records of critically ill hospital patients (BIDMC dataset, PhysioNet), not of astronauts.

@@ -78,6 +78,8 @@ Reglas de integridad:
 - Índice por (tripulante, ts) en `lecturas` y por (estado, prioridad, creado) en la cola.
 - **Hash encadenado verificable:** `hash = SHA-256(hash_prev | campos del evento | ts_guardado)`. El `ts` se persiste para poder recomputarlo; se incluye un verificador de cadena.
 
+El explicador local opcional (`GET /api/estado/{tid}/explicacion`) recibe únicamente el estado ya calculado. Su salida es informativa: no puede modificar niveles, prioridades, acciones ni la cola. Si no hay un modelo local configurado, devuelve una explicación determinista.
+
 ## 6. Reglas clínicas
 
 ### 6.1 NEWS2 (fuente: Royal College of Physicians, 2017 — verificar tablas contra la publicación)
