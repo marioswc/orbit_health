@@ -60,6 +60,23 @@ def test_voz_no_envia_datos_privados_al_modelo(monkeypatch):
     assert '"indicador": "sueno_horas"' not in vistos[0]
 
 
+def test_contexto_de_voz_incluye_mision_y_escalamiento(monkeypatch):
+    capturado = {}
+
+    def consultar(_prompt, **kwargs):
+        capturado.update(kwargs)
+        return None
+
+    monkeypatch.setattr(voz_local.explicador_local, "consultar_modelo", consultar)
+    voz_local.responder("Me siento solo", {"nivel_general": "verde"}, {"tono": "calido"})
+
+    sistema = capturado["system"]
+    assert "Copiloto de Autonomía Clínica" in sistema
+    assert "hábitat" in sistema
+    assert "DTN Bundle" in sistema
+    assert "no inventes que fue enviado" in sistema
+
+
 def test_audio_invalido_se_expone_como_error_de_validacion(tmp_path):
     ruta = tmp_path / "audio.wav"
     ruta.write_bytes(b"no es audio")

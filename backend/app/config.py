@@ -65,7 +65,8 @@ IA_LOCAL_MODELO = os.getenv("ORBIT_IA_LOCAL_MODELO", "")
 IA_LOCAL_TIMEOUT_S = float(os.getenv("ORBIT_IA_LOCAL_TIMEOUT_S", "4"))
 
 # Proveedor externo opcional (DeepSeek, API compatible con OpenAI). OJO: el texto sale del equipo.
-# Vacío = automático (usa DeepSeek si hay API key, si no el modelo local); "local" fuerza el de la estación.
+# "automatico" prueba Ollama, luego DeepSeek si hay API key; "local" fuerza la estación.
+# Vacío conserva la selección heredada: DeepSeek si hay API key, si no Ollama.
 DEEPSEEK_API_KEY = os.getenv("ORBIT_DEEPSEEK_API_KEY", "").strip()
 DEEPSEEK_MODELO = os.getenv("ORBIT_DEEPSEEK_MODELO", "deepseek-flash")
 DEEPSEEK_URL = os.getenv("ORBIT_DEEPSEEK_URL", "https://api.deepseek.com/chat/completions")

@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import logging
 import ssl
+from contextvars import ContextVar
 from ipaddress import ip_address
 from pathlib import Path
 from urllib.error import URLError
@@ -20,6 +21,7 @@ from ..dominio.acciones import DETALLES, ESTILO_POR_DEFECTO, TONOS
 
 log = logging.getLogger("orbit.ia")
 _LOOPBACKS = {"localhost", "127.0.0.1", "::1"}
+_ULTIMA_FUENTE: ContextVar[str | None] = ContextVar("orbit_ultima_fuente", default=None)
 AVISO_IA = "Texto generado por un modelo local. No es un diagnóstico y no modifica la alerta."
 AVISO_IA_EXTERNA = ("Texto generado por IA en un servicio externo por internet (DeepSeek): tu consulta y tu estado salieron de la estación. "
                     "No es un diagnóstico y no modifica la alerta.")
@@ -123,8 +125,19 @@ def _usar_deepseek() -> bool:
     return config.IA_PROVEEDOR != "local" and bool(config.DEEPSEEK_API_KEY)
 
 
+def _modo_automatico() -> bool:
+    return config.IA_PROVEEDOR in {"automatico", "auto"}
+
+
 def _modelo_activo() -> tuple[str, str] | None:
     """Devuelve (fuente, modelo) si hay un proveedor listo, o None si solo aplican reglas locales."""
+    if _modo_automatico():
+        url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
+        if url and modelo and _url_local(url):
+            return "modelo_local", modelo
+        if config.DEEPSEEK_API_KEY:
+            return "deepseek", config.DEEPSEEK_MODELO
+        return None
     if _usar_deepseek():
         return "deepseek", config.DEEPSEEK_MODELO
     url, modelo = config.IA_LOCAL_URL, config.IA_LOCAL_MODELO
@@ -142,6 +155,7 @@ def explicar(estado: dict, preferencias: dict | None = None) -> dict:
                 "explicacion": _fallback(estado, preferencias), "nivel_general": nivel}
     fuente, modelo = activo
 
+    _ULTIMA_FUENTE.set(None)
     texto = consultar_modelo(_prompt(estado, preferencias))
     if texto is None:
         return {"fuente": "reglas_locales", "modelo": None, "generado_por_ia": False,
@@ -151,7 +165,9 @@ def explicar(estado: dict, preferencias: dict | None = None) -> dict:
         log.warning("Respuesta del modelo descartada: %s", motivo)
         return {"fuente": "reglas_locales", "modelo": None, "generado_por_ia": False, "descartado_por": motivo,
                 "explicacion": _fallback(estado, preferencias), "nivel_general": nivel}
-    return {"fuente": fuente, "modelo": modelo, "generado_por_ia": True, "aviso": aviso_para(fuente),
+    fuente_real = _ULTIMA_FUENTE.get() or fuente
+    modelo_real = config.DEEPSEEK_MODELO if fuente_real == "deepseek" else config.IA_LOCAL_MODELO
+    return {"fuente": fuente_real, "modelo": modelo_real, "generado_por_ia": True, "aviso": aviso_para(fuente_real),
             "explicacion": texto, "nivel_general": nivel}
 
 
@@ -184,9 +200,28 @@ def _consultar_deepseek(prompt: str, system: str | None = None) -> str | None:
 
 
 def consultar_modelo(prompt: str, system: str | None = None) -> str | None:
-    """Consulta el proveedor configurado (DeepSeek o Ollama local) y devuelve None si no está disponible."""
+    """Consulta el proveedor configurado y registra qué fuente respondió."""
+    _ULTIMA_FUENTE.set(None)
+    if _modo_automatico():
+        texto = _consultar_local(prompt, system)
+        if texto is not None:
+            _ULTIMA_FUENTE.set("modelo_local")
+            return texto
+        if config.DEEPSEEK_API_KEY:
+            texto = _consultar_deepseek(prompt, system)
+            if texto is not None:
+                _ULTIMA_FUENTE.set("deepseek")
+            return texto
+        return None
     if _usar_deepseek():
-        return _consultar_deepseek(prompt, system)
+        texto = _consultar_deepseek(prompt, system)
+        if texto is not None:
+            _ULTIMA_FUENTE.set("deepseek")
+        return texto
+    return _consultar_local(prompt, system)
+
+
+def _consultar_local(prompt: str, system: str | None = None) -> str | None:
     url = config.IA_LOCAL_URL
     modelo = config.IA_LOCAL_MODELO
     if not url or not modelo or not _url_local(url):
