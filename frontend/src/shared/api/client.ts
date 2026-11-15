@@ -18,8 +18,9 @@ export function onNoAutorizado(fn: (() => void) | null) {
 
 export async function api<T>(ruta: string, init?: RequestInit): Promise<T> {
   const token = getToken();
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (token) headers.Authorization = `Bearer ${token}`;
+  const headers = new Headers(init?.headers);
+  if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+  if (token) headers.set("Authorization", `Bearer ${token}`);
 
   const r = await fetch(`/api${ruta}`, {
     headers,
