@@ -20,6 +20,9 @@ A Spanish version for the team is kept in `README.es.md` (internal, not part of 
 - Adapts its wording to each astronaut's chosen tone and level of detail, without changing any alert level.
 - Verifies and restores its own database and exports a report for Earth with an integrity fingerprint.
 
+## Install it as an app / run it in a container
+ORBIT Health is an installable web app (PWA): open it in Chrome or Edge and use the *Install* prompt. It opens in its own window and the interface loads even if the server is slow. Clinical data is never cached in the browser. Installing needs `localhost` or HTTPS. Or run it in Docker: `docker compose up --build` (http://127.0.0.1:3000, loopback only). Details and limits: `docs/INSTALAR_COMO_APP.md` (in Spanish).
+
 ## Run it (works without internet once prepared)
 Requirements: Python 3.10+ and Node.js with npm. Optional offline AI and voice: `scripts/instalar_ia_local.sh` and `scripts/instalar_voz_local.sh` (see `docs/IA_LOCAL.md`, in Spanish).
 
