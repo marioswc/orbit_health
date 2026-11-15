@@ -26,6 +26,8 @@ Hay una prueba automática (`test_auditoria_seguridad.py`) que corre el script s
 7. **Límites**: 30 peticiones por minuto por persona y 2 simultáneas con el modelo (`ORBIT_IA_PETICIONES_POR_MIN`, `ORBIT_IA_MAX_SIMULTANEAS`); sobre el tope, responde 429 con `Retry-After`.
 8. Los intentos evidentes de inyección se **registran sin guardar el texto**.
 
+9. **Respaldo a la nube sin datos personales**: si el proveedor es automático (primero el modelo local y, si falla, DeepSeek) o es la nube directa, a DeepSeek solo viajan las preferencias de trato, el estado calculado y la pregunta. **Nunca** el perfil, los rasgos, la conversación reciente ni el nombre (`explicador_local.datos_personales_permitidos` y el parámetro `externo` de `consultar_modelo`). Lo cubren dos pruebas. Lo que la persona escribe en la pregunta sí viaja, y la respuesta lo avisa (`aviso`).
+
 ## Cabeceras HTTP
 `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Permissions-Policy` (solo micrófono), `Cross-Origin-Opener-Policy`, y `Cache-Control: no-store` en la API.
 
