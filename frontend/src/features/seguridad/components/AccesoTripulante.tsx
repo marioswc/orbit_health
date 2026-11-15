@@ -1,6 +1,7 @@
 import { FormEvent, memo, useState } from "react";
 import { useTranslation } from "../../../i18n";
 import Alerta from "../../../shared/components/Alerta";
+import Logo from "../../../shared/components/Logo";
 import Selector, { type Opcion } from "../../../shared/components/Selector";
 
 interface Props {
@@ -50,6 +51,10 @@ function AccesoTripulante({ tripulantes, alEntrar, alRecuperar }: Props) {
 
   return (
     <section className="tarjeta acceso" aria-label={t("aria")}>
+      <div className="acceso-marca">
+        <Logo />
+        <span>ORBIT Health</span>
+      </div>
       <p className="etiqueta-pagina">{t("kicker")}</p>
       <h1>{t("title")}</h1>
       <p className="suave">{t("desc")}</p>

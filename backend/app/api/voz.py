@@ -2,9 +2,10 @@ from fastapi import APIRouter, Body, Depends, Header, HTTPException
 
 from .. import config
 from ..servicios import estado as servicio_estado
+from ..servicios import perfil_ia as servicio_perfil
 from ..servicios import preferencias as servicio_preferencias
 from ..servicios import voz_local
-from .dependencias import conexion, requerir_tripulante, requiere
+from .dependencias import actor, conexion, exigir_propietario, requerir_tripulante, requiere
 
 router = APIRouter(prefix="/api/voz", tags=["voz"])
 
@@ -12,13 +13,14 @@ router = APIRouter(prefix="/api/voz", tags=["voz"])
 @router.post("/chat/{tid}")
 def chat_voz(tid: str, audio: bytes = Body(...), content_type: str | None = Header(default=None),
              content_length: int | None = Header(default=None),
-             conn=Depends(conexion), _: dict = Depends(requiere("clinico:leer"))) -> dict:
+             conn=Depends(conexion), a: dict = Depends(actor), _: dict = Depends(requiere("clinico:leer"))) -> dict:
     """Transcribe audio localmente, responde con el LLM local y devuelve audio opcional."""
     if not config.VOZ_ACTIVA:
         raise HTTPException(503, "La voz local está desactivada")
     if content_length is not None and content_length > config.VOZ_MAX_AUDIO_BYTES:
         raise HTTPException(413, "Audio demasiado grande")
     requerir_tripulante(conn, tid)
+    exigir_propietario(a, tid)               # la conversación es personal: solo su dueño
     extension = ".wav" if not content_type else {
         "audio/wav": ".wav", "audio/webm": ".webm", "audio/ogg": ".ogg",
         "audio/mpeg": ".mp3", "audio/mp4": ".m4a",
@@ -29,7 +31,8 @@ def chat_voz(tid: str, audio: bytes = Body(...), content_type: str | None = Head
         texto = voz_local.transcribir(audio, extension)
         estado = servicio_estado.estado_tripulante(conn, tid)
         preferencias = servicio_preferencias.obtener(conn, tid)
-        respuesta = voz_local.responder(texto, estado, preferencias)
+        ctx = servicio_perfil.contexto(conn, tid)
+        respuesta = voz_local.responder(texto, estado, preferencias, perfil=ctx["intereses"], nombre=ctx["nombre"])
         respuesta["transcripcion"] = texto
         respuesta["nivel_general"] = estado["nivel_general"]
         if config.VOZ_PIPER_MODELO:

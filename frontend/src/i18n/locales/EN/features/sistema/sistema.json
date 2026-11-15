@@ -14,7 +14,7 @@
   "health.every": "every {{min}} min",
   "health.disabled": "automatic backups off",
   "pin.title": "Reset PIN",
-  "pin.desc": "Doctor or commander only. Generates a temporary PIN and signs that person out everywhere. It is recorded in the audit log.",
+  "pin.desc": "Commander only. Generates a temporary PIN and signs that person out everywhere. It is recorded in the audit log.",
   "pin.crew": "Crew member",
   "pin.button": "Reset PIN",
   "pin.done": "PIN reset",

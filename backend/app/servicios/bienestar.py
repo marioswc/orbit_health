@@ -1,5 +1,5 @@
 """Casos de uso de bienestar: diario, PHQ-2, protocolo de crisis psicológica (con variable de calidad de oxígeno)
-y aviso con consentimiento al médico de a bordo.
+y aviso con consentimiento al comandante.
 
 Por diseño nada de esto se encola hacia Tierra (`cola_salida`).
 """
@@ -43,7 +43,7 @@ def registrar_tamizaje(conn: sqlite3.Connection, tid: str, item1: int, item2: in
     o2_efectivo = _oxigeno_vigente(conn, calidad_oxigeno)
     ev = modelo_crisis.evaluar_tamizaje(item1, item2, riesgo_autolesion, o2_efectivo)
     if compartir_medico and not ev["positivo"]:
-        raise ValueError("Solo se comparte con el médico un resultado positivo o en crisis")
+        raise ValueError("Solo se comparte con el comandante un resultado positivo o en crisis")
 
     tamizaje_id = repo.insertar_tamizaje(
         conn, tid, item1, item2, ev["total"], ev["riesgo_autolesion"],
@@ -102,9 +102,9 @@ def obtener_protocolo(conn: sqlite3.Connection, tid: str | None = None, nivel: s
 def solicitar_apoyo_medico(conn: sqlite3.Connection, tid: str, consentimiento: bool,
                            tipo: str = "crisis", tamizaje_id: int | None = None,
                            mensaje: str | None = None) -> dict:
-    """Crea un aviso interno al médico de a bordo SOLO con el consentimiento explícito del tripulante."""
+    """Crea un aviso interno al comandante SOLO con el consentimiento explícito del tripulante."""
     if not consentimiento:
-        raise ValueError("Se requiere el consentimiento explícito del tripulante para avisar al médico")
+        raise ValueError("Se requiere el consentimiento explícito del tripulante para avisar al comandante")
     if tipo not in modelo_crisis.TIPOS_AVISO:
         raise ValueError(f"tipo debe ser uno de: {', '.join(modelo_crisis.TIPOS_AVISO)}")
 
@@ -131,7 +131,7 @@ def solicitar_apoyo_medico(conn: sqlite3.Connection, tid: str, consentimiento: b
 
 
 def revocar_apoyo_medico(conn: sqlite3.Connection, tid: str, aviso_id: int) -> dict:
-    """El propio tripulante retira su consentimiento: el aviso deja de mostrarse al médico de a bordo."""
+    """El propio tripulante retira su consentimiento: el aviso deja de mostrarse al comandante."""
     aviso = repo.obtener_aviso_medico(conn, aviso_id)
     if not aviso:
         raise LookupError("Aviso no encontrado")

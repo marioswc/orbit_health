@@ -20,3 +20,8 @@ def contar(conn: sqlite3.Connection) -> int:
 
 def insertar_varios(conn: sqlite3.Connection, filas: list[tuple]) -> None:
     conn.executemany("INSERT INTO tripulantes (id,nombre,rol,fecha_nacimiento) VALUES (?,?,?,?)", filas)
+
+
+def nombre(conn: sqlite3.Connection, tid: str) -> str:
+    f = conn.execute("SELECT nombre FROM tripulantes WHERE id=?", (tid,)).fetchone()
+    return f["nombre"] if f else ""

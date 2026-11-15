@@ -1,0 +1,11 @@
+{
+  "name": "ORBIT Health",
+  "short_name": "ORBIT",
+  "description": "Apoyo a la decisión clínica sin internet para tripulaciones espaciales",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020",
+  "icons": [{ "src": "/icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

@@ -14,18 +14,18 @@ import re
 import secrets
 from datetime import datetime, timedelta
 
-ROLES = ("tripulante", "medico", "comandante")
+ROLES = ("tripulante", "comandante")      # todos son astronautas; no hay médico a bordo, solo un comandante con permisos extra
 _PIN = re.compile(r"^\d{6,10}$")
 
 # Acción -> roles autorizados. "autenticado" significa cualquier tripulante con sesión.
 PERMISOS = {
     "clinico:leer": set(ROLES),
     "clinico:escribir": set(ROLES),
-    "enlace:cambiar": {"medico", "comandante"},
-    "pin:reiniciar": {"medico", "comandante"},
-    "auditoria:leer": {"medico", "comandante"},
-    "demo:ejecutar": {"medico", "comandante"},
-    "salud_mental:avisos": {"medico", "comandante"},
+    "enlace:cambiar": {"comandante"},
+    "pin:reiniciar": {"comandante"},
+    "auditoria:leer": {"comandante"},
+    "demo:ejecutar": {"comandante"},
+    "salud_mental:avisos": {"comandante"},
 }
 
 

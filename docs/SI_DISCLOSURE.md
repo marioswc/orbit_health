@@ -11,7 +11,7 @@ The NASA Space Apps Challenge requires every project to state where and how SI t
 | Backend code (`backend/app/`) | Wrote the implementation: API, services, repositories, clinical rules engine, outbound queue, authentication, self-recovery | Commit trailer `Co-Authored-By: Claude` (74 of 100 commits when this was updated: all 65 by the backend author and 9 of 12 by one frontend developer; the other team members' commits carry no trailer, which does not by itself show whether they used other AI tools) |
 | Tests (`backend/tests/`) | Wrote and ran the automated tests | Same trailer |
 | Scripts (`scripts/`, `run.sh`) | Wrote start-up, end-to-end check, backup and calibration scripts | Same trailer |
-| Documentation (`README.md`, `docs/`) | Drafted technical documentation, decision records and the English summary | Same trailer |
+| Documentation (`README.md`, `README.es.md`, `docs/`) | Drafted technical documentation, decision records and the English summary | Same trailer |
 | Research | Read the official challenge pages and public references while building | Cited in `docs/PROJECT_SUMMARY_EN.md` |
 
 ## SI inside the product (optional)

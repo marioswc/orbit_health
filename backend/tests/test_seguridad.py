@@ -44,6 +44,6 @@ def test_bloqueo_temporal_y_reinicio_de_cuenta():
 
 def test_permisos_por_rol():
     assert s.permitido("tripulante", "clinico:leer") and s.permitido("tripulante", "clinico:escribir")
-    assert not s.permitido("tripulante", "enlace:cambiar") and s.permitido("medico", "enlace:cambiar")
+    assert not s.permitido("tripulante", "enlace:cambiar") and s.permitido("comandante", "enlace:cambiar") and not s.permitido("medico", "enlace:cambiar")      # el médico ya no existe como rol
     assert not s.permitido("tripulante", "auditoria:leer") and s.permitido("comandante", "auditoria:leer")
     assert not s.permitido("tripulante", "accion_inexistente")

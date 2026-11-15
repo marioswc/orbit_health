@@ -115,9 +115,9 @@ def recuperar(conn: sqlite3.Connection, tid: str, codigo: str, pin_nuevo: str,
 
 
 def reiniciar_pin(conn: sqlite3.Connection, actor: dict, tid: str, ahora: datetime | None = None) -> dict:
-    """Un médico o el comandante reinicia el PIN de otro tripulante (queda auditado). Devuelve un PIN temporal."""
+    """El comandante reinicia el PIN de otro tripulante (queda auditado). Devuelve un PIN temporal."""
     if not seg.permitido(actor["rol"], "pin:reiniciar"):
-        raise AuthError("permiso", "Solo el médico o el comandante pueden reiniciar un PIN")
+        raise AuthError("permiso", "Solo el comandante puede reiniciar un PIN")
     if repo.obtener_credencial(conn, tid) is None:
         raise ValueError("Tripulante sin credenciales")
     pin = seg.generar_pin()

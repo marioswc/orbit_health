@@ -31,6 +31,9 @@ export default function App() {
   const { t } = useTranslation();
   const auth = useAuth();
   const { tripulantes, tid, setTid, error: errorTripulantes } = useTripulantes();
+  useEffect(() => {
+    if (auth.actor?.tripulante_id) setTid(auth.actor.tripulante_id);
+  }, [auth.actor?.tripulante_id, setTid]);
   const { estado, error: errorEstado, refrescar } = useEstadoTripulante(auth.requiereAcceso ? "" : tid);
   const { tema, alternar } = useTema();
   const [vista, setVista] = useRuta();
@@ -53,28 +56,42 @@ export default function App() {
     ? { titulo: t("prototype.title"), texto: t("prototype.text", { version: umbrales.version, estado: estadoUmbral(t, umbrales.estado) }) } : null;
   useEffect(() => { api<EstadoUmbrales>("/umbrales").then(setUmbrales).catch(() => setUmbrales(null)); }, []);
 
+  if (auth.requiereAcceso) {
+    return (
+      <>
+        <FondoEstrellas />
+        <CambioIdioma />
+        <main className="acceso-pantalla">
+          <AccesoTripulante
+            tripulantes={tripulantes.map((t) => ({ valor: t.id, etiqueta: `${t.nombre} · ${t.rol}` }))}
+            alEntrar={auth.login}
+            alRecuperar={auth.recuperar}
+          />
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       <FondoEstrellas />
-      {tid && !auth.requiereAcceso && <Suspense fallback={null}><BurbujaVoz tripulanteId={tid} /></Suspense>}
+      {tid && <Suspense fallback={null}><BurbujaVoz tripulanteId={tid} /></Suspense>}
       <CambioIdioma />
       <div className="app">
-      <BarraLateral vista={vista} alCambiarVista={setVista} aviso={aviso} />
+      <BarraLateral vista={vista} alCambiarVista={setVista} aviso={aviso} alSalir={auth.actor ? auth.logout : null} />
       <div className="app-col">
       <BarraSuperior
         titulo={VISTAS.some((v) => v.id === vista) ? t(`nav.${vista}`) : undefined}
         tema={tema} alAlternarTema={alternar}
         selector={
-          auth.requiereAcceso ? null : (
-            <>
-              <SelectorTripulante tripulantes={tripulantes} valor={tid} alCambiar={setTid} />
-              {auth.actor && (
-                <button type="button" className="ghost" onClick={auth.logout} aria-label={t("topbar.logoutAria", { rol: auth.actor.rol })}>
-                  {t("topbar.logout")}
-                </button>
-              )}
-            </>
-          )
+          <>
+            <SelectorTripulante tripulantes={tripulantes} valor={tid} alCambiar={setTid} />
+            {auth.actor && (
+              <button type="button" className="ghost" onClick={auth.logout} aria-label={t("topbar.logoutAria", { rol: auth.actor.rol })}>
+                {t("topbar.logout")}
+              </button>
+            )}
+          </>
         }
       />
       <main className="pantalla">
@@ -82,13 +99,6 @@ export default function App() {
           {aviso && <div className="aviso-movil"><Alerta tono="aviso" titulo={aviso.titulo}>{aviso.texto}</Alerta></div>}
           {error && <Alerta tono="error" titulo={t("errors.generic")}>{error}</Alerta>}
         </div>
-        {auth.requiereAcceso ? (
-          <AccesoTripulante
-            tripulantes={tripulantes.map((t) => ({ valor: t.id, etiqueta: `${t.nombre} · ${t.rol}` }))}
-            alEntrar={auth.login}
-            alRecuperar={auth.recuperar}
-          />
-        ) : (
         <div className="vista" key={vista} style={{ display: vista === "monitor" ? "contents" : undefined, "--dx": `${dx}px` } as CSSProperties}>
           {tid && vista === "monitor" && (
             <MonitorPage
@@ -108,7 +118,6 @@ export default function App() {
             {vista === "enlace" && <EnlacePage />}
           </Suspense>
         </div>
-        )}
       </main>
       </div>
       </div>

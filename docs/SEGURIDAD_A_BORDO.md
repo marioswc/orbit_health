@@ -7,25 +7,25 @@ Principio: el sistema vive sin internet, con una tripulación pequeña y con la 
 | Realidad a bordo | Decisión |
 |---|---|
 | Sin internet ni correo | Sin recuperación por email ni identidad externa; todo local y con librería estándar |
-| 4 a 6 personas | Tres roles: tripulante, médico y comandante |
+| 4 a 6 personas | Todos son astronautas y **no hay médico a bordo**: dos roles de acceso, `tripulante` y `comandante` (uno solo por tripulación, con permisos extra) |
 | Un tripulante puede quedar incapacitado | Lo clínico lo **ven y registran todos** los autenticados; registrar a un compañero queda auditado |
 | Un bloqueo permanente podría impedir atender una emergencia | Bloqueos **temporales** (5 min tras 5 fallos), nunca permanentes |
 | Guantes y pantalla táctil | PIN numérico de 6 a 10 dígitos |
-| Sin soporte desde Tierra para restablecer accesos | Código de recuperación entregado al alta, o reinicio por médico o comandante |
+| Sin soporte desde Tierra para restablecer accesos | Código de recuperación entregado al alta, o reinicio por el comandante |
 | Turnos largos y reinicios de equipo | Sesión de 12 h guardada en la base, revocable |
 | Nadie puede auditar desde fuera | Auditoría con hash encadenado, verificable sin red |
-| Privacidad de salud mental | Diario, PHQ-2 y ánimo: solo su dueño, **sin excepción de rol**. Única vía de salida: un aviso que el propio tripulante decide enviar (con consentimiento, revocable y auditado) al médico o al comandante, sin diario ni puntaje |
+| Privacidad de salud mental | Diario, PHQ-2 y ánimo: solo su dueño, **sin excepción de rol**. Única vía de salida: un aviso que el propio tripulante decide enviar (con consentimiento, revocable y auditado) al comandante, sin diario ni puntaje |
 
 ## Permisos
 
-| Acción | Tripulante | Médico | Comandante |
-|---|---|---|---|
-| Ver y registrar signos de cualquiera | Sí | Sí | Sí |
-| Diario y PHQ-2 propios | Sí | Sí | Sí |
-| Diario y PHQ-2 de otra persona | No | No | No |
-| Ver los avisos de salud mental que un tripulante decidió enviar | No | Sí | Sí |
-| Cambiar el enlace, escenarios de demo | No | Sí | Sí |
-| Reiniciar el PIN de otro, ver auditoría | No | Sí | Sí |
+| Acción | Tripulante | Comandante |
+|---|---|---|
+| Ver y registrar signos de cualquiera | Sí | Sí |
+| Diario y PHQ-2 propios | Sí | Sí |
+| Diario y PHQ-2 de otra persona | No | No |
+| Ver los avisos de salud mental que un tripulante decidió enviar | No | Sí |
+| Cambiar el enlace, escenarios de demo | No | Sí |
+| Reiniciar el PIN de otro, ver auditoría | No | Sí |
 
 ## Cómo activarla
 

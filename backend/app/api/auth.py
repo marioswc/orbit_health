@@ -70,7 +70,7 @@ def recuperar(datos: RecuperarIn, conn=Depends(conexion)) -> dict:
 
 @router.post("/auth/reiniciar-pin/{tid}")
 def reiniciar_pin(tid: str, a: dict = Depends(requiere("pin:reiniciar")), conn=Depends(conexion)) -> dict:
-    """El médico o el comandante reinicia el PIN de otro tripulante"""
+    """El comandante reinicia el PIN de otro tripulante"""
     try:
         return auth.reiniciar_pin(conn, a, tid)
     except auth.AuthError as e:
@@ -81,7 +81,7 @@ def reiniciar_pin(tid: str, a: dict = Depends(requiere("pin:reiniciar")), conn=D
 
 @router.get("/auditoria")
 def ver_auditoria(_: dict = Depends(requiere("auditoria:leer")), conn=Depends(conexion)) -> list[dict]:
-    """Últimos registros de auditoría (médico o comandante)"""
+    """Últimos registros de auditoría (solo el comandante)"""
     return auditoria.recientes(conn)
 
 

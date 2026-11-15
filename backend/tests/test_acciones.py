@@ -3,7 +3,7 @@ from app.dominio.acciones import acciones_sugeridas as a
 
 def test_rojo_pide_repetir_avisar_y_explica_la_cola():
     p = a("rojo", 5)
-    assert "Repite la medición ahora" in p[0] and "médico de a bordo o al comandante" in p[1]
+    assert "Repite la medición ahora" in p[0] and "al comandante o a un compañero" in p[1]
     assert "prioridad máxima" in p[2] and p[-1] == "Próxima captura recomendada en 5 min."
 
 

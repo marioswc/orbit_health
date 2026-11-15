@@ -82,7 +82,7 @@ def ver_protocolo_crisis(tripulante_id: str | None = None, nivel: str = "crisis"
 
 @router.post("/crisis/aviso-medico")
 def crear_aviso_medico(datos: AvisoMedicoIn, conn=Depends(conexion), a: dict = Depends(actor)) -> dict:
-    """Notifica al médico de a bordo con consentimiento explícito. Nunca entra a la cola hacia Tierra."""
+    """Notifica al comandante con consentimiento explícito. Nunca entra a la cola hacia Tierra."""
     requerir_tripulante(conn, datos.tripulante_id)
     exigir_propietario(a, datos.tripulante_id)
     try:
@@ -97,7 +97,7 @@ def crear_aviso_medico(datos: AvisoMedicoIn, conn=Depends(conexion), a: dict = D
 
 @router.get("/crisis/avisos/{tid}")
 def ver_mis_avisos(tid: str, conn=Depends(conexion), a: dict = Depends(actor)) -> list[dict]:
-    """Avisos que el propio tripulante compartió con el médico y su estado (pendiente, atendido o revocado)."""
+    """Avisos que el propio tripulante compartió con el comandante y su estado (pendiente, atendido o revocado)."""
     requerir_tripulante(conn, tid)
     exigir_propietario(a, tid)
     return servicio.listar_mis_avisos(conn, tid)
@@ -105,7 +105,7 @@ def ver_mis_avisos(tid: str, conn=Depends(conexion), a: dict = Depends(actor)) -
 
 @router.post("/crisis/avisos/{aviso_id}/revocar")
 def revocar_aviso(aviso_id: int, datos: RevocarAvisoIn, conn=Depends(conexion), a: dict = Depends(actor)) -> dict:
-    """El propio tripulante revoca su consentimiento: el aviso deja de ser visible para el médico."""
+    """El propio tripulante revoca su consentimiento: el aviso deja de ser visible para el comandante."""
     requerir_tripulante(conn, datos.tripulante_id)
     exigir_propietario(a, datos.tripulante_id)
     try:
@@ -120,7 +120,7 @@ def revocar_aviso(aviso_id: int, datos: RevocarAvisoIn, conn=Depends(conexion), 
 def listar_avisos_medico(solo_pendientes: bool = False,
                          _: dict = Depends(requiere("salud_mental:avisos")),
                          conn=Depends(conexion)) -> list[dict]:
-    """Vista exclusiva para el médico o comandante: solo muestra avisos con consentimiento vigente."""
+    """Vista exclusiva del comandante: solo muestra avisos con consentimiento vigente."""
     return servicio.listar_avisos_medico(conn, solo_pendientes)
 
 
@@ -128,7 +128,7 @@ def listar_avisos_medico(solo_pendientes: bool = False,
 def atender_aviso_medico(aviso_id: int,
                          a: dict = Depends(requiere("salud_mental:avisos")),
                          conn=Depends(conexion)) -> dict:
-    """El médico o el comandante marca un aviso de salud mental como atendido"""
+    """El comandante marca un aviso de salud mental como atendido"""
     try:
         return servicio.atender_aviso_medico(conn, aviso_id, a.get("tripulante_id"))
     except LookupError as e:

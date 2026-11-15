@@ -26,13 +26,13 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 
 | Método | Ruta | Sesión | Qué hace |
 |---|---|---|---|
-| GET | `/api/auditoria` | requerida | Últimos registros de auditoría (médico o comandante) |
+| GET | `/api/auditoria` | requerida | Últimos registros de auditoría (solo el comandante) |
 | GET | `/api/auditoria/verificar` | requerida | Comprueba que la cadena de hash de la auditoría no fue alterada |
 | GET | `/api/auth/estado` | pública | Permite al frontend saber si debe mostrar la pantalla de acceso |
 | POST | `/api/auth/login` | pública | Inicia sesión con el PIN y devuelve un token |
 | POST | `/api/auth/logout` | requerida | Cierra la sesión actual |
 | POST | `/api/auth/recuperar` | pública | Restablece el PIN con el código de recuperación |
-| POST | `/api/auth/reiniciar-pin/{tid}` | requerida | El médico o el comandante reinicia el PIN de otro tripulante |
+| POST | `/api/auth/reiniciar-pin/{tid}` | requerida | El comandante reinicia el PIN de otro tripulante |
 | GET | `/api/auth/yo` | requerida | Quién es el usuario de la sesión actual y cuál es su rol |
 
 ## lecturas
@@ -53,11 +53,11 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 |---|---|---|---|
 | POST | `/api/animo` | requerida | Ánimo diario de 1 a 5. Exclusivo de su dueño y nunca se transmite |
 | GET | `/api/animo/{tid}` | requerida | Serie del ánimo diario del propio tripulante (privado) |
-| POST | `/api/crisis/aviso-medico` | requerida | Notifica al médico de a bordo con consentimiento explícito. Nunca entra a la cola hacia Tierra |
-| GET | `/api/crisis/avisos` | requerida | Vista exclusiva para el médico o comandante: solo muestra avisos con consentimiento vigente |
-| POST | `/api/crisis/avisos/{aviso_id}/atender` | requerida | El médico o el comandante marca un aviso de salud mental como atendido |
-| POST | `/api/crisis/avisos/{aviso_id}/revocar` | requerida | El propio tripulante revoca su consentimiento: el aviso deja de ser visible para el médico |
-| GET | `/api/crisis/avisos/{tid}` | requerida | Avisos que el propio tripulante compartió con el médico y su estado (pendiente, atendido o revocado) |
+| POST | `/api/crisis/aviso-medico` | requerida | Notifica al comandante con consentimiento explícito. Nunca entra a la cola hacia Tierra |
+| GET | `/api/crisis/avisos` | requerida | Vista exclusiva del comandante: solo muestra avisos con consentimiento vigente |
+| POST | `/api/crisis/avisos/{aviso_id}/atender` | requerida | El comandante marca un aviso de salud mental como atendido |
+| POST | `/api/crisis/avisos/{aviso_id}/revocar` | requerida | El propio tripulante revoca su consentimiento: el aviso deja de ser visible para el comandante |
+| GET | `/api/crisis/avisos/{tid}` | requerida | Avisos que el propio tripulante compartió con el comandante y su estado (pendiente, atendido o revocado) |
 | GET | `/api/crisis/protocolo` | requerida | Protocolo de crisis psicológica / riesgo de autolesión, integrando tono y calidad de oxígeno en cabina |
 | POST | `/api/diario` | requerida | Guarda en local. Por diseño no escribe en la cola de salida |
 | GET | `/api/diario/{tid}` | requerida | Notas del diario del propio tripulante (privado) |
@@ -109,7 +109,10 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 
 | Método | Ruta | Sesión | Qué hace |
 |---|---|---|---|
+| POST | `/api/asistente/chat/{tid}` | requerida | Conversa por texto con tu asistente de apoyo. Privado: solo el propio astronauta. No requiere la voz |
 | GET | `/api/estado/{tid}/explicacion` | requerida | Explica un estado ya calculado con reglas locales o un modelo local opcional |
+| GET | `/api/perfil-ia/{tid}` | requerida | Intereses que el propio astronauta le cuenta a su asistente (privado: solo su dueño) |
+| PUT | `/api/perfil-ia/{tid}` | requerida | Guarda sus intereses y motivadores (máx. 160 caracteres). Solo se usan con un modelo local |
 
 ## voz
 
@@ -117,4 +120,4 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 |---|---|---|---|
 | POST | `/api/voz/chat/{tid}` | requerida | Transcribe audio localmente, responde con el LLM local y devuelve audio opcional |
 
-Total: 60 operaciones, 13 públicas.
+Total: 63 operaciones, 13 públicas.
