@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRecargaPorClave } from "../../../shared/hooks/useRecargaPorClave";
 import { api } from "../../../shared/api/client";
 import type { Estado } from "../types/estado";
 
@@ -23,14 +24,14 @@ interface Props {
 export default function RachaMediciones({ tripulanteId, estado }: Props) {
   const [racha, setRacha] = useState<DatosRacha | null>(null);
 
-  useEffect(() => {
+  useRecargaPorClave(() => {
     if (!tripulanteId) return;
     let activo = true;
     api<DatosRacha>(`/racha/${encodeURIComponent(tripulanteId)}`)
       .then((d) => { if (activo) setRacha(d); })
       .catch(() => { if (activo) setRacha(null); });
     return () => { activo = false; };
-  }, [tripulanteId, estado]);
+  }, estado, [tripulanteId]);
 
   if (!racha) return null;
 

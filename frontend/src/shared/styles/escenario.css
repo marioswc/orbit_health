@@ -61,7 +61,8 @@
 .punto.amarillo .p-anillo { animation: anillo-svg 2.2s var(--ease-out) infinite; }
 .punto.rojo .p-anillo { animation: anillo-svg 1.3s var(--ease-out) infinite; }
 .punto.sel .p-anillo { animation: anillo-svg 1.6s var(--ease-out) infinite; stroke: var(--hud); }
-@keyframes anillo-svg { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(2.6); opacity: 0; } }
+/* Solo opacidad: escalar un elemento SVG obliga a recalcular el layout en cada cuadro */
+@keyframes anillo-svg { 0% { opacity: .85; } 100% { opacity: 0; } }
 .llamada { stroke: var(--hud); stroke-dasharray: 600; stroke-dashoffset: 600; animation: trazar .9s var(--ease-out) .15s forwards; opacity: .9; }
 @keyframes trazar { to { stroke-dashoffset: 0; } }
 

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useRecargaPorClave } from "../../../shared/hooks/useRecargaPorClave";
 import { api } from "../../../shared/api/client";
 import type { AlertasColectivas } from "../types/cabina";
 
@@ -11,7 +12,7 @@ export function useAlertasColectivas(clave: unknown) {
     api<AlertasColectivas>("/alertas/colectivas").then((d) => { setDatos(d); setError(""); }).catch((e) => setError(e.message));
   }, []);
 
-  useEffect(() => { cargar(); }, [cargar, clave]);
+  useRecargaPorClave(() => { cargar(); }, clave, [cargar]);
   useEffect(() => {
     const t = setInterval(() => { if (!document.hidden) cargar(); }, 5000);
     const visible = () => { if (!document.hidden) cargar(); };
