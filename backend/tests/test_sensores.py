@@ -41,6 +41,20 @@ def test_el_deterioro_pasa_por_amarillo_antes_de_rojo(cliente):
     assert origenes() == {"simulado"}                                          # lo inventado se declara simulado, nunca sensor
 
 
+def test_el_sensor_simulado_integra_exposicion_a_radiacion(cliente):
+    r = cliente.post("/api/demo/sensor/T1?perfil=exposicion_radiacion&ticks=12&semilla=7")
+    assert r.status_code == 200
+    rondas = r.json()["rondas"]
+    dosis = [ronda["valores"]["dosis_pct"] for ronda in rondas]
+    assert dosis[0] < 70 <= dosis[-1]
+    assert dosis == sorted(dosis)
+    assert rondas[-1]["nivel"] == "rojo"
+    assert origenes() == {"simulado"}
+    historial = cliente.get("/api/historial/T1?indicador=dosis_pct").json()["puntos"]
+    assert len(historial) == 12 and {p["origen"] for p in historial} == {"simulado"}
+    assert cliente.get("/api/cola/verificar").json()["valida"] is True
+
+
 def test_la_lectura_de_sensor_usa_la_misma_clasificacion_y_cola_con_origen_sensor(cliente):
     r = cliente.post("/api/sensores/lectura", json={"tripulante_id": "T1", "indicador": "spo2", "valor": 88, "dispositivo_id": "reloj-1"}).json()
     assert r["nivel"] == "rojo" and r["prioridad"] == 1 and r["acciones_sugeridas"]

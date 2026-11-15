@@ -61,12 +61,33 @@ def _calcular_tramo(entorno: str, tx: datetime,
     return llegada, ack
 
 
+def compactar_rutina(conn: sqlite3.Connection) -> dict | None:
+    """Tras un apagón largo, cambia cientos de eventos de rutina por UN resumen, para que lo urgente llegue primero y el
+    enlace no se ocupe con datos sin novedad. Los eventos originales NO se borran (siguen en la cadena de integridad y a
+    bordo); solo pasan a 'resumido'. Los eventos amarillos y rojos nunca se resumen."""
+    umbral = config.COMPACTAR_RUTINA_DESDE
+    rutina = repo.rutina_retenida(conn) if umbral > 0 else []
+    if len(rutina) < umbral:
+        return None
+    por_tripulante: dict[str, list[dict]] = {}
+    for f in rutina:
+        por_tripulante.setdefault(f["tripulante_id"], []).append(f)
+    repo.marcar_resumidos(conn, [f["id"] for f in rutina])
+    for tid, fs in por_tripulante.items():          # un resumen por tripulante, para que cada uno conserve su dueño
+        encolar_sin_commit(conn, tid, "resumen_rutina", 3, {
+            "cantidad": len(fs), "desde": fs[0]["ts_guardado"], "hasta": fs[-1]["ts_guardado"],
+            "ids": [fs[0]["id"], fs[-1]["id"]],
+            "nota": "Eventos de rutina (sin novedad) resumidos; los originales siguen guardados a bordo."})
+    return {"resumidos": len(rutina), "resumenes": len(por_tripulante)}
+
+
 def despachar_sin_commit(conn: sqlite3.Connection, enlace_activo: bool, entorno: str = "marte",
                          ahora: datetime | None = None) -> list[dict]:
     """Con enlace activo drena por prioridad (1→3) y antigüedad dentro de la transacción activa."""
     if not enlace_activo:
         return []
     ahora = ahora or _ahora()
+    compactar_rutina(conn)
     salida = repo.retenidos_ordenados(conn)
     llegada_prev: datetime | None = None
     ack_prev: datetime | None = None
@@ -134,7 +155,7 @@ def estado_cola(conn: sqlite3.Connection, ahora: datetime | None = None) -> dict
     resumen: dict = {}
     for f in repo.conteo_por_estado_y_prioridad(conn):
         resumen.setdefault(f["estado"], {1: 0, 2: 0, 3: 0})[f["prioridad"]] = f["total"]
-    return {"enlace": repo_enlace.leer(conn), "resumen": resumen, "items": items}
+    return {"enlace": repo_enlace.leer(conn), "resumen": resumen, "resumidos": repo.total_resumidos(conn), "items": items}
 
 
 def cambiar_enlace(conn: sqlite3.Connection, activo: bool, entorno: str,
