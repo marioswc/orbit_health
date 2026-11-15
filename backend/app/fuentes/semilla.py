@@ -1,15 +1,35 @@
 """Datos de demostración ficticios (no son personas reales)."""
 import sys
 
-from ..repositorios import bienestar, seguridad as repo_seg, tripulantes
+from datetime import datetime, timezone
+
+from ..repositorios import bienestar, perfil_ia, preferencias, seguridad as repo_seg, tripulantes
 from ..servicios import auth
 
 TRIPULANTES = [
-    ("T1", "Tripulante Uno", "Comandante", "1985-03-12"),
-    ("T2", "Tripulante Dos", "Especialista de misión", "1988-07-21"),
-    ("T3", "Tripulante Tres", "Ingeniero", "1990-11-02"),
-    ("T4", "Tripulante Cuatro", "Piloto", "1987-05-30"),
+    ("T1", "Valeria Montoya", "Comandante", "1985-03-12"),
+    ("T2", "Mateo Ríos", "Especialista de misión", "1988-07-21"),
+    ("T3", "Camila Ortega", "Ingeniero", "1990-11-02"),
+    ("T4", "Andrés Leal", "Piloto", "1987-05-30"),
 ]
+_NOMBRES_ANTIGUOS = {"T1": "Tripulante Uno", "T2": "Tripulante Dos", "T3": "Tripulante Tres", "T4": "Tripulante Cuatro"}
+
+# Perfil FICTICIO de cada astronauta (no son personas reales; todo es simulado): lo que le gusta, cómo es y cómo prefiere
+# que le hablen. Es lo que el asistente de cada quien usa para tratarlo. Cada persona puede cambiarlo desde su pantalla.
+PERFILES = {
+    "T1": {"intereses": "el ajedrez, salir a correr y tener metas claras",
+           "rasgos": "Serena y disciplinada; lleva el peso de la tripulación y le cuesta pedir ayuda; prefiere que le hablen claro.",
+           "tono": "directo", "detalle": "completo"},
+    "T2": {"intereses": "tocar la guitarra, cocinar y hablar de su familia",
+           "rasgos": "Curioso y bromista; se apaga si se siente aislado; le ayuda la conversación cálida.",
+           "tono": "calido", "detalle": "completo"},
+    "T3": {"intereses": "la ciencia ficción, la astronomía y los rompecabezas",
+           "rasgos": "Analítica y tranquila; necesita silencio y pausas; prefiere respuestas breves y concretas.",
+           "tono": "directo", "detalle": "breve"},
+    "T4": {"intereses": "el fútbol, la música y los retos entre compañeros",
+           "rasgos": "Sociable y competitivo; se anima con compañía y desafíos; el encierro le pesa.",
+           "tono": "calido", "detalle": "breve"},
+}
 
 CREDENCIALES_DEMO = [
     ("T1", "comandante", "111111"),
@@ -44,6 +64,17 @@ def sembrar_credenciales_demo(conn) -> None:
 def sembrar(conn) -> None:
     if tripulantes.contar(conn) == 0:
         tripulantes.insertar_varios(conn, TRIPULANTES)
+    else:                                              # bases anteriores: solo se reemplazan los nombres genéricos de antes
+        for tid, nombre, rol, _ in TRIPULANTES:
+            conn.execute("UPDATE tripulantes SET nombre=? WHERE id=? AND nombre=?", (nombre, tid, _NOMBRES_ANTIGUOS[tid]))
+            if tid == "T2":
+                conn.execute("UPDATE tripulantes SET rol=? WHERE id='T2' AND rol='Médico de a bordo'", (rol,))
+    ahora = datetime.now(timezone.utc).isoformat()
+    for tid, perfil in PERFILES.items():               # solo si la persona aún no tiene perfil ni preferencias propias
+        if tripulantes.existe(conn, tid) and not perfil_ia.existe(conn, tid):
+            perfil_ia.guardar(conn, tid, perfil["intereses"], perfil["rasgos"], ahora)
+        if tripulantes.existe(conn, tid) and preferencias.obtener(conn, tid) is None:
+            preferencias.guardar(conn, tid, perfil["tono"], perfil["detalle"], "normal", ahora)
     bienestar.insertar_capsulas(conn, CAPSULAS)
     conn.commit()
     if "pytest" not in sys.modules:

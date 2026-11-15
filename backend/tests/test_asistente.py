@@ -58,7 +58,7 @@ def test_preferencias_por_defecto_y_guardado(cliente):
     r = cliente.put("/api/preferencias/T1", json={"tono": "calido", "detalle": "breve", "recordatorios": "frecuente"})
     assert r.status_code == 200 and r.json()["tono"] == "calido"
     assert cliente.get("/api/preferencias/T1").json()["detalle"] == "breve"
-    assert cliente.get("/api/preferencias/T2").json()["tono"] == "directo"      # cada quien la suya
+    assert cliente.get("/api/preferencias/T2").json()["tono"] == "calido"      # cada quien la suya (T2 trae sembrado el trato cálido)
 
 
 def test_preferencias_invalidas_dan_422(cliente):
@@ -93,11 +93,11 @@ def test_con_autenticacion_las_preferencias_son_personales(cliente_auth):
 
 def test_el_asistente_se_adapta_a_quien_mira_cuando_un_companero_registra(cliente_auth):
     c = cliente_auth
-    h3, h4 = c.entrar("T3"), c.entrar("T4")
+    h3, h1 = c.entrar("T3"), c.entrar("T1")
     c.put("/api/preferencias/T3", json={"tono": "calido", "detalle": "breve", "recordatorios": "normal"}, headers=h3)
-    r = c.post("/api/lecturas", json={"tripulante_id": "T4", "indicador": "spo2", "valor": 88}, headers=h3).json()
-    assert r["estilo"]["tono"] == "calido"        # T3 registra por T4 y ve el texto con SU estilo
-    assert c.get("/api/estado/T4", headers=h4).json()["estilo"]["tono"] == "directo"
+    r = c.post("/api/lecturas", json={"tripulante_id": "T1", "indicador": "spo2", "valor": 88}, headers=h3).json()
+    assert r["estilo"]["tono"] == "calido"        # T3 registra por T1 y ve el texto con SU estilo
+    assert c.get("/api/estado/T1", headers=h1).json()["estilo"]["tono"] == "directo"
 
 
 def test_las_preferencias_no_guardan_nada_del_diario_ni_del_animo(cliente):

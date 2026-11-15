@@ -12,7 +12,8 @@ router = APIRouter(prefix="/api", tags=["asistente"])
 
 
 class PerfilIn(BaseModel):
-    intereses: str = Field(default="", max_length=400)
+    intereses: str | None = Field(default=None, max_length=400)
+    rasgos: str | None = Field(default=None, max_length=400)
 
 
 class ChatIn(BaseModel):
@@ -34,7 +35,7 @@ def guardar_perfil(tid: str, datos: PerfilIn, conn=Depends(conexion), a: dict = 
     requerir_tripulante(conn, tid)
     exigir_propietario(a, tid)
     try:
-        return servicio.guardar(conn, tid, datos.intereses)
+        return servicio.guardar(conn, tid, datos.intereses, datos.rasgos)
     except ValueError as e:
         raise HTTPException(422, str(e)) from e
 
@@ -47,7 +48,7 @@ def chat_texto(tid: str, datos: ChatIn, conn=Depends(conexion), a: dict = Depend
     estado = servicio_estado.estado_tripulante(conn, tid)
     ctx = servicio.contexto(conn, tid)
     r = voz_local.responder(datos.texto, estado, servicio_preferencias.obtener(conn, tid),
-                            perfil=ctx["intereses"], nombre=ctx["nombre"],
+                            perfil=ctx["intereses"], rasgos=ctx["rasgos"], nombre=ctx["nombre"],
                             idioma=datos.idioma or guardia_ia.detectar_idioma(datos.texto))
     r["nivel_general"] = estado["nivel_general"]
     return r

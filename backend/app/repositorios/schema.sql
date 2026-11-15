@@ -151,5 +151,6 @@ CREATE INDEX IF NOT EXISTS idx_avisos_sm_estado ON avisos_salud_mental (estado, 
 CREATE TABLE IF NOT EXISTS perfil_ia (
     tripulante_id TEXT PRIMARY KEY REFERENCES tripulantes(id) ON DELETE CASCADE,
     intereses TEXT NOT NULL DEFAULT '',
+    rasgos TEXT NOT NULL DEFAULT '',          -- cómo es la persona, en sus palabras
     actualizado_ts TEXT NOT NULL
 );
