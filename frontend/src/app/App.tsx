@@ -12,7 +12,6 @@ import CambioIdioma from "../shared/components/CambioIdioma";
 import BarraLateral, { VISTAS } from "./BarraLateral";
 import { useRuta } from "./useRuta";
 import BarraSuperior from "./BarraSuperior";
-import AsistenteFlotante from "./AsistenteFlotante";
 
 // Vistas secundarias: se descargan solo al abrirlas
 const BienestarPage = lazy(() => import("../features/bienestar").then((m) => ({ default: m.BienestarPage })));
@@ -113,7 +112,6 @@ export default function App() {
       </main>
       </div>
       </div>
-      {!auth.requiereAcceso && !!tid && <AsistenteFlotante tripulanteId={tid} estado={estado} />}
     </>
   );
 }
