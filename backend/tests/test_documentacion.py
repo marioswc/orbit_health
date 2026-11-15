@@ -67,7 +67,7 @@ def test_las_rutas_citadas_en_los_documentos_existen():
     assert inexistentes == []
 
 
-@pytest.mark.parametrize("doc", DOCS_TODOS, ids=lambda p: str(p.relative_to(RAIZ)))
+@pytest.mark.parametrize("doc", DOCS_TODOS, ids=lambda p, **kw: str(p.relative_to(RAIZ)))
 def test_los_enlaces_locales_de_la_documentacion_existen(doc):
     rotos = []
     for m in re.finditer(r"\]\((?!https?:|#|mailto:)([^)\s#]+)", doc.read_text(encoding="utf-8")):

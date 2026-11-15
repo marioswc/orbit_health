@@ -81,3 +81,8 @@ VOZ_PIPER_MODELO = os.getenv("ORBIT_VOZ_PIPER_MODELO", "")
 VOZ_PIPER_MODELO_EN = os.getenv("ORBIT_VOZ_PIPER_MODELO_EN", "")        # voz en inglés (opcional)
 VOZ_MAX_AUDIO_BYTES = int(os.getenv("ORBIT_VOZ_MAX_AUDIO_BYTES", "10000000"))
 VOZ_MAX_RESPUESTA_CARACTERES = int(os.getenv("ORBIT_VOZ_MAX_RESPUESTA_CARACTERES", "600"))
+
+# Rendimiento de la IA local: mantener el modelo en memoria y cargarlo (y la voz) al arrancar, para que la primera
+# pregunta no pague la carga (unos 10 s en la laptop de desarrollo).
+IA_LOCAL_KEEP_ALIVE = os.getenv("ORBIT_IA_LOCAL_KEEP_ALIVE", "30m")
+PRECALENTAR = os.getenv("ORBIT_PRECALENTAR", "1") == "1"

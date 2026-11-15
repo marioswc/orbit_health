@@ -21,7 +21,7 @@ def test_respuesta_de_voz_no_decide_el_nivel(monkeypatch):
 
 def test_voz_no_envia_datos_privados_al_modelo(monkeypatch):
     vistos = []
-    monkeypatch.setattr(voz_local.explicador_local, "consultar_modelo", lambda p: vistos.append(p) or None)
+    monkeypatch.setattr(voz_local.explicador_local, "consultar_modelo", lambda p, **kw: vistos.append(p) or None)
     voz_local.responder(
         "¿Qué significa mi estado?",
         {

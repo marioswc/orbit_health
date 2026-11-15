@@ -1,3 +1,7 @@
+import os
+
+os.environ["ORBIT_PRECALENTAR"] = "0"          # las pruebas no deben llamar a ningún modelo al arrancar
+
 import pytest
 from fastapi.testclient import TestClient
 
