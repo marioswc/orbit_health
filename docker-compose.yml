@@ -1,24 +1,32 @@
 # docker compose up --build      ->  http://127.0.0.1:3000   (solo accesible desde este equipo)
-# En MacBook (o con ./run.sh --docker): usa el Ollama nativo del anfitrión (Metal) y monta backend/models para voz local.
+# En Mac (o con ./run.sh --docker): usa el Ollama de tu computadora (host.docker.internal) y monta ./backend/models para la voz local.
+#
+# CONFIGURACIÓN: se toma de un archivo `.env` junto a este (copia .env.example). Compose lo usa para dos cosas: sustituir ${ORBIT_PUERTO}
+# aquí abajo y, con `env_file`, pasar TODAS las variables al contenedor. A propósito NO hay un bloque `environment:` con valores fijos:
+# en Compose ese bloque le GANA al .env y, antes, dejaba ORBIT_AUTH y ORBIT_SEED_DEMO atados a "0" y "1" sin que nadie lo notara.
+# Para ver qué recibió de verdad el contenedor:   docker compose exec orbit python -m app.diagnostico
+#
+# Lo que cambia por estar en un contenedor ya lo resuelve el programa: un ORBIT_IA_LOCAL_URL con 127.0.0.1 se traduce a host.docker.internal,
+# y ORBIT_VOZ_PIPER_BIN=./.venv/bin/piper cae al `piper` del sistema. En Linux, Ollama debe escuchar en una dirección alcanzable desde el contenedor
+# (OLLAMA_HOST=0.0.0.0 o la IP de docker0); si no, usa la IA incrustada: docker compose build --build-arg CON_IA=1
 services:
   orbit:
-    build: .
+    build:
+      context: .
+      args:
+        CON_IA: ${CON_IA:-0}
+        CON_VOZ: ${CON_VOZ:-libs}                                   # libs: las librerías de voz; los modelos se montan desde ./backend/models
     image: orbit-health:latest
     ports:
-      - "127.0.0.1:3000:3000"          # a propósito solo loopback: los datos de salud no se exponen en la red
+      - "127.0.0.1:${ORBIT_PUERTO:-3000}:${ORBIT_PUERTO:-3000}"   # solo loopback: los datos de salud no se exponen en la red
     extra_hosts:
-      - "host.docker.internal:host-gateway"
-    environment:
-      ORBIT_AUTH: "0"                    # 1 = pedir PIN (ver docs/CUENTAS_DEMO.md)
-      ORBIT_SEED_DEMO: "1"               # tripulación ficticia; en una instalación real, 0
-      ORBIT_IA_LOCAL_URL: "http://host.docker.internal:11434/api/generate"  # conecta con el Ollama del anfitrión
-      ORBIT_VOZ_PIPER_BIN: "piper"       # dentro del contenedor piper está en el PATH del sistema, no en .venv
+      - "host.docker.internal:host-gateway"                         # en Linux hace falta declararlo; en Docker Desktop ya existe
     env_file:
-      - path: .env                       # opcional: si no existe, se ignora
+      - path: .env                                                  # opcional: si no existe, se usan los valores por defecto
         required: false
     volumes:
       - orbit-data:/app/data
-      - ./backend/models:/app/backend/models:ro
+      - ./backend/models:/app/backend/models:ro                     # modelos de voz (scripts/instalar_voz_local.sh)
     restart: unless-stopped
 volumes:
   orbit-data:
