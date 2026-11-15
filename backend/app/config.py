@@ -5,12 +5,22 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parents[2]
 
 
+def _ruta_dotenv() -> Path | None:
+    """Dónde buscar el .env. Normal: la raíz del proyecto. Ejecutable empaquetado: RAIZ sería una carpeta temporal (y su
+    padre, un directorio compartido), así que NUNCA se busca ahí; solo el archivo que el lanzador indique, dentro de la
+    carpeta de datos del propio usuario."""
+    if getattr(sys, "frozen", False):
+        indicada = os.environ.get("ORBIT_ENV_FILE", "")
+        return Path(indicada) if indicada else None
+    return RAIZ / ".env"
+
+
 def _cargar_dotenv() -> None:
-    """Carga .env de la raíz automáticamente (salvo en pytest) para no depender de --env-file."""
+    """Carga el .env automáticamente (salvo en pytest) para no depender de --env-file."""
     if "pytest" in sys.modules:
         return
-    ruta = RAIZ / ".env"
-    if not ruta.is_file():
+    ruta = _ruta_dotenv()
+    if ruta is None or not ruta.is_file():
         return
     for linea in ruta.read_text(encoding="utf-8").splitlines():
         texto = linea.strip()
