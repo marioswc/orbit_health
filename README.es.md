@@ -12,7 +12,8 @@ Plan completo: [PLAN_DE_DESARROLLO.md](backend/docs/PLAN_DE_DESARROLLO.md).
 En una máquina nueva (necesita internet una sola vez; requiere Python 3.10+ y Node.js con npm):
 
 ```bash
-scripts/preparar.sh      # entorno de Python, dependencias, compilación de la interfaz y .env
+scripts/asistente_inicio.sh   # asistente paso a paso que te hace preguntas (recomendado si es tu primera vez)
+scripts/preparar.sh      # o, sin preguntas: entorno de Python, dependencias, compilación de la interfaz y .env
 ./run.sh                 # API y frontend en http://127.0.0.1:3000, sin internet
 ```
 

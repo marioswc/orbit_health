@@ -24,7 +24,8 @@ A Spanish version for the team is kept in `README.es.md` (internal, not part of 
 Requirements: Python 3.10+ and Node.js with npm. Optional offline AI and voice: `scripts/instalar_ia_local.sh` and `scripts/instalar_voz_local.sh` (see `docs/IA_LOCAL.md`, in Spanish).
 
 ```bash
-scripts/preparar.sh          # one step on a new machine: Python env, dependencies, build, .env (needs internet once)
+scripts/asistente_inicio.sh --en # friendly step-by-step setup that asks you questions (recommended if you are new)
+scripts/preparar.sh          # or, non-interactive, one step on a new machine: Python env, dependencies, build, .env (needs internet once)
 ./run.sh                     # http://127.0.0.1:3000, no network needed
 scripts/cuentas_demo.sh      # optional: demo PIN accounts (set ORBIT_AUTH=1 in .env): T1 111111, T2 222222, T3 333333, T4 444444
 scripts/verificar_e2e.sh     # automatic end-to-end check
