@@ -252,8 +252,7 @@ export default function BurbujaVoz({ tripulanteId }: Props) {
         <span className="voz-anillos" aria-hidden="true"><i /><i /></span>
         {grabando ? (
           <span className="voz-icono-activo" aria-hidden="true">
-            <span className="voz-onda boton"><i /><i /><i /><i /><i /></span>
-            <svg className="voz-stop" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="4" /></svg>
+            <svg className="voz-stop" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="18" rx="4" /></svg>
           </span>
         ) : hablando ? (
           <span className="voz-onda boton asistente" aria-hidden="true"><i /><i /><i /><i /><i /></span>
