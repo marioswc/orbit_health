@@ -13,3 +13,10 @@ Los datos de salud mental (cómo se siente el astronauta, su diario personal o u
 - **Tamizaje PHQ-2, oxígeno de cabina y protocolo de crisis (commit `ce363f8`):**
   - Si el tamizaje sale positivo o el tripulante indica estar en crisis, se despliega el protocolo de apoyo inmediato y se verifica la calidad de oxígeno en cabina (`% O₂`) por si un problema ambiental está influyendo.
   - **Consentimiento explícito y revocable:** el tripulante decide si quiere avisar al médico a bordo con una nota opcional, y puede **revocar su consentimiento** en cualquier momento desde la misma pantalla.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

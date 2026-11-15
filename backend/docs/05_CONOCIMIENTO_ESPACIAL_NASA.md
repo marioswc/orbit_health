@@ -47,3 +47,10 @@ En `backend/app/datos/entornos.json` y `backend/app/dominio/entornos.py` (`GET /
 - Se definieron los 5 entornos operativos de la misión:
   - **En microgravedad (`nave` y `estacion`):** `estimacion_osea_aplica = true`, con la tasa de `1.0 % a 1.5 %` mensual limitada a un máximo de 6 meses y su cita oficial de la NASA.
   - **En gravedad parcial (`luna` con ~1/6 g, `marte` con ~3/8 g según la NASA, y `rover` en superficie):** `estimacion_osea_aplica = false`, explicando claramente el motivo y la fuente oficial para no mostrar cálculos óseos sin respaldo científico.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Antigravity (Google DeepMind)** sobre base técnica documentada con **Claude (Anthropic / Claude Code)**.
+> - **Justificación de uso:** Se utilizó para estructurar y explicar en lenguaje claro y sin tecnicismos la arquitectura y los módulos del backend a partir del código fuente y el historial de commits, bajo la definición conceptual y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

@@ -74,3 +74,10 @@ En `backend/app/dominio/acciones.py` y `backend/app/servicios/preferencias.py` (
 - La ruta `GET /api/racha/{tid}` (`backend/app/servicios/racha.py`) ofrece una motivación ligera para mantener el hábito de registrarse:
   - Un día cuenta como completo cuando el tripulante registra sus **5 signos vitales cuantitativos** (frecuencia cardíaca, frecuencia respiratoria, SpO₂, presión sistólica y temperatura).
   - **Sin presión ni castigos:** mientras el día de hoy sigue en curso y aún no se completan los 5 signos, la racha acumulada hasta ayer **no se rompe**. Solo entrega 3 reconocimientos sencillos (`primer_dia`, `tres_dias`, `siete_dias`).
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Antigravity (Google DeepMind)** sobre base técnica documentada con **Claude (Anthropic / Claude Code)**.
+> - **Justificación de uso:** Se utilizó para estructurar y explicar en lenguaje claro y sin tecnicismos la arquitectura y los módulos del backend a partir del código fuente y el historial de commits, bajo la definición conceptual y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

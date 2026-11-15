@@ -77,3 +77,10 @@ Decirle a un tripulante "estás en amarillo o rojo" sin indicarle qué paso sigu
 En `backend/app/dominio/acciones.py` se creó un generador de **pasos procedimentales** que acompaña a cada lectura (`POST /api/lecturas`) y a cada consulta de estado (`GET /api/estado/{tid}`):
 - Indica pasos prácticos y seguros: repetir la medición para descartar un mal contacto, guardar reposo, avisar al médico o compañero de guardia, verificar el suministro de aire si el problema es respiratorio y completar los signos vitales que falten para cerrar el cálculo de NEWS2.
 - Una prueba automática (`backend/tests/test_acciones.py`) vigila que ningún texto sugiera jamás medicamentos ni tratamientos clínicos.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Antigravity (Google DeepMind)** sobre base técnica documentada con **Claude (Anthropic / Claude Code)**.
+> - **Justificación de uso:** Se utilizó para estructurar y explicar en lenguaje claro y sin tecnicismos la arquitectura y los módulos del backend a partir del código fuente y el historial de commits, bajo la definición conceptual y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

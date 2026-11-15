@@ -31,3 +31,10 @@ Everything shown comes from the running system. The crew is **simulated** and mu
 - No claim of clinical validity, accuracy figures or "real-time NASA monitoring": NASA's ARCHeR page only says actigraphy is collected during the mission.
 - No claim that the crew or readings are real.
 - Show the AI labels and the "simulated" tags on screen: judges look for AI disclosure (see `SI_DISCLOSURE.md`).
+
+
+---
+
+> **AI Signature & Justification (SI Disclosure):**
+> - **Tool used:** **Claude (Anthropic)** via **Claude Code**.
+> - **Justification:** Used as a technical assistant during the hackathon to draft and structure technical documentation, record architectural decisions, and maintain traceability with the source code and public NASA references, under the human team's conceptual definition, review, and validation (in compliance with *NASA Space Apps Challenge* rules).

@@ -44,3 +44,10 @@ curl -X POST "localhost:3000/api/demo/escenarios/hipoxia_eclipse?reconectar=true
 - Vital signs are entered by hand, through a simulated device or, for heart rate only, through a Bluetooth bridge (details in `docs/BANDA_BLE.md`, internal and in Spanish) that is tested with simulated packets. A real consumer band (IDW26, Veryfit app) connected but uses a proprietary protocol, so it is **not supported**.
 - No encryption at rest and no TLS on the cabin network yet; local PIN authentication exists but is off by default.
 - The calibration data are records of critically ill hospital patients (BIDMC dataset, PhysioNet), not of astronauts.
+
+
+---
+
+> **AI Signature & Justification (SI Disclosure):**
+> - **Tool used:** **Claude (Anthropic)** via **Claude Code**.
+> - **Justification:** Used as a technical assistant during the hackathon to draft and structure technical documentation, record architectural decisions, and maintain traceability with the source code and public NASA references, under the human team's conceptual definition, review, and validation (in compliance with *NASA Space Apps Challenge* rules).

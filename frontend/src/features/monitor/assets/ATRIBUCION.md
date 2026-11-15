@@ -8,3 +8,10 @@
 | organos.svg | "Circulatory System no tags.svg", Wikimedia Commons, LadyofHats. Se recorto | Dominio publico |
 
 Las capas se alinean con el astronauta por el centro de la cabeza (casco) y por los pies (botas).
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

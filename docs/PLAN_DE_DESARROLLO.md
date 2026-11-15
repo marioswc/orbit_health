@@ -2,7 +2,7 @@
 
 Sistema de apoyo a la decisión clínica para tripulaciones en misiones de espacio profundo con comunicación degradada. Funciona 100 % local, sin internet, con reglas clínicas deterministas y auditables.
 
-> **Nota:** este es el plan inicial del día. El estado vigente está en [PENDIENTES.md](../../docs/PENDIENTES.md) y las rutas reales en [API_REFERENCIA.md](../../docs/API_REFERENCIA.md).
+> **Nota:** este es el plan inicial del día. El estado vigente está en [PENDIENTES.md](PENDIENTES.md) y las rutas reales en [API_REFERENCIA.md](API_REFERENCIA.md).
 
 > **Alcance:** prototipo funcional construido desde cero en este repositorio. Es una herramienta de apoyo; no sustituye criterio médico. Todo umbral marcado como *Supuesto* requiere validación por un profesional de la salud antes de uso real.
 
@@ -200,3 +200,10 @@ Para uso real habría que reemplazar la calibración por mediciones propias de c
 - Validación médica de todos los umbrales marcados como *Supuesto*.
 - Decisión de la opción A o B en 6.1.
 - Confirmar fuentes de cifras antes de usarlas en la presentación.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

@@ -79,3 +79,10 @@ Principio vigente: la **decisión clínica** sigue siendo determinista y auditab
 - Opción A, B o C para el PHQ-2 positivo (sección 3).
 - Si algo de la sección 4 entra al alcance de hoy; recomendado: ninguna.
 - Aviso de alcance: el sistema es un prototipo de apoyo y no sustituye criterio médico. Cualquier uso real requeriría revisión regulatoria y legal que no se cubre aquí.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

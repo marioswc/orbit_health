@@ -69,3 +69,10 @@ Tierra que responde con retraso y pérdida de paquetes con reintentos. (Resumir 
 
 ## Fuera de alcance, declarado como trabajo futuro
 Cifrado de la base, TLS en la red de la cabina, sensores y radio reales. El explicador de modelo local ya está integrado de forma opcional, pero requiere instalar y validar un modelo en la estación. Sus protecciones están en [IA_LOCAL.md](IA_LOCAL.md); la lista de frases de crisis necesita revisión profesional.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

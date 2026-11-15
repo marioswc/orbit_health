@@ -15,3 +15,10 @@ A medida que crecieron las funciones (Monitor, Banda, Historial, Bienestar, Asis
   - Paleta casi acromática con modo claro/oscuro, paneles *liquid glass*, semáforo clínico siempre acompañado de texto y detección de rendimiento reducido para desactivar efectos pesados si hace falta.
 - **PWA mínima offline ([manifest.webmanifest](../../public/manifest.webmanifest), [sw.js](../../public/sw.js), commit `fc7de22`):**
   - Manifiesto e ícono propios para instalar la app y *service worker* que guarda los archivos estáticos de la interfaz **sin cachear nunca `/api`**, garantizando que los datos clínicos siempre vengan frescos del servidor local.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

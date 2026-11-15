@@ -19,3 +19,10 @@ Guía clara y sin tecnicismos de lo que hace el frontend de **ORBIT Health**, c�
 
 ## Versión en inglés / English version
 - [English Documentation Index](../en/00_INDEX.md)
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

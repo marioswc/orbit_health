@@ -13,3 +13,10 @@ Mental health data (daily mood, personal journal entries, depression screening) 
 - **PHQ-2 screening, cabin O₂ check & crisis protocol (commit `ce363f8`):**
   - If screening is positive or the crew member reports an acute crisis, immediate support steps appear alongside a cabin oxygen (`% O₂`) check to rule out environmental hypoxia.
   - **Explicit, revocable consent:** the crew member chooses whether to notify the onboard physician (with an optional short note) and can **withdraw consent** at any time.
+
+
+---
+
+> **AI Signature & Justification (SI Disclosure):**
+> - **Tool used:** **Claude (Anthropic)** via **Claude Code**.
+> - **Justification:** Used as a technical assistant during the hackathon to draft and structure the frontend documentation, UI architecture, and component guides, under the human team's visual design, UX decisions, and validation (in compliance with *NASA Space Apps Challenge* rules).

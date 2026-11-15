@@ -144,3 +144,10 @@ SVG optimizados con svgo (de ≈1.3 MB a ≈0.5 MB; presupuesto verificado por t
 | `astronauta.svg` | **Sin confirmar** (posible banco de imágenes): resolver antes de publicar |
 
 Detalle y créditos en [ATRIBUCION.md](../src/features/monitor/assets/ATRIBUCION.md).
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

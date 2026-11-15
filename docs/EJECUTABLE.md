@@ -33,3 +33,10 @@ Un ejecutable solo corre en el sistema donde se construyó. Para Windows y Mac e
 ## Comprobado y no comprobado
 - Hecho (Linux): se construyó; arrancó en 1.8 s con una carpeta de datos nueva; sirvió API, interfaz y manifiesto; creó la base y los respaldos en la carpeta del usuario; ignoró un `.env` ajeno del directorio temporal; leyó el `.env` propio; detectó una instancia ya abierta; pruebas automáticas del lanzador.
 - **No hecho:** el doble clic desde el explorador de archivos (se probó desde la terminal y sin abrir el navegador), el aspecto en Windows y Mac, el flujo de GitHub Actions, la firma de código y la notarización de Apple (cuestan dinero y cuentas de desarrollador), ni un instalador (`.msi`, `.dmg`, `.deb`).
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

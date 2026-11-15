@@ -64,3 +64,10 @@ Conectarse a una banda ajena para descifrarla no es algo que haga esta herramien
 - Se encontró por Bluetooth (nombre `IDW26`, servicio propio `0xAF0`, sin el estándar de frecuencia cardíaca `0x180D`).
 - La laptop se conecta, pero la banda **no expone ningún servicio** sin el handshake de su app: no se pudo leer nada.
 - Conclusión: **no soportada**. Usarla exigiría descifrar el protocolo propio de Veryfit; queda fuera del alcance. La demo usa la misión simulada (`origen = simulado`).
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

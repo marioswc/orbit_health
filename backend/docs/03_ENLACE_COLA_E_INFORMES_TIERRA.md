@@ -65,3 +65,10 @@ En auditoría médica y aeroespacial es fundamental demostrar dos cosas:
 - **Informes listos para Tierra (`GET /api/informe` y `GET /api/informe/{tid}`):**
   - Generan un reporte completo de toda la tripulación o de un tripulante en formato **JSON** o **CSV** (listo para abrir en una hoja de cálculo en Tierra).
   - Incluyen su propia huella de integridad `SHA-256` verificable y **excluyen por diseño el diario privado, los tamizajes PHQ-2 y el ánimo diario**.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Antigravity (Google DeepMind)** sobre base técnica documentada con **Claude (Anthropic / Claude Code)**.
+> - **Justificación de uso:** Se utilizó para estructurar y explicar en lenguaje claro y sin tecnicismos la arquitectura y los módulos del backend a partir del código fuente y el historial de commits, bajo la definición conceptual y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

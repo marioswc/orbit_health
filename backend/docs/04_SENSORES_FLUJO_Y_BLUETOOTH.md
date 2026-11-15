@@ -69,3 +69,10 @@ Durante las pruebas (`commit 23d9b13`), se detectó que tanto la misión simulad
   4. `calibracion`: series históricas precargadas (PhysioNet BIDMC) para dar contexto de 14 días, que nunca se envían a Tierra.
 - Las rutas de sensores (`/api/sensores/lectura`, `/api/sensores/lote`, `/api/sensores/flujo` y `/api/sensores/flujo/lote`) ahora aceptan explícitamente `"origen": "sensor"` (por defecto) o `"origen": "simulado"`, rechazando cualquier intento de inyectar datos como `manual` o `calibracion`.
 - El campo `origen` viaja dentro del paquete hacia Tierra y aparece en el historial y en `/api/informe`, garantizando trazabilidad total.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Antigravity (Google DeepMind)** sobre base técnica documentada con **Claude (Anthropic / Claude Code)**.
+> - **Justificación de uso:** Se utilizó para estructurar y explicar en lenguaje claro y sin tecnicismos la arquitectura y los módulos del backend a partir del código fuente y el historial de commits, bajo la definición conceptual y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

@@ -40,3 +40,10 @@ Runs fully offline from a single local server. Optional local authentication (sw
 - Only 8 of the 17 HRP risks have any indicator behind them, and only hypoxia is covered directly.
 - The adaptive assistant is preference-based personalisation, not a model that learns personalities. A local language model that rephrases the texts is future work.
 - No encryption at rest and no TLS on the cabin network yet.
+
+
+---
+
+> **AI Signature & Justification (SI Disclosure):**
+> - **Tool used:** **Claude (Anthropic)** via **Claude Code**.
+> - **Justification:** Used as a technical assistant during the hackathon to draft and structure technical documentation, record architectural decisions, and maintain traceability with the source code and public NASA references, under the human team's conceptual definition, review, and validation (in compliance with *NASA Space Apps Challenge* rules).

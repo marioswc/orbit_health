@@ -16,3 +16,10 @@ A traditional medical dashboard shows dozens of raw numbers that are hard to sca
   - Shows when the next check is due based on the crew member's status and tracks consecutive monitoring days without punitive alerts while today is still in progress.
 - **Faster startup rendering (commit `3ab9737`):**
   - Reduced duplicate requests on startup and eliminated unnecessary layout recalculations in the Monitor view.
+
+
+---
+
+> **AI Signature & Justification (SI Disclosure):**
+> - **Tool used:** **Claude (Anthropic)** via **Claude Code**.
+> - **Justification:** Used as a technical assistant during the hackathon to draft and structure the frontend documentation, UI architecture, and component guides, under the human team's visual design, UX decisions, and validation (in compliance with *NASA Space Apps Challenge* rules).

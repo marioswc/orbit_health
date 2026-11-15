@@ -75,3 +75,10 @@ Cliente base: [`src/shared/api/client.ts`](../src/shared/api/client.ts).
 ## Justificación del uso de IA / AI Usage Justification
 
 Los contratos de API, umbrales clínicos y reglas de negocio fueron definidos y validados por el equipo; la IA se empleó como apoyo para conectar hooks/componentes en TypeScript y generar pruebas unitarias sobre contratos mockeados. Ver [USO_IA_Y_DOCUMENTACION_FRONTEND.md](./USO_IA_Y_DOCUMENTACION_FRONTEND.md) y [docs/SI_DISCLOSURE.md](../../docs/SI_DISCLOSURE.md).
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

@@ -37,3 +37,10 @@ La imagen (≈ 180 MB) compila la interfaz y corre la API como usuario sin privi
 ## Comprobaciones hechas y no hechas
 - Hecho: pruebas automáticas del manifiesto (campos, iconos PNG con su tamaño real, atajos a pestañas que existen), del service worker (no guarda `/api`, precarga archivos que existen) y de las cabeceras de caché; el servidor sirve todos los archivos; la imagen de Docker se construyó, arrancó, quedó *healthy*, corre sin root y sirve la API y la interfaz.
 - **No hecho:** instalar la app en un navegador real, probar el modo sin conexión y la pantalla de actualización en un dispositivo, medir con Lighthouse, ni capturas de pantalla en el manifiesto. Hay que probarlo a mano en Chrome o Edge.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).
