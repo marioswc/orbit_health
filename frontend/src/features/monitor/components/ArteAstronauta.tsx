@@ -2,9 +2,9 @@ import type { CSSProperties } from "react";
 import { useTranslation } from "../../../i18n";
 import type { Capa } from "../zonas";
 import astronauta from "../assets/astronauta.svg";
-import esqueleto from "../assets/esqueleto.svg";
-import musculos from "../assets/musculos.svg";
-import organos from "../assets/organos.svg";
+import esqueleto from "../assets/esqueleto.webp";
+import musculos from "../assets/musculos.webp";
+import organos from "../assets/organos.webp";
 
 // Coordenadas = px del dibujo original del astronauta. Las capas de anatomia se alinean por el centro de la cabeza
 // con el casco y por los pies con las botas (ver assets/ATRIBUCION.md).
@@ -15,9 +15,9 @@ export type Caja = [number, number, number, number]; // x, y, ancho, alto
 
 export const CAJAS: Record<Capa, Caja> = {
   traje: [VB.x, VB.y, VB.w, VB.h],
-  musculo: [130.8, 48.4, 218.5, 391],
-  hueso: [167.9, 48.9, 171.3, 397.3],
-  organos: [138.9, 49.8, 172.1, 396.5],
+  musculo: [173.6, 48.4, 132.6, 391],
+  hueso: [166.9, 48.9, 144.8, 397.3],
+  organos: [155.7, 49.8, 171.9, 396.5],
 };
 
 export const URL_CAPA: Record<Capa, string> = { traje: astronauta, musculo: musculos, hueso: esqueleto, organos };

@@ -3,10 +3,8 @@
 | Archivo | Origen | Licencia |
 |---|---|---|
 | astronauta.svg | Imagen raster (WebP incrustada en un SVG; no es un vector) del astronauta de frente que aporto el equipo, recortada con fondo transparente | **Pendiente de confirmar**: procedencia y licencia sin verificar (la imagen original traia marca de agua); confirmar antes de publicar o sustituirla por una propia |
-| musculos.svg | "Muscles front and back.svg", Wikimedia Commons, OpenStax, Tomas Kebert y umimeto.org. Se recorto la vista frontal y se quitaron metadatos (`scripts/preparar_musculos.py`) | **CC BY-SA 4.0**: exige atribucion y que las adaptaciones conserven la misma licencia |
-| esqueleto.svg | "Human skeleton front - no labels.svg", Wikimedia Commons, LadyofHats. Se quito el fondo blanco y se recorto | Dominio publico |
-| organos.svg | "Circulatory System no tags.svg", Wikimedia Commons, LadyofHats. Se recorto | Dominio publico |
-
-Fuente de musculos: https://commons.wikimedia.org/wiki/File:Muscles_front_and_back.svg
+| musculos.webp | Fotografia/ilustracion de la musculatura humana de frente que aporto el equipo (imagen de banco de imagenes, 800x640, fondo blanco), recortada con fondo transparente (relleno desde el borde; se quito la sombra del suelo y el hueco entre las piernas, sin retocar el cuerpo) y convertida a WebP | **Pendiente de confirmar**: trae marca de agua de un banco de imagenes (no esta licenciada). Antes de publicar, adquirir la licencia o sustituirla. El musculos.svg anterior (CC BY-SA 4.0) esta en el historial de git |
+| esqueleto.webp | Fotografia de un esqueleto humano de frente que aporto el equipo (imagen de banco de imagenes, 800x800, fondo blanco), recortada con fondo transparente (relleno desde el borde, sin retoque del contenido) y convertida a WebP | **Pendiente de confirmar**: la imagen original trae marca de agua de un banco de imagenes, lo que indica que no esta licenciada. Antes de publicar, adquirir la licencia o sustituirla por una propia / de dominio publico (el esqueleto vectorial anterior de LadyofHats, dominio publico, esta en el historial de git) |
+| organos.webp | Figura central de una lamina anatomica (musculos, huesos y organos) que aporto el equipo (474x711, con miniaturas de organos alrededor). Se recorto solo la figura: se quitaron el fondo, las miniaturas y las lineas que las unian, sin retocar el cuerpo; convertida a WebP | **Pendiente de confirmar**: procedencia y licencia sin verificar (imagen de banco de imagenes / posiblemente generada con IA). Antes de publicar, confirmar la licencia o sustituirla. El organos.svg anterior (LadyofHats, dominio publico) esta en el historial de git |
 
 Las capas se alinean con el astronauta por el centro de la cabeza (casco) y por los pies (botas).

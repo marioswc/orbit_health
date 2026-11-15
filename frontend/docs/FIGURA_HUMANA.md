@@ -9,9 +9,9 @@ Ubicación: `features/monitor/` — `components/FiguraHumana.tsx`, `components/A
 | Capa | Archivo | Origen |
 |---|---|---|
 | Traje | `astronauta.svg` | Vectorización con curvas de la ilustración de referencia del equipo. **Licencia por confirmar** (parece de banco de imágenes) |
-| Músculo | `musculos.svg` | "Muscles front and back.svg" (Wikimedia Commons; OpenStax, Tomáš Kebert y umimeto.org), recortada a la vista frontal con `scripts/preparar_musculos.py`. **CC BY-SA 4.0**: exige atribución y que las adaptaciones conserven la misma licencia |
-| Hueso | `esqueleto.svg` | Wikimedia Commons, dominio público (LadyofHats) |
-| Órganos | `organos.svg` | Wikimedia Commons, dominio público (LadyofHats) |
+| Músculo | `musculos.webp` | Imagen aportada por el equipo; **licencia pendiente** (trae marca de agua), ver `src/features/monitor/assets/ATRIBUCION.md` |
+| Hueso | `esqueleto.webp` | Fotografía aportada por el equipo; **licencia pendiente** (trae marca de agua), ver `src/features/monitor/assets/ATRIBUCION.md` |
+| Órganos | `organos.webp` | Lámina aportada por el equipo (solo la figura central); **licencia pendiente**, ver `src/features/monitor/assets/ATRIBUCION.md` |
 
 Detalle y atribuciones en `assets/ATRIBUCION.md`. Las capas se alinean por el centro de la cabeza (casco) y por los pies (botas). En cada capa activa, la región de la zona elegida se ve a todo color y el resto apagado (`REGIONES` en `ArteAstronauta.tsx`).
 
