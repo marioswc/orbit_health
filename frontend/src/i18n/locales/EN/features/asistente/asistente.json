@@ -25,8 +25,8 @@
   "prefs.reminders.normal": "Normal",
   "prefs.reminders.frecuente": "Frequent",
   "prefs.saved": "Saved. Recommendations will use this style.",
-  "chat.title": "Talk to my assistant",
-  "chat.hint": "Private: only you see it. It can keep you company and explain your status, but it never changes an alert or gives treatment advice.",
+  "chat.title": "Nova, your companion",
+  "chat.hint": "Private: only you see it. Nova listens and keeps you company; it never changes an alert or gives treatment advice.",
   "chat.intereses": "What you like or what motivates you (optional, max. 160 characters)",
   "chat.interesesEjemplo": "For example: chess, music, talking about my family",
   "chat.saved": "Saved. It is only used with this device's AI and is never sent out.",
@@ -37,5 +37,7 @@
   "chat.asistente": "Assistant",
   "chat.escrito": "Answer from local rules, no generative AI. Not a diagnosis.",
   "chat.rasgos": "How you are (optional, max. 160 characters)",
-  "chat.rasgosEjemplo": "For example: calm, I need breaks, I cheer up with company"
+  "chat.rasgosEjemplo": "For example: calm, I need breaks, I cheer up with company",
+  "chat.perfil": "How you want Nova to know you",
+  "chat.sugerencias": "Shortcuts to get started"
 }
