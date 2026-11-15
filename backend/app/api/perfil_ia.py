@@ -43,7 +43,8 @@ def chat_texto(tid: str, datos: ChatIn, conn=Depends(conexion), a: dict = Depend
     requerir_tripulante(conn, tid)
     exigir_propietario(a, tid)
     estado = servicio_estado.estado_tripulante(conn, tid)
+    ctx = servicio.contexto(conn, tid)
     r = voz_local.responder(datos.texto, estado, servicio_preferencias.obtener(conn, tid),
-                            perfil=servicio.obtener(conn, tid)["intereses"])
+                            perfil=ctx["intereses"], nombre=ctx["nombre"])
     r["nivel_general"] = estado["nivel_general"]
     return r

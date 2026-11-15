@@ -63,3 +63,25 @@ def test_un_perfil_que_intenta_colar_un_farmaco_no_hace_que_pase(monkeypatch):
     monkeypatch.setattr(explicador_local, "consultar_modelo", lambda p: "Toma ibuprofeno y descansa.")
     r = voz_local.responder("me duele", ESTADO, {"tono": "directo"}, perfil="ibuprofeno")
     assert r["generado_por_ia"] is False and "descartado_por" in r
+
+
+def test_sin_modelo_el_asistente_igual_se_dirige_por_su_nombre_y_recuerda_sus_intereses(cliente, monkeypatch):
+    monkeypatch.setattr(config, "IA_LOCAL_URL", "")
+    cliente.put("/api/perfil-ia/T1", json={"intereses": "el ajedrez"})
+    cliente.put("/api/preferencias/T1", json={"tono": "calido", "detalle": "completo", "recordatorios": "normal"})
+    t = cliente.post("/api/asistente/chat/T1", json={"texto": "hola"}).json()["texto"]
+    assert "Tripulante Uno" in t and "el ajedrez" in t and "aquí estoy contigo" in t
+
+
+def test_el_tono_directo_cambia_la_forma_del_trato_personal():
+    directo = voz_local._toque_personal("Ana", "la música", "directo")
+    calido = voz_local._toque_personal("Ana", "la música", "calido")
+    assert directo != calido and "Ana" in directo and "la música" in directo
+    assert voz_local._toque_personal("", "", "calido") == ""
+
+
+def test_la_voz_tambien_es_solo_para_su_dueno(cliente_auth, monkeypatch):
+    monkeypatch.setattr(config, "VOZ_ACTIVA", True)
+    c = cliente_auth
+    r = c.post("/api/voz/chat/T3", content=b"audio", headers={**c.entrar("T4"), "Content-Type": "audio/wav"})
+    assert r.status_code == 403

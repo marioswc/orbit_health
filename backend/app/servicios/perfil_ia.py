@@ -7,6 +7,7 @@ import sqlite3
 from datetime import datetime, timezone
 
 from ..repositorios import perfil_ia as repo
+from ..repositorios import tripulantes
 
 MAX_CARACTERES = 160
 
@@ -28,3 +29,8 @@ def guardar(conn: sqlite3.Connection, tid: str, intereses: str) -> dict:
     repo.guardar(conn, tid, limpiar(intereses), datetime.now(timezone.utc).isoformat())
     conn.commit()
     return obtener(conn, tid)
+
+
+def contexto(conn: sqlite3.Connection, tid: str) -> dict:
+    """Lo que el asistente puede saber de la persona: su nombre y los intereses que ella misma escribió."""
+    return {"nombre": tripulantes.nombre(conn, tid), "intereses": repo.obtener(conn, tid)}
