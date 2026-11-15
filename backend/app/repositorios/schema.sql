@@ -145,3 +145,11 @@ CREATE TABLE IF NOT EXISTS avisos_salud_mental (
     actualizado_ts TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_avisos_sm_estado ON avisos_salud_mental (estado, creado_ts DESC);
+
+-- Cómo quiere cada astronauta que lo trate su asistente (intereses y motivadores). Solo lo ve su dueño; nunca va a Tierra
+-- ni a un proveedor de IA externo.
+CREATE TABLE IF NOT EXISTS perfil_ia (
+    tripulante_id TEXT PRIMARY KEY REFERENCES tripulantes(id) ON DELETE CASCADE,
+    intereses TEXT NOT NULL DEFAULT '',
+    actualizado_ts TEXT NOT NULL
+);
