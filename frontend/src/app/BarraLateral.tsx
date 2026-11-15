@@ -24,10 +24,12 @@ interface Props {
   alCambiarVista: (v: Vista) => void;
   /** Aviso fijo al pie (prototipo / umbrales). Lo compone App. */
   aviso?: { titulo: string; texto: string } | null;
+  /** Accion opcional para cerrar la sesion activa. */
+  alSalir?: (() => void) | null;
 }
 
 /** Menu lateral: marca, vistas (con indicador deslizante), colapsable, y aviso del prototipo al pie. En movil pasa a barra inferior. */
-export default function BarraLateral({ vista, alCambiarVista, aviso }: Props) {
+export default function BarraLateral({ vista, alCambiarVista, aviso, alSalir }: Props) {
   const { t } = useTranslation();
   const [colapsada, setColapsada] = useState(() => {
     const q = new URLSearchParams(window.location.search).get("lateral"); // ?lateral=1|0 fuerza el estado (ensayos y capturas)
@@ -72,6 +74,13 @@ export default function BarraLateral({ vista, alCambiarVista, aviso }: Props) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 4 3 19.5h18L12 4z" /><path d="M12 10v4.5M12 17.2v.1" /></svg>
           <div className="texto-nav"><strong>{aviso.titulo}</strong><span>{aviso.texto}</span></div>
         </div>
+      )}
+
+      {alSalir && (
+        <button type="button" className="lateral-colapsar" onClick={alSalir} aria-label={t("topbar.logout")} title={colapsada ? t("topbar.logout") : undefined}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /></svg>
+          <span className="texto-nav">{t("topbar.logout")}</span>
+        </button>
       )}
 
       <button type="button" className="lateral-colapsar" onClick={alternar} aria-label={colapsada ? t("nav.expand") : t("nav.collapse")} aria-pressed={colapsada} title={colapsada ? t("nav.expand") : undefined}>

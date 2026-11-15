@@ -78,7 +78,7 @@ export default function App() {
       {tid && <Suspense fallback={null}><BurbujaVoz tripulanteId={tid} /></Suspense>}
       <CambioIdioma />
       <div className="app">
-      <BarraLateral vista={vista} alCambiarVista={setVista} aviso={aviso} />
+      <BarraLateral vista={vista} alCambiarVista={setVista} aviso={aviso} alSalir={auth.actor ? auth.logout : null} />
       <div className="app-col">
       <BarraSuperior
         titulo={VISTAS.some((v) => v.id === vista) ? t(`nav.${vista}`) : undefined}
