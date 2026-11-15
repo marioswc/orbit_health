@@ -20,7 +20,7 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 | GET | `/api/peligros` | pública | Marco de peligros y riesgos del HRP, con la cobertura real de ORBIT Health por cada riesgo |
 | GET | `/api/salud` | pública | Estado de la base y de los respaldos. Pensado para que un tripulante no técnico sepa si todo está bien |
 | GET | `/api/tripulantes` | pública | Lista de tripulantes (id, nombre y rol) para el selector de acceso |
-| GET | `/api/umbrales` | pública | Versión y estado de validación clínica de los umbrales en uso |
+| GET | `/api/umbrales` | pública | Perfil, versión y estado de validación clínica de los umbrales en uso |
 
 ## seguridad
 
