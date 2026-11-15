@@ -1,16 +1,16 @@
 import { useLanguage, useTranslation } from "../../i18n";
 
-/** Conmutador ES | EN. El idioma se recuerda y se refleja en <html lang>. */
+/** Un solo boton circular: muestra el idioma actual (ES / EN) y al pulsarlo cambia al otro. Se recuerda y se refleja en <html lang>. */
 export default function ToggleIdioma() {
   const { language, setLanguage } = useLanguage();
   const { t } = useTranslation();
+  const otro = language === "es" ? "en" : "es";
   return (
-    <div className="idioma" role="group" aria-label={t("topbar.language")}>
-      {(["es", "en"] as const).map((l) => (
-        <button key={l} type="button" className={language === l ? "activo" : ""} aria-pressed={language === l} lang={l} onClick={() => setLanguage(l)}>
-          {l.toUpperCase()}
-        </button>
-      ))}
-    </div>
+    <button type="button" className="idioma-boton" lang={language}
+      aria-label={`${t("topbar.language")}: ${language.toUpperCase()} → ${otro.toUpperCase()}`}
+      title={`${t("topbar.language")}: ${language.toUpperCase()} → ${otro.toUpperCase()}`}
+      onClick={() => setLanguage(otro)}>
+      {language.toUpperCase()}
+    </button>
   );
 }

@@ -139,8 +139,8 @@ SVG optimizados con svgo (de ≈1.3 MB a ≈0.5 MB; presupuesto verificado por t
 ## 10. Licencias del arte
 | Archivo | Licencia |
 |---|---|
-| `musculos.svg` | CC BY-SA 4.0 (atribución obligatoria; adaptaciones bajo la misma licencia) |
-| `esqueleto.svg`, `organos.svg` | Dominio público |
+| `musculos.webp` | Licencia pendiente (imagen con marca de agua de banco de imágenes) |
+| `organos.webp` | Licencia pendiente (procedencia sin verificar) |
 | `astronauta.svg` | **Sin confirmar** (posible banco de imágenes): resolver antes de publicar |
 
 Detalle y créditos en [ATRIBUCION.md](../src/features/monitor/assets/ATRIBUCION.md).

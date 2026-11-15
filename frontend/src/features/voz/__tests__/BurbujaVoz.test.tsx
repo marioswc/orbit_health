@@ -83,4 +83,35 @@ describe("BurbujaVoz", () => {
     expect(fetchMock).toHaveBeenCalledWith("/api/voz/chat/T1?idioma=en", expect.objectContaining({ method: "POST" }));
     expect(speak).toHaveBeenCalledWith(expect.objectContaining({ text: "Your level is green.", lang: "en-US" }));
   });
+
+  it("conserva el turno anterior en el hilo al hacer una segunda pregunta", async () => {
+    vi.stubGlobal("MediaRecorder", GrabadorFalso);
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn(async () => ({ getTracks: () => [{ stop: vi.fn() }] })) },
+    });
+    const respuestas = [
+      { texto: "Primera respuesta.", transcripcion: "Primera pregunta", fuente: "reglas_locales" },
+      { texto: "Segunda respuesta.", transcripcion: "Segunda pregunta", fuente: "reglas_locales" },
+    ];
+    let n = 0;
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(respuestas[n++]), { status: 200 })));
+    vi.stubGlobal("speechSynthesis", undefined);
+
+    const { container } = render(<BurbujaVoz tripulanteId="T1" />);
+    const turno = async () => {
+      await act(async () => { fireEvent.click(screen.getByRole("button", { pressed: false })); });
+      await act(async () => { fireEvent.click(screen.getByRole("button", { pressed: true })); });
+    };
+    await turno();
+    await waitFor(() => expect(screen.getByText("Primera respuesta.")).toBeInTheDocument());
+    expect(container.querySelector(".voz-hilo")).toBeNull();
+
+    await turno();
+    await waitFor(() => expect(screen.getByText("Segunda respuesta.")).toBeInTheDocument());
+    const hilo = container.querySelector(".voz-hilo");
+    expect(hilo).toBeInTheDocument();
+    expect(hilo).toHaveTextContent("Primera pregunta");
+    expect(hilo).toHaveTextContent("Primera respuesta.");
+  });
 });

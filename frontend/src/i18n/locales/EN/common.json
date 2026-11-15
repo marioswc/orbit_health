@@ -17,6 +17,8 @@
   "nav.collapse": "Collapse menu",
   "nav.expand": "Expand menu",
   "nav.collapseShort": "Collapse",
+  "topbar.profile": "Profile",
+  "topbar.profileAria": "{{nombre}} profile",
   "topbar.logout": "Sign out",
   "topbar.logoutAria": "Sign out ({{rol}})",
   "topbar.language": "Language",

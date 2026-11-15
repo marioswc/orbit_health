@@ -2,6 +2,12 @@ from app import config
 from app.servicios import voz_local
 
 
+def test_normaliza_idioma_desde_locale():
+    assert voz_local.normalizar_idioma("ES") == "es"
+    assert voz_local.normalizar_idioma("en-US") == "en"
+    assert voz_local.normalizar_idioma("auto") is None
+
+
 def test_endpoint_de_voz_esta_desactivado_por_defecto(cliente):
     respuesta = cliente.post("/api/voz/chat/T1", content=b"audio", headers={"Content-Type": "audio/wav"})
     assert respuesta.status_code == 503
@@ -17,6 +23,19 @@ def test_respuesta_de_voz_no_decide_el_nivel(monkeypatch):
     )
     assert resultado["fuente"] == "reglas_locales"
     assert "rojo" in resultado["texto"]
+
+
+def test_respuesta_de_voz_en_ingles_sin_modelo(monkeypatch):
+    monkeypatch.setattr(config, "IA_LOCAL_URL", "")
+    monkeypatch.setattr(config, "IA_LOCAL_MODELO", "")
+    resultado = voz_local.responder(
+        "How am I?",
+        {"nivel_general": "verde"},
+        {"tono": "directo"},
+        idioma="en",
+    )
+    assert resultado["idioma"] == "en"
+    assert "overall status is green" in resultado["texto"]
 
 
 def test_voz_no_envia_datos_privados_al_modelo(monkeypatch):

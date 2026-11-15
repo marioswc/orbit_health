@@ -70,7 +70,7 @@ def test_sin_modelo_el_asistente_igual_se_dirige_por_su_nombre_y_recuerda_sus_in
     cliente.put("/api/perfil-ia/T1", json={"intereses": "el ajedrez"})
     cliente.put("/api/preferencias/T1", json={"tono": "calido", "detalle": "completo", "recordatorios": "normal"})
     t = cliente.post("/api/asistente/chat/T1", json={"texto": "hola"}).json()["texto"]
-    assert "Valeria Montoya" in t and "el ajedrez" in t and "aquí estoy contigo" in t
+    assert "Valeria" in t and "Montoya" not in t and "el ajedrez" in t and "aquí estoy contigo" in t
 
 
 def test_el_tono_directo_cambia_la_forma_del_trato_personal():
@@ -186,3 +186,56 @@ def test_el_perfil_se_puede_cambiar_por_partes(cliente):
     cliente.put("/api/perfil-ia/T3", json={"intereses": "leer"})
     cliente.put("/api/perfil-ia/T3", json={"rasgos": "tímida"})
     assert cliente.get("/api/perfil-ia/T3").json() == {"intereses": "leer", "rasgos": "tímida"}
+
+
+# ---------- Nova: compañía personal ----------
+def test_la_respiracion_guiada_no_pasa_por_el_modelo_y_respeta_el_idioma(monkeypatch):
+    monkeypatch.setattr(explicador_local, "consultar_modelo", lambda p, **kw: (_ for _ in ()).throw(AssertionError("al modelo no")))
+    es = voz_local.responder("quiero respirar", ESTADO, {"tono": "calido"}, nombre="Ana", idioma="es")
+    en = voz_local.responder("I want to breathe", ESTADO, {"tono": "calido"}, nombre="Ana", idioma="en")
+    assert es["fuente"] == "guia_respiracion" and "Ana" in es["texto"] and "cuatro" in es["texto"] and es["generado_por_ia"] is False
+    assert en["fuente"] == "guia_respiracion" and "breathe together" in en["texto"] and "four" in en["texto"]
+
+
+def test_una_crisis_gana_a_la_respiracion_guiada():
+    r = voz_local.responder("no quiero vivir, necesito respirar", ESTADO, {"tono": "directo"})
+    assert r["fuente"] == "protocolo_crisis"
+
+
+def test_el_saludo_es_personal_instantaneo_y_solo_del_dueno(cliente_auth):
+    c = cliente_auth
+    h2 = c.entrar("T2")
+    s = c.get("/api/asistente/saludo/T2?idioma=es", headers=h2).json()
+    assert "Mateo" in s["texto"] and "Nova" in s["texto"] and "la guitarra" in s["texto"] and len(s["sugerencias"]) == 4
+    en = c.get("/api/asistente/saludo/T2?idioma=en", headers=h2).json()
+    assert "I'm Nova" in en["texto"] and en["idioma"] == "en"
+    assert c.get("/api/asistente/saludo/T2", headers=c.entrar("T3")).status_code == 403
+    assert c.get("/api/asistente/saludo/T2").status_code == 401
+
+
+def test_nova_recuerda_los_ultimos_mensajes_solo_con_modelo_local(monkeypatch):
+    vistos = []
+    monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "")
+    monkeypatch.setattr(explicador_local, "consultar_modelo", lambda p, **kw: vistos.append(p) or None)
+    hist = [{"rol": "yo", "texto": f"mensaje {i}"} for i in range(9)] + [{"rol": "asistente", "texto": "te escucho"}]
+    voz_local.responder("sigo igual", ESTADO, {"tono": "calido"}, historial=hist)
+    p = vistos[0]
+    assert "Conversación reciente" in p and "te escucho" in p and "mensaje 8" in p and "mensaje 1" not in p     # solo los últimos 6
+    monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "clave-de-prueba")
+    vistos.clear()
+    voz_local.responder("sigo igual", ESTADO, {"tono": "calido"}, historial=hist)
+    assert "Conversación reciente" not in vistos[0] and "te escucho" not in vistos[0]       # a la nube no viaja la conversación
+
+
+def test_el_endpoint_acepta_historial_pero_no_mas_de_seis_ni_roles_raros(cliente):
+    base = {"texto": "hola"}
+    ok = cliente.post("/api/asistente/chat/T1", json={**base, "historial": [{"rol": "yo", "texto": "a"}] * 6})
+    assert ok.status_code == 200
+    assert cliente.post("/api/asistente/chat/T1", json={**base, "historial": [{"rol": "yo", "texto": "a"}] * 7}).status_code == 422
+    assert cliente.post("/api/asistente/chat/T1", json={**base, "historial": [{"rol": "sistema", "texto": "a"}]}).status_code == 422
+
+
+def test_la_persona_de_nova_es_una_asistente_que_acompana_y_no_habla_de_su_cuerpo():
+    s = voz_local.SISTEMA_BASE
+    assert "Nova" in s and "NUNCA hables de ti como si tuvieras cuerpo" in s and "UNA sola pregunta" in s
+    assert "comandante o un compañero" in s

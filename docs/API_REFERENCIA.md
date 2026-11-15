@@ -110,6 +110,7 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 | Método | Ruta | Sesión | Qué hace |
 |---|---|---|---|
 | POST | `/api/asistente/chat/{tid}` | requerida | Conversa por texto con tu asistente de apoyo. Privado: solo el propio astronauta. No requiere la voz |
+| GET | `/api/asistente/saludo/{tid}` | requerida | Saludo de Nova y atajos de conversación (sin modelo). Privado: solo el propio astronauta |
 | GET | `/api/estado/{tid}/explicacion` | requerida | Explica un estado ya calculado con reglas locales o un modelo local opcional |
 | GET | `/api/perfil-ia/{tid}` | requerida | Intereses que el propio astronauta le cuenta a su asistente (privado: solo su dueño) |
 | PUT | `/api/perfil-ia/{tid}` | requerida | Guarda sus intereses y motivadores (máx. 160 caracteres). Solo se usan con un modelo local |
@@ -120,4 +121,4 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 |---|---|---|---|
 | POST | `/api/voz/chat/{tid}` | requerida | Transcribe audio localmente, responde con el LLM local y devuelve audio opcional |
 
-Total: 63 operaciones, 13 públicas.
+Total: 64 operaciones, 13 públicas.
