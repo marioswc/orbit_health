@@ -1,21 +1,17 @@
-import { Suspense, lazy, useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { Suspense, lazy, useEffect, useRef, useState, type CSSProperties } from "react";
 import { api } from "../shared/api/client";
 import Alerta from "../shared/components/Alerta";
-import Drawer from "../shared/components/Drawer";
 import FondoEstrellas from "../shared/components/FondoEstrellas";
 import { useTema } from "../shared/hooks/useTema";
 import { SelectorTripulante, useTripulantes } from "../features/tripulantes";
 import { MonitorPage, useEstadoTripulante } from "../features/monitor";
-import { PanelMedicion } from "../features/mediciones";
 import { MonitorCabina, resolverAmbiente, useAlertasColectivas } from "../features/cabina";
 import { AccesoTripulante, useAuth } from "../features/seguridad";
 import { useTranslation } from "../i18n";
-import { CapturaContext } from "../shared/capturaContext";
 import CambioIdioma from "../shared/components/CambioIdioma";
 import BarraLateral, { VISTAS } from "./BarraLateral";
 import { useRuta } from "./useRuta";
 import BarraSuperior from "./BarraSuperior";
-import BotonCaptura from "./BotonCaptura";
 
 // Vistas secundarias: se descargan solo al abrirlas
 const BienestarPage = lazy(() => import("../features/bienestar").then((m) => ({ default: m.BienestarPage })));
@@ -29,9 +25,6 @@ const estadoUmbral = (t: (k: string) => string, estado: string) => { const k = `
 
 interface EstadoUmbrales { version: string; estado: string }
 
-/** Estado inicial desde la URL (?captura=1): sirve para ensayar una pantalla de la demo. La vista va en la ruta (#/historial). */
-const capturaDesdeUrl = () => new URLSearchParams(window.location.search).get("captura") === "1";
-
 export default function App() {
   const { t } = useTranslation();
   const auth = useAuth();
@@ -39,7 +32,6 @@ export default function App() {
   const { estado, error: errorEstado, refrescar } = useEstadoTripulante(auth.requiereAcceso ? "" : tid);
   const { tema, alternar } = useTema();
   const [vista, setVista] = useRuta();
-  const [captura, setCaptura] = useState(capturaDesdeUrl);
   const [umbrales, setUmbrales] = useState<EstadoUmbrales | null>(null);
   const error = errorTripulantes || errorEstado;
   const { datos: colectivas } = useAlertasColectivas(estado);
@@ -54,15 +46,13 @@ export default function App() {
   const previa = useRef(orden.indexOf(vista));
   const dx = orden.indexOf(vista) >= previa.current ? 32 : -32;
   useEffect(() => { previa.current = orden.indexOf(vista); });
-  const cerrarCaptura = useCallback(() => setCaptura(false), []);
-  const abrirCaptura = useCallback(() => setCaptura(true), []);
 
   const aviso = umbrales && !umbrales.estado.startsWith("validado")
     ? { titulo: t("prototype.title"), texto: t("prototype.text", { version: umbrales.version, estado: estadoUmbral(t, umbrales.estado) }) } : null;
   useEffect(() => { api<EstadoUmbrales>("/umbrales").then(setUmbrales).catch(() => setUmbrales(null)); }, []);
 
   return (
-    <CapturaContext.Provider value={{ alAbrir: abrirCaptura, disponible: !!tid }}>
+    <>
       <FondoEstrellas />
       <CambioIdioma />
       <div className="app">
@@ -84,7 +74,6 @@ export default function App() {
           )
         }
       />
-      {!auth.requiereAcceso && !captura && <BotonCaptura alAbrir={abrirCaptura} disponible={!!tid} />}
       <main className="pantalla">
         <div className="avisos">
           {aviso && <div className="aviso-movil"><Alerta tono="aviso" titulo={aviso.titulo}>{aviso.texto}</Alerta></div>}
@@ -119,10 +108,6 @@ export default function App() {
       </main>
       </div>
       </div>
-
-      <Drawer abierto={!auth.requiereAcceso && captura && !!tid} alCerrar={cerrarCaptura} titulo="Captura manual">
-        <PanelMedicion tripulanteId={tid} alGuardar={refrescar} />
-      </Drawer>
-    </CapturaContext.Provider>
+    </>
   );
 }
