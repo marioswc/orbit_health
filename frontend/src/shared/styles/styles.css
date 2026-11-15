@@ -2051,19 +2051,68 @@ html:root .lateral-item, html:root .lateral-item:hover, html:root .lateral-item:
   }
 }
 
-/* ==================== 3D por sombreado: menu y cabecera PEGADOS a los bordes, con volumen y sombra proyectada ==================== */
+/* ==================== Menu lateral casi invisible y barra superior tipo hielo esmerilado ==================== */
+:root {
+  --glass-nav-bg: rgba(255, 255, 255, .03);
+  --glass-nav-sheen: rgba(255, 255, 255, .06);
+  --glass-nav-edge: rgba(0, 0, 0, .07);
+  --ice-bg: linear-gradient(180deg, rgba(255, 255, 255, .44), rgba(240, 246, 255, .28));
+  --ice-edge: rgba(255, 255, 255, .72);
+  --ice-sheen: rgba(255, 255, 255, .85);
+}
+:root[data-theme="dark"] {
+  --glass-nav-bg: transparent;
+  --glass-nav-sheen: rgba(255, 255, 255, .015);
+  --glass-nav-edge: rgba(255, 255, 255, .10);
+  --ice-bg: linear-gradient(180deg, rgba(210, 228, 255, .06), rgba(24, 28, 36, .28));
+  --ice-edge: rgba(210, 228, 255, .16);
+  --ice-sheen: rgba(235, 245, 255, .14);
+}
+
+html:root .lateral {
+  background: linear-gradient(135deg, var(--glass-nav-sheen), transparent 40%), var(--glass-nav-bg);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html:root .barra {
+  background: var(--ice-bg);
+  -webkit-backdrop-filter: blur(18px) saturate(160%) brightness(1.04);
+  backdrop-filter: blur(18px) saturate(160%) brightness(1.04);
+}
+
 @media (min-width: 801px) {
   html:root .lateral {
-    margin: 0; height: 100vh; border-radius: 0; border: 0; border-right: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
+    margin: 0; height: 100vh; border-radius: 0; border: 0; border-right: 1px solid var(--glass-nav-edge);
     transform: none; transition: none;
-    background: linear-gradient(90deg, rgba(255, 255, 255, .03), transparent 18%, transparent 72%, rgba(0, 0, 0, .14)),
-      linear-gradient(180deg, rgba(255, 255, 255, .025), transparent 30%, rgba(0, 0, 0, .1)), var(--barra-bg);
-    box-shadow: inset 1px 0 0 var(--canto-luz), inset -1px 0 0 var(--canto-sombra), 12px 0 24px -12px rgba(0, 0, 0, .4), 2px 0 6px -2px rgba(0, 0, 0, .25);
+    box-shadow: inset 1px 0 0 var(--glass-nav-sheen), inset -1px 0 0 var(--canto-sombra), 10px 0 24px -14px rgba(0, 0, 0, .35);
   }
   html:root .barra {
-    width: 100%; margin: 0; top: 0; border-radius: 0; border: 0; border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent); padding-inline: var(--spacing-32);
+    width: 100%; margin: 0; top: 0; border-radius: 0; border: 0; border-bottom: 1px solid var(--ice-edge); padding-inline: var(--spacing-32);
     transform: none; transition: none;
-    background: linear-gradient(180deg, rgba(255, 255, 255, .035), transparent 45%, rgba(0, 0, 0, .12)), var(--barra-bg);
-    box-shadow: inset 0 1px 0 var(--canto-luz), inset 0 -1px 0 var(--canto-sombra), 0 12px 24px -14px rgba(0, 0, 0, .4), 0 2px 6px -2px rgba(0, 0, 0, .25);
+    box-shadow: inset 0 1px 0 var(--ice-sheen), inset 0 -1px 0 var(--canto-sombra), 0 10px 26px -14px rgba(0, 0, 0, .32);
   }
 }
+
+@media (max-width: 800px) {
+  html:root .lateral, html:root .lateral.colapsada { border-right: 0; border-top: 1px solid var(--glass-nav-edge); }
+  html:root .barra { border-bottom: 1px solid var(--ice-edge); }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  html:root .lateral { background: var(--glass-nav-bg); }
+  html:root .barra { background: var(--barra-bg); }
+}
+html[data-rendimiento="bajo"] :is(.lateral, .barra) {
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+
+/* Indicador activo del menu lateral: pildora translucida en lugar de blanco/negro solido */
+html:root .lateral-indicador,
+html:root .lateral-item.activo {
+  background: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ink) 22%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-ink) 18%, transparent);
+}
+html:root .lateral-item.activo { color: var(--color-ink); }
+html:root .lateral-nav.con-indicador .lateral-item.activo { background: transparent; border-color: transparent; box-shadow: none; }
