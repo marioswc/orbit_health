@@ -74,7 +74,7 @@ def test_la_pagina_y_el_service_worker_se_revalidan_y_los_assets_con_hash_se_gua
     (dist / "assets").mkdir(parents=True)
     (dist / "index.html").write_text("<html></html>")
     (dist / "sw.js").write_text("//sw")
-    (dist / "assets" / "app-abc123.js").write_text("//js")
+    (dist / "assets" / "app-abc123.js").write_text("const datos = '" + ("x" * 2048) + "';")
     monkeypatch.setattr(config, "FRONTEND_DIST", str(dist))
     originales = list(main.app.router.routes)
     main.app.router.routes = [r for r in originales if getattr(r, "name", "") != "frontend"]
@@ -83,7 +83,10 @@ def test_la_pagina_y_el_service_worker_se_revalidan_y_los_assets_con_hash_se_gua
         with TestClient(main.app) as c:
             assert c.get("/sw.js").headers["cache-control"] == "no-cache"
             assert c.get("/").headers["cache-control"] == "no-cache"
-            assert "immutable" in c.get("/assets/app-abc123.js").headers["cache-control"]
+            asset = c.get("/assets/app-abc123.js", headers={"Accept-Encoding": "gzip"})
+            assert asset.headers["cache-control"] == "public, max-age=31536000, immutable"
+            assert asset.headers["content-encoding"] == "gzip"
+            assert asset.headers["vary"] == "Accept-Encoding"
             assert c.get("/api/salud").headers["cache-control"] == "no-store"
     finally:
         main.app.router.routes = originales                          # no dejar la app apuntando a una carpeta temporal

@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
+from starlette.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from . import config
@@ -55,6 +56,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="ORBIT Health", version="0.1.0", lifespan=lifespan)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
 @app.middleware("http")
