@@ -9,19 +9,21 @@ En lugar de concentrar todo en un solo archivo gigante, la documentación está 
 ## Índice de documentos
 
 1. **[01 — Motor Clínico, Reglas Combinadas y Línea Base Personal](01_MOTOR_CLINICO_Y_LINEA_BASE.md)**
-   Cómo el sistema evalúa signos vitales (NEWS2, glucosa, sueño, ejercicio, aire de cabina), cómo cruza señales para detectar problemas grupales de CO₂ y cómo se corrigieron las falsas alarmas de la línea base personal.
+   Cómo el sistema evalúa signos vitales (NEWS2, glucosa, sueño, actigrafía, variabilidad cardíaca, ejercicio, aire de cabina), el perfil y semántica del semáforo, cómo cruza señales para detectar problemas grupales y cómo se corrigieron las falsas alarmas de la línea base personal.
 2. **[02 — Bienestar, Salud Mental, Crisis y Hábitos](02_BIENESTAR_SALUD_MENTAL_Y_HABITOS.md)**
-   Cómo se protege la privacidad del diario y del ánimo, cómo funciona el protocolo de crisis psicológica cruzado con el oxígeno de cabina, los avisos con consentimiento al médico, el asistente adaptable y la racha de mediciones.
+   Cómo se protege la privacidad del diario y del ánimo, cómo funciona el protocolo de crisis psicológica cruzado con el oxígeno de cabina, los avisos con consentimiento al comandante, el asistente adaptable y la racha de mediciones.
 3. **[03 — Enlace con Tierra, Cola con Prioridad e Informes](03_ENLACE_COLA_E_INFORMES_TIERRA.md)**
-   Cómo funciona el Modo Eclipse, el envío ordenado por urgencia al recuperar señal, la simulación de distancia (Luna y Marte), la vista del centro de control en Tierra y los informes exportables con sello de integridad.
+   Cómo funciona el Modo Eclipse, el envío ordenado por urgencia al recuperar señal, la compactación automática de eventos de rutina tras un apagón largo, la simulación de distancia (Luna y Marte), la vista del centro de control en Tierra y los informes exportables con sello de integridad.
 4. **[04 — Sensores, Flujo Continuo, Bluetooth (BLE) y Origen de Datos](04_SENSORES_FLUJO_Y_BLUETOOTH.md)**
-   Cómo se reciben datos continuos sin saturar la base de datos (ventanas de 1 minuto con paso inmediato para emergencias), el puente para bandas Bluetooth y cómo se distingue un sensor real de una simulación.
+   Cómo se reciben datos continuos sin saturar la base de datos (ventanas de 1 minuto con paso inmediato para emergencias), el puente e inspector para bandas Bluetooth con cálculo de variabilidad cardíaca (RMSSD) y selección segura entre dispositivos, y cómo se distingue un sensor real de una simulación.
 5. **[05 — Conocimiento Espacial: Riesgos NASA, Explicaciones y Entornos](05_CONOCIMIENTO_ESPACIAL_NASA.md)**
-   Cómo se integraron los peligros oficiales de la NASA, las citas textuales con enlaces reales y el cálculo de gravedad y pérdida ósea según el entorno (nave, estación, Luna o Marte).
+   Cómo se integraron los peligros oficiales de la NASA, las citas textuales con enlaces reales (incluyendo actigrafía ARCHeR y adaptación cardiovascular) y el cálculo de gravedad y pérdida ósea según el entorno (nave, estación, Luna o Marte).
 6. **[06 — Seguridad a Bordo, Simulación en Vivo y Pruebas de Calidad](06_SEGURIDAD_SIMULACION_Y_CALIDAD.md)**
-   Cómo funciona el acceso con PIN sin internet, los permisos ante emergencias, la misión simulada en vivo que corre sola para demostraciones y las pruebas automáticas que vigilan la seguridad y la documentación.
-7. **[07 — IA Local Explicativa y Asistente de Voz Offline](07_IA_LOCAL_Y_VOZ.md)**
-   Cómo funciona el explicador opcional con IA local (`GET /api/estado/{tid}/explicacion`) y el chat de voz offline (`POST /api/voz/chat/{tid}`), garantizando que la IA solo explique resultados ya calculados sin alterar jamás el nivel clínico ni saturar la computadora a bordo.
+   Cómo funciona el acceso con PIN sin internet (roles `tripulante` y `comandante`, cuentas de demo listas), los permisos ante emergencias, la misión simulada en vivo, el simulador fisiológico con 7 perfiles y las **63 operaciones de la API** vigiladas por pruebas automáticas.
+7. **[07 — IA Local Explicativa, Asistente Personal, Voz Offline y Guardia de IA](07_IA_LOCAL_Y_VOZ.md)**
+   Cómo funcionan el explicador (`GET /api/estado/{tid}/explicacion`), el perfil privado de intereses (`GET` y `PUT /api/perfil-ia/{tid}`), el chat por texto (`POST /api/asistente/chat/{tid}`) y por voz (`POST /api/voz/chat/{tid}`), la **Guardia de IA** (`guardia_ia.py`) y la transparencia ante modelos locales o externos.
+8. **[08 — Guion de Speech para Jueces (3 Minutos)](../../docs/GUION_SPEECH_3_MINUTOS.md)**
+   Guion directo y libre de tecnicismos para presentar el proyecto en 3 minutos (gancho, problemática, solución, qué mostrar en pantalla en cada bloque y respuestas rápidas para preguntas del jurado).
 
 > Para ver el plan inicial del proyecto puedes consultar [PLAN_DE_DESARROLLO.md](PLAN_DE_DESARROLLO.md), y para el listado completo de rutas disponibles consulta [API_REFERENCIA.md](../../docs/API_REFERENCIA.md).
 

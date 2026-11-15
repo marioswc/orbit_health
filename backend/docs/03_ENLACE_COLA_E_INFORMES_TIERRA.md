@@ -19,6 +19,9 @@ En misiones a la Luna o a Marte, las comunicaciones se cortan por eclipses o con
     - **Prioridad 3:** Verde (rutina)
   - Si el enlace está en **Modo Eclipse**, todos los eventos quedan con estado `retenido` a bordo.
   - En cuanto el enlace vuelve a estar activo (`POST /api/enlace`), el sistema drena la cola sacando **primero todos los de Prioridad 1, luego Prioridad 2 y al final Prioridad 3**, respetando el orden de antigüedad dentro de cada prioridad.
+- **Resumen automático de rutina tras un apagón largo (`compactar_rutina`, `commit 20312e7`):**
+  - *Qué problema había:* durante un corte de señal largo (como una conjunción solar), las bandas acumulan más de cien lecturas verdes (prioridad 3, sin novedad). Al volver el enlace, enviar cientos de mensajes rutinarios uno por uno ocupaba el canal con datos sin novedad, pero tampoco se podían borrar de la tabla `cola_salida` porque se rompería la cadena de hash de integridad (`SHA-256`).
+  - *Cómo se solucionó:* cuando se acumulan al menos `ORBIT_COMPACTAR_RUTINA_DESDE` (20 por defecto) eventos de rutina (prioridad 3) retenidos, al reconectar el enlace el sistema marca esos registros individuales con `resumido = 1` (**no los borra**, por lo que siguen guardados a bordo y la cadena de hash en `GET /api/cola/verificar` se mantiene intacta) y genera **un único evento `resumen_rutina` por tripulante** con la cantidad de lecturas agrupadas y el rango de horas. Los eventos amarillos (prioridad 2) y rojos (prioridad 1) **nunca se resumen** y salen íntegros al frente de la fila.
 
 ---
 
