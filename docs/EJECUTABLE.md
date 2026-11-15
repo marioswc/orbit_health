@@ -4,8 +4,12 @@ Un solo archivo (≈ 24 MB en Linux) que lleva dentro el servidor, la interfaz y
 
 ## Para quien lo usa
 1. Descarga el archivo de tu sistema (`orbit-health` en Linux y Mac, `orbit-health.exe` en Windows) y su `.sha256` si quieres comprobar que no se alteró.
-2. Dale doble clic. Se abre una ventana negra (no la cierres: es el programa) y el navegador en `http://127.0.0.1:3000`. La primera vez aparece la guía de bienvenida.
-3. Para detenerlo, cierra esa ventana.
+2. Dale doble clic. Se abre **la ventana de ORBIT** (como una app: sin pestañas ni barra de direcciones, con su icono) y, por dentro, arranca el servidor. La primera vez aparece la guía de bienvenida.
+3. Para detenerlo, **cierra la ventana de ORBIT**: el servidor se apaga solo.
+
+**Cómo se hace la ventana:** usa el navegador basado en Chromium que ya traiga tu sistema, en *modo aplicación* y con un perfil propio (no toca tus pestañas ni tus sesiones): **Edge** en Windows (viene incluido en Windows 10 y 11), y Chrome, Edge, Chromium o Brave donde estén instalados en Linux y Mac. Si no hay ninguno (por ejemplo solo Firefox o Safari, que no tienen modo aplicación), abre el navegador normal y el servidor sigue hasta que lo detengas con Ctrl+C. Opciones: `--navegador` fuerza el navegador normal; `--sin-navegador` arranca solo el servidor.
+
+**Windows:** el ejecutable se construye sin consola, así que no aparece ninguna ventana negra; si algo falla, queda escrito en `orbit-health.log` dentro de la carpeta de datos. **Mac:** se mantiene una ventana de Terminal detrás (convertirlo en un `.app` no se pudo probar).
 
 | Sistema | Lo que verás la primera vez |
 |---|---|
@@ -41,7 +45,8 @@ scripts/probar_ejecutable.sh         # prueba de humo del que acabas de construi
 ## Comprobado y no comprobado
 - **Comprobado en GitHub (ejecución del 15-nov-2026):** los tres sistemas (Linux, Windows y macOS) construyeron el ejecutable y **pasaron la prueba de humo** corriéndolo allí mismo. Linux es el más probado: además se descargó el artefacto de GitHub, se verificó su suma, conserva el permiso de ejecución y pasó la prueba de humo en una computadora real.
 - Hecho en Linux por mí: arranca en unos 2 s con una carpeta de datos nueva; creó la base y los respaldos en la carpeta del usuario; ignoró un `.env` ajeno; leyó el `.env` propio; detectó una instancia ya abierta.
-- **No hecho:** abrir el ejecutable de **Windows o Mac con doble clic en una computadora real** (la prueba de humo en GitHub lo arranca por línea de comandos y sin navegador); ver cómo se ve la interfaz en esos sistemas; Macs con procesador Intel (el construido es Apple Silicon); firma de código y notarización de Apple (cuestan dinero y cuentas de desarrollador); instaladores (`.msi`, `.dmg`, `.deb`). Los avisos de seguridad de la primera ejecución en Windows y Mac son esperables.
+- **Ventana de aplicación (comprobado en Linux con Edge):** se abre su propia ventana, y al cerrarla el servidor pasa de responder a apagado por sí solo.
+- **No hecho:** la ventana de aplicación en **Windows y Mac** (la lógica está probada con pruebas automáticas, pero ahí solo corrió la prueba de humo del servidor, sin ventana); abrir el ejecutable de **Windows o Mac con doble clic en una computadora real** (la prueba de humo en GitHub lo arranca por línea de comandos y sin navegador); ver cómo se ve la interfaz en esos sistemas; Macs con procesador Intel (el construido es Apple Silicon); firma de código y notarización de Apple (cuestan dinero y cuentas de desarrollador); instaladores (`.msi`, `.dmg`, `.deb`). Los avisos de seguridad de la primera ejecución en Windows y Mac son esperables.
 
 
 ---
