@@ -15,9 +15,10 @@ echo "[2/4] Entorno de construcción (aparte del de desarrollo)"
 PY=.venv-build/bin/python; [ -x "$PY" ] || PY=.venv-build/Scripts/python.exe
 "$PY" -m pip install -q --upgrade pip
 "$PY" -m pip install -q -r backend/requirements.txt pyinstaller
+INDICE_IA=cpu; [ "$(uname -s)" = "Darwin" ] && INDICE_IA=metal      # en Mac las ruedas precompiladas están en el índice de Metal
 IA=0   # motor de IA incrustado (llama.cpp): opcional; si no hay rueda precompilada para este sistema, el ejecutable sale sin él
 if [ "${ORBIT_SIN_IA:-0}" != "1" ] && "$PY" -m pip install -q -r backend/requirements-ia.txt --only-binary=:all: \
-     --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu; then IA=1; EXTRA_IA=(--collect-all llama_cpp)
+     --extra-index-url "https://abetlen.github.io/llama-cpp-python/whl/$INDICE_IA"; then IA=1; EXTRA_IA=(--collect-all llama_cpp)
 else echo "  (sin motor de IA incrustado en este ejecutable)"; EXTRA_IA=(); fi
 
 echo "[3/4] Empaquetando"
