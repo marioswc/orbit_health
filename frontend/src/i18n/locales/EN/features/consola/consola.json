@@ -1,0 +1,22 @@
+{
+  "page.kicker": "Console",
+  "page.title": "Mission console",
+  "page.desc": "Vitals, body zones and trends on a single board, using the crew member's real readings.",
+  "news2.level": "Overall level",
+  "news2.aria": "NEWS2 score: {{p}}",
+  "news2.scale": "of {{max}}",
+  "news2.window": "{{min}}-min window",
+  "vitals.title": "Vital signs",
+  "vitals.empty": "No readings yet. Add one with \"Manual entry\".",
+  "body.title": "Status by zone",
+  "body.aria": "Body heat map by zone",
+  "pulse.title": "Pulse",
+  "pulse.none": "No recent heart rate",
+  "pulse.note": "Beats at the last recorded rate",
+  "cabin.title": "Cabin",
+  "cabin.co2": "Cabin CO₂",
+  "cabin.dosis": "Accumulated dose",
+  "cabin.none": "No reading",
+  "trend.title": "Trend",
+  "actions.title": "Suggested actions"
+}

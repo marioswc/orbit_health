@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { useTranslation } from "../../../i18n";
+import { num } from "../../../shared/formato";
 import type { LecturaEstado } from "../types/estado";
 import { nombreIndicador } from "../utils/indicadores";
 import { compararConBase, formatoDelta } from "../utils/lineaBase";
@@ -31,7 +32,7 @@ function TarjetaSignoVital({ lectura: l, destello = false, activa = false, alSel
         <span className="signo-nombre">{nombre}</span>
         <span className={`badge ${l.nivel}`}>{nivelTxt}</span>
       </header>
-      <p className="signo-valor"><strong>{l.valor}</strong> <span>{l.unidad}</span></p>
+      <p className="signo-valor"><strong>{num(l.valor)}</strong> <span>{l.unidad}</span></p>
       {c.disponible && c.media !== undefined && c.delta !== undefined ? (
         <p className="signo-base">{t("signo.base", { media: Number(c.media.toFixed(1)), unidad: l.unidad, delta: formatoDelta(c.delta) })}</p>
       ) : (

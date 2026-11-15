@@ -1,7 +1,9 @@
 import { useTranslation } from "../../../i18n";
+import { num } from "../../../shared/formato";
 import type { LecturaEstado } from "../types/estado";
 import { FUENTE_EFECTOS, ZONAS, nivelZona, type Capa } from "../zonas";
 
+import type { EntornoMision } from "../hooks/useEntornos";
 import { nombreIndicador } from "../utils/nombreIndicador";
 import ExplicacionIndicador from "./ExplicacionIndicador";
 import { MESES_MAX, textoPerdida } from "../utils/perdidaOsea";
@@ -12,9 +14,10 @@ interface Props {
   capa: Capa;
   meses: number;
   alMeses: (m: number) => void;
+  entorno?: EntornoMision | null;
 }
 
-export default function DetalleZona({ id, lecturas, capa, meses, alMeses }: Props) {
+export default function DetalleZona({ id, lecturas, capa, meses, alMeses, entorno = null }: Props) {
   const { t } = useTranslation("monitor");
   const zona = ZONAS.find((z) => z.id === id);
   if (!zona) return null;
@@ -35,12 +38,21 @@ export default function DetalleZona({ id, lecturas, capa, meses, alMeses }: Prop
           <p>{textoCapa ? t(`zona.${zona.id}.anat.${capa}`) : t("detalle.sinInfoCapa")}</p>
           {huesoDeCarga && (
             <div className="osea">
-              <label htmlFor="meses-mg">{t("detalle.tiempoMg")} <strong>{t("detalle.meses", { count: meses })}</strong></label>
-              <input id="meses-mg" type="range" min={0} max={MESES_MAX} step={1} value={meses} onChange={(e) => alMeses(Number(e.target.value))} />
-              <p className="osea-dato">
-                {t("detalle.perdida")} <strong>{textoPerdida(meses)}</strong>
-              </p>
-              <p className="fuente">{t("detalle.notaPerdida")}</p>
+              {!entorno || entorno.microgravedad ? (
+                <>
+                  <label htmlFor="meses-mg">{t("detalle.tiempoMg")} <strong>{t("detalle.meses", { count: meses })}</strong></label>
+                  <input id="meses-mg" type="range" min={0} max={MESES_MAX} step={1} value={meses} onChange={(e) => alMeses(Number(e.target.value))} />
+                  <p className="osea-dato">
+                    {t("detalle.perdida")} <strong>{textoPerdida(meses)}</strong>
+                  </p>
+                  <p className="fuente">{entorno?.estimacion_osea.nota ?? t("detalle.notaPerdida")}</p>
+                </>
+              ) : (
+                <p className="fuente">
+                  <strong>{entorno.nombre} ({entorno.gravedad_g !== null ? `${entorno.gravedad_g} g` : "gravedad variable"}):</strong>{" "}
+                  {entorno.estimacion_osea.nota}
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -53,7 +65,7 @@ export default function DetalleZona({ id, lecturas, capa, meses, alMeses }: Prop
         <div key={l.indicador} className={`ind-fila ${l.nivel}`}>
           <div className="ind-dato">
             <span className="ind-nombre">{nombreIndicador(l.indicador, t)}<ExplicacionIndicador clave={l.indicador} /></span>
-            <span className="ind-valor">{l.valor} {l.unidad}</span>
+            <span className="ind-valor">{num(l.valor)} {l.unidad}</span>
           </div>
           <span className={`badge ${l.nivel}`}>{t(`common:status.${l.nivel}`)}</span>
         </div>

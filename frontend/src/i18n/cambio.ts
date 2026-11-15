@@ -6,8 +6,8 @@ import { changeLanguage, getCurrentLanguage, normalizeLanguage, type SupportedLa
  * detras de el y el modal permanece un minimo para que no sea un parpadeo. Store de modulo: quien dispara (ToggleIdioma)
  * y quien pinta (CambioIdioma, en App) viven en ramas distintas del arbol.
  */
-export const MIN_MS = 900;
-const APLICAR_MS = 300;
+export const MIN_MS = 1300;
+const APLICAR_MS = 450;
 
 let pendiente: SupportedLanguage | null = null;
 const oyentes = new Set<() => void>();
@@ -26,9 +26,9 @@ export async function cambiarConAviso(destino: string): Promise<void> {
   pendiente = l;
   emitir();
   try {
-    await dormir(reducir ? 80 : APLICAR_MS);
+    await dormir(reducir ? 150 : APLICAR_MS);
     await changeLanguage(l);
-    await dormir(reducir ? 250 : MIN_MS - APLICAR_MS);
+    await dormir(reducir ? 650 : MIN_MS - APLICAR_MS);
   } finally {
     pendiente = null;
     emitir();

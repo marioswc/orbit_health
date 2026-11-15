@@ -52,7 +52,6 @@
 .col-titulo .suave { font-size: var(--text-caption); }
 .col-prioridad .conteo { min-width: 30px; padding: 2px var(--spacing-8); text-align: center; border-radius: var(--radius-pill); font-size: var(--text-body-sm); font-weight: 600; color: var(--c); background: color-mix(in srgb, var(--c) 12%, transparent); }
 .col-prioridad li { position: relative; padding: var(--spacing-12) var(--spacing-12) var(--spacing-12) var(--spacing-16); border-radius: 16px; border: 1px solid var(--color-stone); background: color-mix(in srgb, var(--color-eggshell) 85%, transparent); transition: border-color .15s ease, transform .15s var(--ease-out); }
-.col-prioridad li::before { content: ""; position: absolute; left: 0; top: 22%; bottom: 22%; width: 3px; border-radius: 0 3px 3px 0; background: var(--c); }
 .col-prioridad li:hover { border-color: color-mix(in srgb, var(--c) 45%, var(--color-stone)); transform: translateY(-1px); }
 .col-prioridad .vacio { display: grid; justify-items: center; gap: var(--spacing-8); padding: var(--spacing-24) var(--spacing-16); }
 .estado-cola { display: inline-flex; align-items: center; gap: 6px; }
@@ -81,3 +80,14 @@
 }
 @media (prefers-reduced-motion: reduce) { .vinculo-pulso { animation: none; left: 50%; } }
 
+
+/* Paneles de prioridad plegables */
+.col-cab { width: 100%; min-height: 0; display: grid; grid-template-columns: auto minmax(0, 1fr) auto 18px; align-items: center; gap: var(--spacing-12); padding: 0; border: 0; border-radius: 12px; background: transparent; text-align: left; font-weight: 400; }
+.col-cab:hover { border: 0; }
+.col-flecha { width: 16px; height: 16px; justify-self: center; background: var(--color-ash); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat; transition: transform .3s var(--ease-out); }
+.col-prioridad.cerrada .col-flecha { transform: rotate(-90deg); }
+.col-cuerpo { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .35s var(--ease-out), opacity .25s ease; }
+.col-cuerpo-int { min-height: 0; overflow: hidden; }
+.col-prioridad.cerrada .col-cuerpo { grid-template-rows: 0fr; opacity: 0; }
+.col-prioridad.cerrada { gap: 0; }
+.col-prioridad li { padding-left: var(--spacing-12); }

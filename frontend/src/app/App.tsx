@@ -1,12 +1,10 @@
-import { Suspense, lazy, useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { Suspense, lazy, useEffect, useRef, useState, type CSSProperties } from "react";
 import { api } from "../shared/api/client";
 import Alerta from "../shared/components/Alerta";
-import Drawer from "../shared/components/Drawer";
 import FondoEstrellas from "../shared/components/FondoEstrellas";
 import { useTema } from "../shared/hooks/useTema";
 import { SelectorTripulante, useTripulantes } from "../features/tripulantes";
 import { MonitorPage, useEstadoTripulante } from "../features/monitor";
-import { PanelMedicion } from "../features/mediciones";
 import { MonitorCabina, resolverAmbiente, useAlertasColectivas } from "../features/cabina";
 import { AccesoTripulante, useAuth } from "../features/seguridad";
 import { useTranslation } from "../i18n";
@@ -14,21 +12,18 @@ import CambioIdioma from "../shared/components/CambioIdioma";
 import BarraLateral, { VISTAS } from "./BarraLateral";
 import { useRuta } from "./useRuta";
 import BarraSuperior from "./BarraSuperior";
-import BotonCaptura from "./BotonCaptura";
 
 // Vistas secundarias: se descargan solo al abrirlas
 const BienestarPage = lazy(() => import("../features/bienestar").then((m) => ({ default: m.BienestarPage })));
 const HistorialPage = lazy(() => import("../features/historial").then((m) => ({ default: m.HistorialPage })));
 const SistemaPage = lazy(() => import("../features/sistema").then((m) => ({ default: m.SistemaPage })));
+const BandaPage = lazy(() => import("../features/banda").then((m) => ({ default: m.BandaPage })));
 const RiesgosPage = lazy(() => import("../features/peligros").then((m) => ({ default: m.RiesgosPage })));
 const EnlacePage = lazy(() => import("../features/enlace").then((m) => ({ default: m.EnlacePage })));
 
 const estadoUmbral = (t: (k: string) => string, estado: string) => { const k = `prototype.estado.${estado}`; const r = t(k); return r === k ? estado : r; };
 
 interface EstadoUmbrales { version: string; estado: string }
-
-/** Estado inicial desde la URL (?captura=1): sirve para ensayar una pantalla de la demo. La vista va en la ruta (#/historial). */
-const capturaDesdeUrl = () => new URLSearchParams(window.location.search).get("captura") === "1";
 
 export default function App() {
   const { t } = useTranslation();
@@ -37,7 +32,6 @@ export default function App() {
   const { estado, error: errorEstado, refrescar } = useEstadoTripulante(auth.requiereAcceso ? "" : tid);
   const { tema, alternar } = useTema();
   const [vista, setVista] = useRuta();
-  const [captura, setCaptura] = useState(capturaDesdeUrl);
   const [umbrales, setUmbrales] = useState<EstadoUmbrales | null>(null);
   const error = errorTripulantes || errorEstado;
   const { datos: colectivas } = useAlertasColectivas(estado);
@@ -48,12 +42,10 @@ export default function App() {
     estado?.indicadores.find((i) => i.indicador === "dosis_pct") ?? null,
   );
   // Direccion del cambio de vista: el contenido entra desde el lado hacia el que se movio la pestana
-  const orden = ["monitor", "historial", "bienestar", "riesgos", "enlace", "sistema"];
+  const orden = ["monitor", "banda", "historial", "bienestar", "riesgos", "enlace", "sistema"];
   const previa = useRef(orden.indexOf(vista));
   const dx = orden.indexOf(vista) >= previa.current ? 32 : -32;
   useEffect(() => { previa.current = orden.indexOf(vista); });
-  const cerrarCaptura = useCallback(() => setCaptura(false), []);
-  const abrirCaptura = useCallback(() => setCaptura(true), []);
 
   const aviso = umbrales && !umbrales.estado.startsWith("validado")
     ? { titulo: t("prototype.title"), texto: t("prototype.text", { version: umbrales.version, estado: estadoUmbral(t, umbrales.estado) }) } : null;
@@ -105,6 +97,7 @@ export default function App() {
           )}
           <Suspense fallback={<span className="esqueleto" style={{ height: 120 }} aria-busy="true" />}>
             {tid && vista === "bienestar" && <BienestarPage tripulanteId={tid} />}
+            {tid && vista === "banda" && <BandaPage tripulanteId={tid} estado={estado} refrescar={refrescar} />}
             {tid && vista === "historial" && <HistorialPage tripulanteId={tid} estado={estado} />}
             {vista === "riesgos" && <RiesgosPage />}
             {vista === "sistema" && <SistemaPage />}
@@ -115,11 +108,6 @@ export default function App() {
       </main>
       </div>
       </div>
-
-      {!auth.requiereAcceso && !captura && <BotonCaptura alAbrir={abrirCaptura} disponible={!!tid} />}
-      <Drawer abierto={!auth.requiereAcceso && captura && !!tid} alCerrar={cerrarCaptura} titulo="Captura manual">
-        <PanelMedicion tripulanteId={tid} alGuardar={refrescar} />
-      </Drawer>
     </>
   );
 }

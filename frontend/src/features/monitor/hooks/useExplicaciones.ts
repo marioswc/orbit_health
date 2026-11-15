@@ -1,10 +1,21 @@
 import { useEffect, useState } from "react";
 import { api } from "../../../shared/api/client";
 
+export interface CitaNasa {
+  texto: string;
+  cita: string;
+  fuente: string;
+}
+
 export interface Explicacion {
   que_es: string; por_que_se_mide: string; como_medirlo: string; en_el_espacio: string; cuando_avisar: string; fuentes: string[];
+  senales_a_vigilar?: CitaNasa[];
+  medidas_nasa?: CitaNasa[];
+  nota_nasa?: string;
+  habitos_generales?: string[];
+  habitos_generales_origen?: string;
 }
-interface Respuesta { estado: string; aviso: string; explicaciones: Record<string, Explicacion> }
+interface Respuesta { estado: string; aviso: string; nota_medidas?: string; explicaciones: Record<string, Explicacion> }
 
 let cache: Promise<Respuesta> | null = null; // una sola descarga por sesion; se reintenta si falla
 

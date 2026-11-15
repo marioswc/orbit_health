@@ -1,20 +1,20 @@
-/* Niveles de rendimiento (ver shared/rendimiento.ts). Se importa AL FINAL para ganar en cascada.
+﻿/* Niveles de rendimiento (ver shared/rendimiento.ts). Se importa AL FINAL para ganar en cascada.
    alto  = sin cambios.
    medio = sin desenfoque de fondo ni animaciones infinitas.
    bajo  = ademas sin animaciones ni transiciones, sin degradados fijos de pagina ni sombras. */
 
 /* ---- medio y bajo: el cristal (backdrop-filter) es lo mas caro de pintar; se cambia por superficie casi opaca ---- */
-html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) :is(.cristal, .barra, .panel, .lado.der, .drawer-fondo) {
+html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) :is(.cristal, .panel, .lado.der, .drawer-fondo) {
   -webkit-backdrop-filter: none; backdrop-filter: none;
 }
-html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) :is(.cristal, .barra, .panel, .lado.der) {
+html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) :is(.cristal, .panel, .lado.der) {
   background: color-mix(in srgb, var(--color-warm-taupe) 94%, transparent);
   box-shadow: none;
 }
 html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) .drawer-fondo { background: rgba(8, 8, 8, .66); }
 
 /* Animaciones infinitas (cada una repinta o recompone sin parar) */
-html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) :is(.badge::before, .latido, .lienzo, .figura, .zona :is(path, circle, rect), .p-anillo, .esqueleto) { animation: none !important; }
+html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) :is(.badge::before, .latido, .lienzo, .figura, .zona :is(path, circle, rect), .p-anillo, .esqueleto, .zc, .corazon-latido, .v-punto, .chispa path, .reloj-corazon) { animation: none !important; }
 html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) .vinculo-pulso { display: none; }
 html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) .vinculo.on .vinculo-linea { border-top-style: solid; }
 
@@ -31,3 +31,11 @@ html[data-rendimiento="bajo"] .drawer { border-width: 2px; }
 
 /* ---- HUD de prueba (?perf=1) ---- */
 .perf-hud { position: fixed; left: 8px; bottom: 8px; z-index: 100; padding: 2px 8px; border-radius: 8px; font: 11px/1.6 var(--font-geist-mono); color: #9fe9ff; background: rgba(0, 0, 0, .75); pointer-events: none; }
+
+html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) .reloj-idle { animation: none; }
+html[data-rendimiento="bajo"] .reloj-escena::before { display: none; }
+html[data-rendimiento="bajo"] .reloj-pose { transition: none; }
+
+
+/* Sin transparencia en ningun nivel de rendimiento: cabecera y menu lateral comparten color */
+html:is([data-rendimiento="medio"], [data-rendimiento="bajo"]) :is(.barra, .lateral) { background: var(--barra-bg); }

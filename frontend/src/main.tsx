@@ -14,6 +14,8 @@ import "./shared/styles/alertas.css";
 import "./shared/styles/bienestar.css";
 import "./shared/styles/conocimiento.css";
 import "./shared/styles/complementos.css";
+import "./shared/styles/consola.css";
+import "./shared/styles/banda.css";
 import "./shared/styles/ligero.css";
 
 iniciarRendimiento(); // antes del primer pintado: el CSS ligero ya aplica desde el inicio

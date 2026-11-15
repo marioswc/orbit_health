@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import AccionCaptura from "./AccionCaptura";
 
 interface Props {
   /** Rotulo corto en mayuscula sobre el titulo. */
@@ -18,7 +19,7 @@ export default function EncabezadoPagina({ etiqueta, titulo, descripcion, childr
         <h1>{titulo}</h1>
         <p className="cuerpo">{descripcion}</p>
       </div>
-      {children && <div className="encabezado-lado">{children}</div>}
+      <div className="encabezado-lado">{children}<AccionCaptura /></div>
     </header>
   );
 }
