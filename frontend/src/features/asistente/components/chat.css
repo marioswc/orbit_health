@@ -20,7 +20,7 @@
 .nova-sugerencias { display: flex; flex-wrap: wrap; gap: var(--spacing-8); }
 .nova-chip {
   border: 1px solid var(--color-stone); background: transparent; color: inherit; cursor: pointer;
-  padding: var(--spacing-4) var(--spacing-12); border-radius: var(--radius-pill); font-size: var(--text-caption);
+  padding: var(--spacing-4) var(--spacing-12); min-height: 40px; border-radius: var(--radius-pill); font-size: var(--text-caption);
   transition: background .2s var(--ease-out);
 }
 .nova-chip:hover:not(:disabled) { background: var(--color-eggshell); color: var(--color-ink); }

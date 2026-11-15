@@ -65,7 +65,8 @@ IA_LOCAL_MODELO = os.getenv("ORBIT_IA_LOCAL_MODELO", "")
 IA_LOCAL_TIMEOUT_S = float(os.getenv("ORBIT_IA_LOCAL_TIMEOUT_S", "4"))
 
 # Proveedor externo opcional (DeepSeek, API compatible con OpenAI). OJO: el texto sale del equipo.
-# Vacío = automático (usa DeepSeek si hay API key, si no el modelo local); "local" fuerza el de la estación.
+# "automatico" prueba Ollama, luego DeepSeek si hay API key; "local" fuerza la estación.
+# Vacío conserva la selección heredada: DeepSeek si hay API key, si no Ollama.
 DEEPSEEK_API_KEY = os.getenv("ORBIT_DEEPSEEK_API_KEY", "").strip()
 DEEPSEEK_MODELO = os.getenv("ORBIT_DEEPSEEK_MODELO", "deepseek-flash")
 DEEPSEEK_URL = os.getenv("ORBIT_DEEPSEEK_URL", "https://api.deepseek.com/chat/completions")
@@ -86,3 +87,7 @@ VOZ_MAX_RESPUESTA_CARACTERES = int(os.getenv("ORBIT_VOZ_MAX_RESPUESTA_CARACTERES
 # pregunta no pague la carga (unos 10 s en la laptop de desarrollo).
 IA_LOCAL_KEEP_ALIVE = os.getenv("ORBIT_IA_LOCAL_KEEP_ALIVE", "30m")
 PRECALENTAR = os.getenv("ORBIT_PRECALENTAR", "1") == "1"
+
+# Protección contra saturar el modelo local (CPU de la laptop de a bordo).
+IA_MAX_SIMULTANEAS = int(os.getenv("ORBIT_IA_MAX_SIMULTANEAS", "2"))
+IA_PETICIONES_POR_MIN = int(os.getenv("ORBIT_IA_PETICIONES_POR_MIN", "30"))        # por persona; 0 = sin límite

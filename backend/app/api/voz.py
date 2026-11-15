@@ -2,6 +2,7 @@ from fastapi import APIRouter, Body, Depends, Header, HTTPException
 
 from .. import config
 from ..servicios import estado as servicio_estado
+from ..servicios import limites
 from ..servicios import perfil_ia as servicio_perfil
 from ..servicios import preferencias as servicio_preferencias
 from ..servicios import voz_local
@@ -21,6 +22,11 @@ def chat_voz(tid: str, audio: bytes = Body(...), idioma: str = "auto", content_t
         raise HTTPException(413, "Audio demasiado grande")
     requerir_tripulante(conn, tid)
     exigir_propietario(a, tid)               # la conversación es personal: solo su dueño
+    try:
+        limites.contar_peticion(f"voz:{tid}")
+    except limites.LimiteExcedido as e:
+        limites.auditar_limite(a.get("tripulante_id"), tid, "voz")
+        raise HTTPException(429, e.motivo, headers={"Retry-After": str(e.espera_s)}) from e
     extension = ".wav" if not content_type else {
         "audio/wav": ".wav", "audio/webm": ".webm", "audio/ogg": ".ogg",
         "audio/mpeg": ".mp3", "audio/mp4": ".m4a",
@@ -35,6 +41,7 @@ def chat_voz(tid: str, audio: bytes = Body(...), idioma: str = "auto", content_t
         ctx = servicio_perfil.contexto(conn, tid)
         respuesta = voz_local.responder(texto, estado, preferencias, perfil=ctx["intereses"], rasgos=ctx["rasgos"], nombre=(ctx["nombre"].split() or [""])[0], idioma=idioma_real)
         respuesta["transcripcion"] = texto
+        limites.auditar_respuesta_ia(a.get("tripulante_id"), tid, "voz", respuesta)
         respuesta["nivel_general"] = estado["nivel_general"]
         if config.VOZ_PIPER_MODELO:
             respuesta["audio_base64"] = voz_local.sintetizar(respuesta["texto"], idioma_real)

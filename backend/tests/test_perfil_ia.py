@@ -6,6 +6,12 @@ from app.servicios import explicador_local, perfil_ia, voz_local
 ESTADO = {"nivel_general": "verde", "indicadores": []}
 
 
+@pytest.fixture
+def local_listo(monkeypatch):
+    monkeypatch.setattr(config, "IA_LOCAL_URL", "http://127.0.0.1:11434/api/generate")
+    monkeypatch.setattr(config, "IA_LOCAL_MODELO", "m")
+
+
 def test_el_perfil_se_guarda_y_se_limpia(cliente):
     r = cliente.put("/api/perfil-ia/T1", json={"intereses": "  me gusta  el ajedrez\n y la música "})
     assert r.status_code == 200 and r.json()["intereses"] == "me gusta el ajedrez y la música"
@@ -41,7 +47,7 @@ def test_una_crisis_en_el_chat_se_atiende_con_el_protocolo(cliente, monkeypatch)
     assert r["fuente"] == "protocolo_crisis" and r["generado_por_ia"] is False
 
 
-def test_el_perfil_llega_al_modelo_local_como_dato_citado(monkeypatch):
+def test_el_perfil_llega_al_modelo_local_como_dato_citado(monkeypatch, local_listo):
     vistos = []
     monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "")
     monkeypatch.setattr(explicador_local, "consultar_modelo", lambda p, **kw: vistos.append(p) or None)
@@ -170,7 +176,7 @@ def test_el_sembrado_respeta_lo_que_la_persona_ya_cambio(cliente):
     assert cliente.get("/api/perfil-ia/T1").json() == {"intereses": "pintar", "rasgos": "tranquila"}
 
 
-def test_los_rasgos_llegan_solo_al_modelo_local_y_como_dato(monkeypatch):
+def test_los_rasgos_llegan_solo_al_modelo_local_y_como_dato(monkeypatch, local_listo):
     vistos = []
     monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "")
     monkeypatch.setattr(explicador_local, "consultar_modelo", lambda p, **kw: vistos.append(p) or None)
@@ -213,7 +219,7 @@ def test_el_saludo_es_personal_instantaneo_y_solo_del_dueno(cliente_auth):
     assert c.get("/api/asistente/saludo/T2").status_code == 401
 
 
-def test_nova_recuerda_los_ultimos_mensajes_solo_con_modelo_local(monkeypatch):
+def test_nova_recuerda_los_ultimos_mensajes_solo_con_modelo_local(monkeypatch, local_listo):
     vistos = []
     monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "")
     monkeypatch.setattr(explicador_local, "consultar_modelo", lambda p, **kw: vistos.append(p) or None)
@@ -237,5 +243,31 @@ def test_el_endpoint_acepta_historial_pero_no_mas_de_seis_ni_roles_raros(cliente
 
 def test_la_persona_de_nova_es_una_asistente_que_acompana_y_no_habla_de_su_cuerpo():
     s = voz_local.SISTEMA_BASE
-    assert "Nova" in s and "NUNCA hables de ti como si tuvieras cuerpo" in s and "UNA sola pregunta" in s
-    assert "comandante o un compañero" in s
+    assert "Nova" in s and "digas que tienes cuerpo" in s and "una sola pregunta abierta" in s
+    assert "comandante o un compañero" in s or "comandante o a un compañero" in s or "avisar al comandante" in s
+
+
+def test_con_respaldo_a_la_nube_lo_personal_nunca_sale_de_la_estacion(monkeypatch, local_listo):
+    """Modo automático: primero el modelo local y, si falla, DeepSeek. Al respaldo solo viaja lo no personal."""
+    enviados = {}
+    monkeypatch.setattr(config, "IA_PROVEEDOR", "automatico")
+    monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "clave-de-prueba")
+    monkeypatch.setattr(explicador_local, "_consultar_local", lambda p, s=None: enviados.update(local=(p, s)) or None)
+    monkeypatch.setattr(explicador_local, "_consultar_deepseek", lambda p, s=None: enviados.update(nube=(p, s)) or None)
+    hist = [{"rol": "yo", "texto": "extraño a mi hija"}]
+    voz_local.responder("hola", ESTADO, {"tono": "calido"}, perfil="ajedrez", rasgos="serena", nombre="Ana", historial=hist)
+    local = " ".join(x or "" for x in enviados["local"])
+    nube = " ".join(x or "" for x in enviados["nube"])
+    for dato in ("ajedrez", "serena", "extraño a mi hija", "Ana"):
+        assert dato in local, dato                 # el modelo local sí conoce a la persona
+        assert dato not in nube, dato              # la nube no recibe nada personal
+    assert 'Pregunta: "hola"' in nube              # pero sí la pregunta y el estado, como antes
+
+
+def test_con_la_nube_directa_tampoco_viaja_lo_personal(monkeypatch, local_listo):
+    enviados = {}
+    monkeypatch.setattr(config, "IA_PROVEEDOR", "")
+    monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "clave-de-prueba")
+    monkeypatch.setattr(explicador_local, "_consultar_deepseek", lambda p, s=None: enviados.update(nube=(p, s)) or None)
+    voz_local.responder("hola", ESTADO, {"tono": "calido"}, perfil="ajedrez", rasgos="serena", nombre="Ana")
+    assert not any(d in " ".join(x or "" for x in enviados["nube"]) for d in ("ajedrez", "serena", "Ana"))

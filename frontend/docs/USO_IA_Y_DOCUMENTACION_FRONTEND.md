@@ -39,7 +39,7 @@ Las siguientes decisiones responden a criterios de UX, flujo operativo y rigor c
 2. **Estimación ósea condicionada al entorno**: en [DetalleZona.tsx](../src/features/monitor/components/DetalleZona.tsx), el cálculo ilustrativo de pérdida ósea (1–1.5 % mensual) solo se muestra cuando el entorno seleccionado tiene microgravedad; en entornos como Luna, Marte o rover se muestra únicamente la nota informativa correspondiente.
 3. **Identidad visual limpia en barra lateral**:
    - [Logo.tsx](../src/shared/components/Logo.tsx) utiliza únicamente la silueta SVG (esquinas HUD, órbita y trazo cardíaco) con `currentColor` para adaptarse automáticamente a modo claro y oscuro sin recuadros de fondo.
-   - Se eliminó la píldora flotante `::after` en la barra colapsada ([layout.css](../src/shared/styles/layout.css)) para evitar que tape el encabezado de las vistas, conservando `aria-label` y `title` nativo.
+   - Se eliminó la píldora flotante `::after` en la barra colapsada ([layout.css](../src/shared/styles/styles.css)) para evitar que tape el encabezado de las vistas, conservando `aria-label` y `title` nativo.
 
 ---
 
@@ -56,7 +56,7 @@ De acuerdo con las reglas del **NASA Space Apps Challenge**, la IA se utilizó c
 | Área | Apoyo de la IA | Validación y control humano |
 |---|---|---|
 | **Integración con API y hooks** | Implementación de hooks y componentes (`useEntornos`, `RachaMediciones`, `SimuladorDemo`, `ExplicacionIndicador`) | Revisión de contratos con el backend, pruebas manuales en navegador y ajuste de textos/estados |
-| **UI, estilos y SVG** | Adaptación a JSX y limpieza de fondo del isotipo SVG en [Logo.tsx](../src/shared/components/Logo.tsx); ajustes de CSS en [layout.css](../src/shared/styles/layout.css) | Definición del concepto visual de marca, revisión en modo claro/oscuro y decisión final de layout |
+| **UI, estilos y SVG** | Adaptación a JSX y limpieza de fondo del isotipo SVG en [Logo.tsx](../src/shared/components/Logo.tsx); ajustes de CSS en [layout.css](../src/shared/styles/styles.css) | Definición del concepto visual de marca, revisión en modo claro/oscuro y decisión final de layout |
 | **Integración Git** | Resolución de conflictos de merge entre ramas de frontend y backend (`MonitorPage.tsx`) | Verificación de que no se perdieran funcionalidades de ningún integrante del equipo |
 | **Pruebas y verificación** | Generación y actualización de pruebas unitarias con Vitest | Ejecución real de `tsc --noEmit` y suites de Vitest tras cada cambio |
 

@@ -1,6 +1,6 @@
 # Estilo de la plataforma — ORBIT Health
 
-Sistema de diseño **vigente** del frontend. Sustituye al de [DISENO.md](./DISENO.md) (referencia Dala, descartada). Fuente de verdad en código: [tokens.css](../src/shared/styles/tokens.css), [styles.css](../src/shared/styles/styles.css), [componentes.css](../src/shared/styles/componentes.css), [escenario.css](../src/shared/styles/escenario.css), [animaciones.css](../src/shared/styles/animaciones.css).
+Sistema de diseño **vigente** del frontend. Sustituye al de [DISENO.md](./DISENO.md) (referencia Dala, descartada). Fuente de verdad en código: [tokens.css](../src/shared/styles/styles.css), [styles.css](../src/shared/styles/styles.css), [componentes.css](../src/shared/styles/styles.css), [escenario.css](../src/shared/styles/styles.css), [animaciones.css](../src/shared/styles/styles.css).
 
 **Resumen:** aplicación de monitoreo (modo *operar*, no landing). Base ElevenLabs (papel crema, tinta negra, tipografía ligera, botones píldora) + modo oscuro + **liquid glass** gris translúcido en paneles + HUD azul alrededor del astronauta. El color se reserva para el semáforo clínico.
 

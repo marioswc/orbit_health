@@ -6,6 +6,7 @@ modelo como DATO entre comillas. Solo se usa con un modelo LOCAL: nunca se enví
 import sqlite3
 from datetime import datetime, timezone
 
+from ..dominio import guardia_ia
 from ..repositorios import perfil_ia as repo
 from ..repositorios import tripulantes
 
@@ -13,9 +14,10 @@ MAX_CARACTERES = 160
 
 
 def limpiar(texto: str) -> str:
-    t = " ".join((texto or "").split())             # colapsa saltos de línea y espacios
-    if any(ord(c) < 32 or ord(c) == 127 for c in t):
+    bruto = texto or ""
+    if any((ord(c) < 32 and c not in "\n\t\r") or ord(c) == 127 for c in bruto):
         raise ValueError("El texto contiene caracteres no permitidos")
+    t = guardia_ia.sanear_para_prompt(bruto, MAX_CARACTERES + 1)      # sin marcas de plantilla ni encabezados de rol
     if len(t) > MAX_CARACTERES:
         raise ValueError(f"Máximo {MAX_CARACTERES} caracteres")
     return t

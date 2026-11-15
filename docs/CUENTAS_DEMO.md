@@ -16,6 +16,8 @@ ORBIT_AUTH=1 ./run.sh            # arranca pidiendo PIN
 
 El PIN debe tener de 6 a 10 dígitos. Un PIN equivocado repetido bloquea la cuenta un rato (ver [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.md)). Para una cuenta real usa `scripts/inscribir_tripulante.sh`, que genera un PIN aleatorio y lo muestra una sola vez.
 
+> **Ojo:** con `ORBIT_SEED_DEMO=1` (el valor por defecto) el arranque ya crea estas cuentas solo, aunque no corras el script. En una instalación real pon `ORBIT_SEED_DEMO=0` y da de alta cuentas con `scripts/inscribir_tripulante.sh` (PIN aleatorio): un PIN público no protege nada. La auditoría de seguridad lo avisa.
+
 ## Probar el login y tu asistente
 1. En `.env`: `ORBIT_AUTH=1` y `ORBIT_IA_PROVEEDOR=local` (con Ollama corriendo).
 2. `scripts/cuentas_demo.sh`, luego `./run.sh` y abre `http://127.0.0.1:3000`.

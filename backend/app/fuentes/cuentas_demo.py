@@ -37,7 +37,7 @@ def main() -> int:
     conn = get_conn()
     try:
         for tid, rol, pin, creada in crear(conn):
-            print(f"{tid:3} {rol:11} PIN {pin}  {'creada' if creada else 'ya existía: sin cambios'}")
+            print(f"{tid:3} {rol:11} PIN {pin}  {'creada' if creada else 'ya estaba creada (sin cambios)'}")
     finally:
         conn.close()
     print("Cuentas DEMO con PIN fácil: no usar en una misión real. Se activan con ORBIT_AUTH=1.")

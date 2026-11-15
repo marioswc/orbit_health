@@ -20,13 +20,18 @@ A Spanish version for the team is kept in `README.es.md` (internal, not part of 
 - Adapts its wording to each astronaut's chosen tone and level of detail, without changing any alert level.
 - Verifies and restores its own database and exports a report for Earth with an integrity fingerprint.
 
+## Install it as an app / run it in a container
+ORBIT Health is an installable web app (PWA): open it in Chrome or Edge and use the *Install* prompt. It opens in its own window and the interface loads even if the server is slow. Clinical data is never cached in the browser. Installing needs `localhost` or HTTPS. Or run it in Docker: `docker compose up --build` (http://127.0.0.1:3000, loopback only). Details and limits: `docs/INSTALAR_COMO_APP.md` (in Spanish).
+
 ## Run it (works without internet once prepared)
+Requirements: Python 3.10+ and Node.js with npm. Optional offline AI and voice: `scripts/instalar_ia_local.sh` and `scripts/instalar_voz_local.sh` (see `docs/IA_LOCAL.md`, in Spanish).
+
 ```bash
-cp .env.example .env
-cd frontend && npm install && npm run build && cd ..          # needs internet once
-cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && cd ..   # needs internet once
-./run.sh                                                      # http://localhost:3000, no network needed
-scripts/verificar_e2e.sh                                      # automatic end-to-end check
+scripts/asistente_inicio.sh --en # friendly step-by-step setup that asks you questions (recommended if you are new)
+scripts/preparar.sh          # or, non-interactive, one step on a new machine: Python env, dependencies, build, .env (needs internet once)
+./run.sh                     # http://127.0.0.1:3000, no network needed
+scripts/cuentas_demo.sh      # optional: demo PIN accounts (set ORBIT_AUTH=1 in .env): T1 111111, T2 222222, T3 333333, T4 444444
+scripts/verificar_e2e.sh     # automatic end-to-end check
 curl -X POST "localhost:3000/api/demo/escenarios/hipoxia_eclipse?reconectar=true"   # scripted demo
 ```
 

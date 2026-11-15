@@ -11,6 +11,8 @@ import { SelectorTripulante, useTripulantes } from "../features/tripulantes";
 import { MonitorPage, useEstadoTripulante } from "../features/monitor";
 import { MonitorCabina, resolverAmbiente, useAlertasColectivas } from "../features/cabina";
 import { AccesoTripulante, PerfilMenu, useAuth } from "../features/seguridad";
+import { Bienvenida } from "../features/bienvenida";
+import InstalarApp from "../shared/components/InstalarApp";
 import { useTranslation } from "../i18n";
 import CambioIdioma from "../shared/components/CambioIdioma";
 import ToggleIdioma from "../shared/components/ToggleIdioma";
@@ -88,6 +90,8 @@ export default function App() {
       <FondoEstrellas />
       {tid && <Suspense fallback={null}><BurbujaVoz tripulanteId={tid} /></Suspense>}
       <CambioIdioma />
+      <Bienvenida />
+      <InstalarApp />
       <div className="app">
       <BarraLateral vista={vista} alCambiarVista={setVista} aviso={aviso} alSalir={auth.actor ? auth.logout : null} />
       <div className="app-col">
