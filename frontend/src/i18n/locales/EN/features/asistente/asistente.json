@@ -24,5 +24,16 @@
   "prefs.reminders.minimo": "Minimal",
   "prefs.reminders.normal": "Normal",
   "prefs.reminders.frecuente": "Frequent",
-  "prefs.saved": "Saved. Recommendations will use this style."
+  "prefs.saved": "Saved. Recommendations will use this style.",
+  "chat.title": "Talk to my assistant",
+  "chat.hint": "Private: only you see it. It can keep you company and explain your status, but it never changes an alert or gives treatment advice.",
+  "chat.intereses": "What you like or what motivates you (optional, max. 160 characters)",
+  "chat.interesesEjemplo": "For example: chess, music, talking about my family",
+  "chat.saved": "Saved. It is only used with this device's AI and is never sent out.",
+  "chat.placeholder": "Type here and press Enter",
+  "chat.enviar": "Send",
+  "chat.enviando": "Thinking…",
+  "chat.yo": "You",
+  "chat.asistente": "Assistant",
+  "chat.escrito": "Answer from local rules, no generative AI. Not a diagnosis."
 }
