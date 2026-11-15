@@ -39,3 +39,15 @@ def test_voz_no_envia_datos_privados_al_modelo(monkeypatch):
     assert '"indicador": "spo2"' in vistos[0]
     assert '"indicador": "animo"' not in vistos[0]
     assert '"indicador": "sueno_horas"' not in vistos[0]
+
+
+def test_audio_invalido_se_expone_como_error_de_validacion(tmp_path):
+    ruta = tmp_path / "audio.wav"
+    ruta.write_bytes(b"no es audio")
+
+    try:
+        voz_local._decodificar_audio(str(ruta))
+    except ValueError as error:
+        assert str(error) == "Audio inválido o formato no compatible"
+    else:
+        raise AssertionError("El audio inválido debe producir ValueError")

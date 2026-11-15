@@ -64,13 +64,16 @@ def _decodificar_audio(ruta: str):
     import numpy as np
 
     muestras = []
-    with av.open(ruta) as contenedor:
-        resampler = av.AudioResampler(format="s16", layout="mono", rate=16000)
-        for frame in contenedor.decode(audio=0):
-            for convertido in resampler.resample(frame):
+    try:
+        with av.open(ruta) as contenedor:
+            resampler = av.AudioResampler(format="s16", layout="mono", rate=16000)
+            for frame in contenedor.decode(audio=0):
+                for convertido in resampler.resample(frame):
+                    muestras.append(convertido.to_ndarray().reshape(-1))
+            for convertido in resampler.resample(None):
                 muestras.append(convertido.to_ndarray().reshape(-1))
-        for convertido in resampler.resample(None):
-            muestras.append(convertido.to_ndarray().reshape(-1))
+    except (av.error.FFmpegError, OSError, TypeError) as error:
+        raise ValueError("Audio inválido o formato no compatible") from error
     if not muestras:
         raise ValueError("No se pudo leer el audio")
     return np.concatenate(muestras).astype(np.float32) / 32768.0
