@@ -13,7 +13,7 @@ function marcarVista() {
 }
 
 /** Guía de bienvenida para quien no sabe nada: se abre sola la primera vez, se puede omitir y se reabre con el botón "?". */
-export default function Bienvenida() {
+export default function Bienvenida({ mostrarBotonFlotante = true }: { mostrarBotonFlotante?: boolean } = {}) {
   const { t } = useTranslation("bienvenida");
   const [abierta, setAbierta] = useState(() => !yaVista());
   const [paso, setPaso] = useState(1);
@@ -29,6 +29,11 @@ export default function Bienvenida() {
 
   useEffect(() => { if (abierta) principal.current?.focus(); }, [abierta, paso]);
   useEffect(() => {
+    const alAbrir = () => setAbierta(true);
+    window.addEventListener("orbit:abrir-bienvenida", alAbrir);
+    return () => window.removeEventListener("orbit:abrir-bienvenida", alAbrir);
+  }, []);
+  useEffect(() => {
     if (!abierta) return;
     const alTeclear = (e: KeyboardEvent) => { if (e.key === "Escape") cerrar(); };
     window.addEventListener("keydown", alTeclear);
@@ -38,7 +43,9 @@ export default function Bienvenida() {
   const ultimo = paso === PASOS;
   return (
     <>
-      <button ref={ayuda} type="button" className="bienvenida-ayuda" aria-label={t("ayuda")} title={t("ayuda")} onClick={() => setAbierta(true)}>?</button>
+      {mostrarBotonFlotante && (
+        <button ref={ayuda} type="button" className="bienvenida-ayuda" aria-label={t("ayuda")} title={t("ayuda")} onClick={() => setAbierta(true)}>?</button>
+      )}
       {abierta && (
         <div className="bienvenida-fondo" onMouseDown={(e) => { if (e.target === e.currentTarget) cerrar(); }}>
           <div className="bienvenida" role="dialog" aria-modal="true" aria-labelledby="bienvenida-titulo" aria-label={t("titulo.aria")}>

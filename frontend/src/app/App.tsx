@@ -90,7 +90,7 @@ export default function App() {
       <FondoEstrellas />
       {tid && <Suspense fallback={null}><BurbujaVoz tripulanteId={tid} /></Suspense>}
       <CambioIdioma />
-      <Bienvenida />
+      <Bienvenida mostrarBotonFlotante={false} />
       <InstalarApp />
       <div className="app">
       <BarraLateral vista={vista} alCambiarVista={setVista} aviso={aviso} />

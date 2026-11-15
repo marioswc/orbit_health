@@ -483,12 +483,12 @@ html.cambiando-tema :is(body, .barra, .panel, .lado, .plataforma, .tarjeta, .cap
 .lateral.colapsada .lateral-cab { justify-content: center; padding: var(--spacing-4) 0 var(--spacing-12); border-bottom: 1px solid var(--glass-line); }
 .lateral .marca { margin: 0; }
 .lateral.colapsada .marca { width: 100%; justify-content: center; gap: 0; }
-.lateral.colapsada .lateral-colapsar { width: 48px; min-height: 48px; padding: 0; margin: 0 auto; justify-content: center; }
+.lateral.colapsada .lateral-colapsar { width: 48px; min-height: 48px; padding: 0; margin: 0 auto; justify-content: center; gap: 0; }
 .lateral.colapsada .marca svg { width: 30px; height: 30px; }
 .lateral.colapsada .lateral-nav { justify-items: center; gap: var(--spacing-8); padding-top: var(--spacing-4); }
-.lateral.colapsada .lateral-item { width: 48px; min-height: 48px; padding: 0; justify-content: center; border-radius: 16px; }
+.lateral.colapsada .lateral-item { width: 48px; min-height: 48px; padding: 0; gap: 0; justify-content: center; border-radius: 16px; }
 .lateral.colapsada .lateral-indicador { left: 50%; right: auto; width: 48px; margin-left: -24px; }
-.lateral.colapsada .lateral-aviso { width: 48px; height: 48px; margin: 0 auto; padding: 0; align-items: center; justify-content: center; border-radius: 16px; }
+.lateral.colapsada .lateral-aviso { width: 48px; height: 48px; margin: 0 auto; padding: 0; gap: 0; align-items: center; justify-content: center; border-radius: 16px; }
 .lateral.colapsada .lateral-aviso svg { margin: 0; }
 
 /* ---- Cabecera delgada ---- */
@@ -2306,30 +2306,6 @@ html:root .lateral-nav.con-indicador .lateral-item.activo { background: transpar
 .gpt-pie { display: grid; justify-items: center; gap: var(--spacing-8); padding: var(--spacing-8) var(--spacing-16) var(--spacing-8); }
 .gpt-nota { margin: 0; font-size: var(--text-caption); color: var(--color-smoke); text-align: center; }
 @media (max-width: 800px) { .chat-gpt { height: calc(100dvh - 250px); } .gpt-fila .nova-burbuja { max-width: 88%; } }
-
-/* ==================== Menu lateral y barra superior: opacos (sin transparencia), con el sombreado 3D suave de antes ==================== */
-@media (min-width: 801px) {
-  html:root .lateral {
-    background: linear-gradient(90deg, rgba(255, 255, 255, .03), transparent 18%, transparent 72%, rgba(0, 0, 0, .14)),
-      linear-gradient(180deg, rgba(255, 255, 255, .025), transparent 30%, rgba(0, 0, 0, .1)), var(--barra-bg);
-    -webkit-backdrop-filter: none; backdrop-filter: none;
-    border-right: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
-    box-shadow: inset 1px 0 0 var(--canto-luz), inset -1px 0 0 var(--canto-sombra), 12px 0 24px -12px rgba(0, 0, 0, .4), 2px 0 6px -2px rgba(0, 0, 0, .25);
-  }
-  html:root .barra {
-    background: linear-gradient(180deg, rgba(255, 255, 255, .035), transparent 45%, rgba(0, 0, 0, .12)), var(--barra-bg);
-    -webkit-backdrop-filter: none; backdrop-filter: none;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
-    box-shadow: inset 0 1px 0 var(--canto-luz), inset 0 -1px 0 var(--canto-sombra), 0 12px 24px -14px rgba(0, 0, 0, .4), 0 2px 6px -2px rgba(0, 0, 0, .25);
-  }
-}
-/* Indicador activo del menu: pildora solida como antes (no translucida) */
-html:root .lateral-indicador, html:root .lateral-item.activo { background: var(--color-ink); border: 0; box-shadow: none; }
-html:root .lateral-item.activo { color: var(--color-eggshell); }
-html:root .lateral-nav.con-indicador .lateral-item.activo { background: transparent; }
-@media (max-width: 800px) {
-  html:root .lateral-item.activo, html:root .lateral.colapsada .lateral-item.activo, html:root .lateral-nav.con-indicador .lateral-item.activo { background: var(--color-ink); color: var(--color-eggshell); border: 0; }
-}
 
 /* ==================== Perfil de Nova ==================== */
 .nova-cab-mini { display: flex; align-items: flex-start; gap: var(--spacing-12); }
