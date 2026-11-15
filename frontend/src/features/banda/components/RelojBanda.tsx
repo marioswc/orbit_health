@@ -317,12 +317,8 @@ function RelojBanda({ fc, spo2, news2, ventana, signosHoy, simulada, fcSerie, sp
               <svg className="rl-capa rl-correas" style={{ transform: `translateZ(calc(var(--u) * ${PROF_CORREA / 2}))` }} viewBox="0 0 300 380" aria-hidden="true">
                 <defs>
                   <linearGradient id="rb-correa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#3d3d42" /><stop offset="1" stopColor="#222226" /></linearGradient>
-                  <linearGradient id="rb-hebilla" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#e6e6ea" /><stop offset=".55" stopColor="#a9a9b0" /><stop offset="1" stopColor="#6e6e75" /></linearGradient>
                 </defs>
                 <path d="M96 30 L204 30 L226 78 L74 78 Z" fill="url(#rb-correa)" stroke="#55555b" strokeWidth="1.5" />
-                <rect x="88" y="14" width="124" height="26" rx="8" fill="url(#rb-hebilla)" stroke="#4a4a50" strokeWidth="1.5" />
-                <rect x="98" y="21" width="104" height="12" rx="4" fill="#2a2a2e" />
-                <rect x="146" y="12" width="8" height="30" rx="3" fill="url(#rb-hebilla)" stroke="#4a4a50" />
                 <g stroke="#5c5c63" strokeWidth="1.2" strokeDasharray="3 4" opacity=".7"><path d="M92 46h116M88 62h124" /></g>
                 <path d="M74 302 L226 302 L212 346 Q210 362 150 364 Q90 362 88 346 Z" fill="url(#rb-correa)" stroke="#55555b" strokeWidth="1.5" />
                 <g fill="#101012" stroke="#55555b" strokeWidth="1">{[318, 331, 344].map((y) => <circle key={y} cx="150" cy={y} r="4.2" />)}</g>
