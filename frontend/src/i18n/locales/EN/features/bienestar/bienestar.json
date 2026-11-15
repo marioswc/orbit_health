@@ -3,7 +3,6 @@
   "page.title": "Wellbeing",
   "page.desc": "Mood, journal and screening are private. None of this is sent to the Earth-bound queue.",
   "page.private": "Private · only on this device",
-
   "animo.title": "How are you feeling today?",
   "animo.hint": "One tap is enough. It is saved only on this device.",
   "animo.group": "Today's mood, from 1 to 5",
@@ -25,7 +24,6 @@
   "animo.lastDays": "Last {{dias}} days",
   "animo.mean": "Average",
   "animo.empty": "No entries yet. The first one will appear here.",
-
   "diario.title": "Personal journal",
   "diario.hint": "Secure local storage, disconnected from external telemetry.",
   "diario.notes_one": "{{count}} note",
@@ -59,7 +57,6 @@
   "diario.yesterday": "Yesterday",
   "diario.untitled": "Untitled note",
   "diario.private": "Private · only on this device",
-
   "avisos.aria": "Notices shared with the physician",
   "avisos.title": "Shared notices",
   "avisos.hint": "Only the onboard physician sees them, and only while you do not withdraw your consent. They never leave for Earth.",
@@ -69,21 +66,6 @@
   "avisos.tipo.crisis": "Crisis support",
   "avisos.tipo.tamizaje_positivo": "Positive screening",
   "avisos.withdraw": "Withdraw consent",
-
-  "prefs.title": "Your assistant",
-  "prefs.hint": "Choose how you want it to talk to you. Only what you choose is saved.",
-  "prefs.tone": "Tone",
-  "prefs.tone.directo": "Direct",
-  "prefs.tone.calido": "Warm",
-  "prefs.detail": "Detail",
-  "prefs.detail.breve": "Brief",
-  "prefs.detail.completo": "Full",
-  "prefs.reminders": "Reminders",
-  "prefs.reminders.minimo": "Minimal",
-  "prefs.reminders.normal": "Normal",
-  "prefs.reminders.frecuente": "Frequent",
-  "prefs.saved": "Saved. Recommendations will use this style.",
-
   "tamizaje.title": "Mood screening (PHQ-2) and crisis protocol",
   "tamizaje.hint": "Last two weeks. Private result: it is not transmitted. This is a screening, not a diagnosis.",
   "tamizaje.crisisProtocol": "Crisis protocol",

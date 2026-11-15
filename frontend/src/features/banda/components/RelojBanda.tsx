@@ -166,21 +166,21 @@ function RelojBanda({ fc, spo2, news2, ventana, signosHoy, simulada, fcSerie, sp
   useEffect(() => () => cancelAnimationFrame(inercia.current), []);
   const [arrastrando, setArrastrando] = useState(false);
   const [tocado, setTocado] = useState(false);
-  const gesto = useRef<{ modo: "rotar" | "pantalla"; x: number; y: number; rx: number; ry: number; movio: boolean } | null>(null);
+  const gesto = useRef<{ modo: "rotar" | "pantalla"; x: number; y: number; rx: number; ry: number; movio: boolean; tol: number } | null>(null);
 
   function abajo(e: PointerEvent<HTMLDivElement>) {
     if ((e.target as HTMLElement).closest("button")) return;
     const enPantalla = Boolean((e.target as HTMLElement).closest("[data-pantalla]"));
     cancelAnimationFrame(inercia.current);
     vel.current = { vx: 0, vy: 0, t: performance.now() };
-    gesto.current = { modo: enPantalla ? "pantalla" : "rotar", x: e.clientX, y: e.clientY, rx: rot.x, ry: rot.y, movio: false };
+    gesto.current = { modo: enPantalla ? "pantalla" : "rotar", x: e.clientX, y: e.clientY, rx: rot.x, ry: rot.y, movio: false, tol: e.pointerType === "mouse" ? 6 : 12 };   // el dedo tiembla mas que el raton
     e.currentTarget.setPointerCapture(e.pointerId);
     setArrastrando(true); setTocado(true);
   }
   function mover(e: PointerEvent<HTMLDivElement>) {
     const g = gesto.current; if (!g) return;
     const dx = e.clientX - g.x, dy = e.clientY - g.y;
-    if (Math.abs(dx) + Math.abs(dy) > 6) g.movio = true;
+    if (Math.abs(dx) + Math.abs(dy) > g.tol) g.movio = true;
     if (g.modo === "rotar" || (g.modo === "pantalla" && g.movio && Math.abs(dy) > Math.abs(dx) * 1.2)) {
       g.modo = "rotar";
       const nuevo = { y: g.ry + dx * 0.5, x: clamp(g.rx - dy * 0.4, -75, 75) };
@@ -194,8 +194,14 @@ function RelojBanda({ fc, spo2, news2, ventana, signosHoy, simulada, fcSerie, sp
     if (g && g.modo === "rotar" && g.movio) soltarConInercia();
     if (!g || g.modo !== "pantalla") return;
     const dx = e.clientX - g.x;
+    const dy = e.clientY - g.y;
     if (!g.movio) ir(pag + 1);           // un toque avanza de pantalla
-    else if (Math.abs(dx) > 30) ir(pag + (dx < 0 ? 1 : -1));
+    else if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) ir(pag + (dx < 0 ? 1 : -1));
+  }
+  /** El navegador se quedo con el gesto (por ejemplo, para desplazar la pagina): no es un toque, no cambia de pantalla. */
+  function cancelar() {
+    const g = gesto.current; gesto.current = null; setArrastrando(false);
+    if (g && g.modo === "rotar" && g.movio) soltarConInercia();
   }
   /** Al soltar, el reloj sigue girando y se frena solo (se omite con "reducir movimiento" y en rendimiento bajo). */
   function soltarConInercia() {
@@ -306,7 +312,7 @@ function RelojBanda({ fc, spo2, news2, ventana, signosHoy, simulada, fcSerie, sp
       <div
         ref={escena} className={`reloj-escena${arrastrando ? " arrastrando" : ""}${tocado ? " tocado" : ""}${visible ? "" : " pausado"}`}
         tabIndex={0} role="group" aria-roledescription={t("watch.role")} aria-label={t("watch.group", { pantalla: nombrePag, n: pag + 1, total: PAGINAS.length })}
-        onPointerDown={abajo} onPointerMove={mover} onPointerUp={arriba} onPointerCancel={arriba} onKeyDown={teclas}
+        onPointerDown={abajo} onPointerMove={mover} onPointerUp={arriba} onPointerCancel={cancelar} onKeyDown={teclas}
       >
         <div className="reloj-pose" style={{ transform: `rotateX(${rot.x}deg) rotateY(${rot.y}deg)` }}>
           <div className="reloj-idle">

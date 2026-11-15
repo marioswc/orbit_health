@@ -68,11 +68,11 @@
 .t-fig { padding: var(--spacing-16); position: sticky; top: calc(var(--spacing-16) + 64px); min-width: 0; }
 .fig-controles { display: grid; gap: var(--spacing-12); margin-top: var(--spacing-12); }
 .fig-grupo { display: grid; gap: var(--spacing-4); min-width: 0; align-content: start; }
-.fig-fila { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--spacing-12); align-items: start; }
+.fig-fila { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: var(--spacing-12); align-items: start; }
 .fig-fila .selector { width: 100%; min-width: 0; }
 .fig-fila .selector-boton { min-height: 38px; font-size: var(--text-caption); }
 .fig-etiqueta { font-size: var(--text-caption); font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--color-smoke); }
-.fig-zonas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--spacing-8); }
+.fig-zonas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr)); gap: var(--spacing-8); }
 .fig-zonas .tab { width: 100%; min-height: 34px; padding: var(--spacing-4) var(--spacing-12); justify-content: flex-start; font-size: var(--text-caption); border-radius: 14px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; transition: background-color .2s ease, color .2s ease, transform .2s var(--ease-out); }
 .fig-zonas .tab:hover:not(.activo) { background: color-mix(in srgb, var(--color-ink) 10%, var(--color-eggshell)); }
 .t-fig .capas { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 3px; border-radius: 14px; }

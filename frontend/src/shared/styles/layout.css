@@ -45,11 +45,11 @@
 .barra { position: sticky; top: 0; z-index: 20; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-16); padding: var(--spacing-12) var(--spacing-32); border-radius: 0; border-width: 0 0 1px; }
 .barra-titulo { font-size: var(--text-body-lg); font-weight: 500; letter-spacing: -0.01em; }
 .barra-acciones { display: flex; align-items: center; justify-content: flex-end; gap: var(--spacing-8); min-width: 0; }
-.barra-acciones .selector { min-width: 0; width: 240px; }
+.barra-acciones .selector { min-width: 0; width: auto; max-width: 340px; }
 .barra .selector-boton span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .aviso-movil { display: none; }
 
-@media (max-width: 1280px) { .barra-acciones .selector { width: 190px; } }
+@media (max-width: 1280px) { .barra-acciones .selector { max-width: 290px; } }
 /* Pantallas angostas: el menu pasa a barra inferior solo con iconos y el aviso vuelve arriba del contenido */
 @media (max-width: 800px) {
   .app { display: block; padding-bottom: 72px; }
