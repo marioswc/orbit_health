@@ -12,6 +12,20 @@ Es **opcional** y funciona sin internet: un modelo de lenguaje que corre en la p
 | El modelo no puede mandar la consulta a otro sitio | La conexión no sigue redirecciones |
 | Lo generado por IA **se marca** | `generado_por_ia: true` y un `aviso` en la respuesta |
 
+## Proveedor externo opcional: DeepSeek (decisión del equipo)
+Si se define `ORBIT_DEEPSEEK_API_KEY`, las explicaciones y la voz usan **DeepSeek, un servicio en internet**, en vez del modelo local (`ORBIT_IA_PROVEEDOR=local` lo fuerza de vuelta a lo local).
+
+| Aspecto | Qué hay que saber |
+|---|---|
+| Datos | El estado de salud calculado y la pregunta **salen de la estación** hacia `api.deepseek.com` |
+| Conexión | Necesita internet: **no sirve en una misión real ni en un ensayo sin red**. Sin conexión, cae a los textos escritos |
+| Crisis | Nunca se envía: el protocolo escrito responde antes |
+| Control | Las mismas validaciones de salida; el nivel de alerta nunca lo decide el modelo |
+| Transparencia | La respuesta trae `fuente: "deepseek"` y un aviso que dice que los datos salieron |
+| Clave | Solo por variable de entorno; `.env` está fuera del repositorio |
+
+Es un recurso para el desarrollo y la demostración con internet. Para el planteamiento de misión (sin internet) vale el modelo local.
+
 ## Límites que hay que conocer
 - La lista de frases de crisis es corta y en español e inglés: **no cubre toda forma de expresarlo**. Es una red de seguridad, no un diagnóstico. Debe revisarla un profesional.
 - Validar números y palabras no garantiza que la frase sea clínicamente correcta, solo que no inventa cifras, fármacos ni alertas.
