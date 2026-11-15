@@ -31,6 +31,7 @@ case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) SEP=";"; ROOT="$(pwd -W)";; esac    
 
 echo "[4/4] Huella de integridad"
 cd dist-ejecutable
-f=$(ls orbit-health orbit-health.exe 2>/dev/null | head -1 || true)
+f=""; for c in orbit-health.exe orbit-health; do [ -f "$c" ] && f="$c" && break; done      # .exe primero: Git Bash en Windows resuelve "orbit-health" a ".exe"
+[ -n "$f" ] || { echo "No se generó el ejecutable"; exit 1; }
 (sha256sum "$f" 2>/dev/null || shasum -a 256 "$f") | tee "$f.sha256"
 echo; echo "Listo: dist-ejecutable/$f  (doble clic, o ./$f desde la terminal)"

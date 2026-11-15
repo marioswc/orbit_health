@@ -38,9 +38,9 @@ jobs:
         run: |
           cd dist-ejecutable
           if [ "${{ matrix.nombre }}" = "windows" ]; then
-            7z a "orbit-health-windows.zip" orbit-health.exe orbit-health.exe.sha256
+            7z a "orbit-health-windows.zip" orbit-health.exe ./*.sha256
           else
-            tar czf "orbit-health-${{ matrix.nombre }}.tar.gz" orbit-health orbit-health.sha256
+            tar czf "orbit-health-${{ matrix.nombre }}.tar.gz" orbit-health ./*.sha256
           fi
       - uses: actions/upload-artifact@v4
         with:
