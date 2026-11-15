@@ -9,7 +9,7 @@ from app.api.referencia import RUTAS_PUBLICAS, generar_markdown
 from app.dominio import peligros
 
 RAIZ = Path(__file__).resolve().parents[2]
-DOCS_PROPIOS = [RAIZ / "README.md", RAIZ / "README.en.md", *sorted((RAIZ / "docs").glob("*.md")),
+DOCS_PROPIOS = [RAIZ / "README.md", RAIZ / "README.es.md", *sorted((RAIZ / "docs").glob("*.md")),
                 *sorted((RAIZ / "backend" / "docs").glob("*.md"))]
 DOCS_TODOS = DOCS_PROPIOS + sorted((RAIZ / "frontend" / "docs").glob("*.md"))
 
@@ -90,7 +90,7 @@ def test_la_cobertura_del_hrp_que_dicen_los_documentos_es_la_real():
     resumen = (RAIZ / "docs" / "PROJECT_SUMMARY_EN.md").read_text(encoding="utf-8")
     assert f"{c} risk fully covered, {p} partially, {n} not covered" in resumen
     assert f"Only {c + p} of the 17 HRP risks have any indicator" in resumen
-    assert f"{c} of 17 risks fully, {p} partly, {n} not covered" in (RAIZ / "README.en.md").read_text(encoding="utf-8")
+    assert f"{c} of 17 risks fully, {p} partly, {n} not covered" in (RAIZ / "README.md").read_text(encoding="utf-8")
     assert f"{c} de 17 riesgos cubierto, {p} parciales, {n} no" in (RAIZ / "docs" / "DECISIONES_EQUIPO.md").read_text(encoding="utf-8")
 
 
