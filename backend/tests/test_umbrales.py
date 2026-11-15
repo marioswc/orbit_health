@@ -9,6 +9,8 @@ from app.dominio import umbrales as u
 def test_archivo_por_defecto_es_valido():
     d = u.cargar()
     assert d["estado"].startswith("pendiente")
+    assert d["perfil"]["tipo"] == "experimental"
+    assert d["semaforo"]["niveles"] == ["verde", "amarillo", "rojo"]
     assert set(u.NEWS2_VARIABLES) <= set(d["news2"]["bandas"])
 
 
@@ -31,6 +33,9 @@ def test_rechaza_seccion_faltante_y_modo_invalido():
     with pytest.raises(u.UmbralesInvalidos):
         u.validar(d)
     d = copy.deepcopy(u.UMBRALES); d["news2"]["modo_parametro_extremo"] = "otro"
+    with pytest.raises(u.UmbralesInvalidos):
+        u.validar(d)
+    d = copy.deepcopy(u.UMBRALES); del d["perfil"]
     with pytest.raises(u.UmbralesInvalidos):
         u.validar(d)
 
@@ -56,6 +61,12 @@ def test_captura_recomendada_se_acorta_con_la_gravedad():
     from app.dominio import reglas as r
     assert (r.captura_recomendada_min("verde"), r.captura_recomendada_min("amarillo"),
             r.captura_recomendada_min("rojo")) == (60, 15, 5)
+
+
+def test_api_expone_perfil_y_metodo_de_linea_base(cliente):
+    r = cliente.get("/api/umbrales").json()
+    assert r["perfil"]["id"] == "adultos_tripulantes_general"
+    assert r["linea_base"]["metodo"] == "media_desviacion_muestral"
 
 
 def test_rechaza_captura_recomendada_incoherente():

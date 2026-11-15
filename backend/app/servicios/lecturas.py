@@ -96,11 +96,13 @@ def registrar_lectura(conn: sqlite3.Connection, tid: str, indicador: str, valor:
     estilo = {**acciones.ESTILO_POR_DEFECTO, **(estilo or {})}
     proxima = acciones.ajustar_intervalo(reglas.captura_recomendada_min(nivel_evento), nivel_evento, estilo["recordatorios"])
     return {"lectura_id": lectura_id, "nivel": nivel_evento,
+            "estado_semaforo": reglas.estado_semaforo(nivel_evento, c["observacion"]),
             "acciones_sugeridas": acciones.acciones_sugeridas(
                 nivel_evento, proxima, c["observacion"], linea["aviso"], c["faltantes"], activas, ETIQUETAS,
                 estilo["tono"], estilo["detalle"]),
             "estilo": {k: estilo[k] for k in ("tono", "detalle", "recordatorios")}, "puntos_news2": c["puntos"],
             "observacion": c["observacion"], "aviso_linea_base": linea["aviso"],
+            "linea_base_estado": linea["estado"],
             "peligros_relacionados": peligros.peligros_de([indicador]) if nivel_evento != "verde" else [],
             "faltantes_news2": c["faltantes"], "reglas_combinadas": activas, "cola_evento_id": evento_id,
             "prioridad": PRIORIDAD[nivel_evento],

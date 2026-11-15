@@ -33,10 +33,17 @@ def _validar_bandas(nombre: str, bandas: list) -> None:
 
 
 def validar(datos: dict) -> dict:
-    for clave in ("version", "estado", "ventana_news2_min", "news2", "ambiente",
+    for clave in ("version", "estado", "perfil", "semaforo", "ventana_news2_min", "news2", "ambiente",
                   "glucosa_mg_dl", "diastolica_mmhg", "sueno_horas", "animo", "linea_base", "indicadores", "reglas_combinadas"):
         if clave not in datos:
             raise UmbralesInvalidos(f"Falta la sección '{clave}'")
+    perfil = datos["perfil"]
+    if not isinstance(perfil, dict) or not perfil.get("id") or not perfil.get("poblacion") \
+            or perfil.get("tipo") not in ("experimental", "validado"):
+        raise UmbralesInvalidos("perfil requiere id, poblacion y tipo experimental/validado")
+    semaforo = datos["semaforo"]
+    if not isinstance(semaforo, dict) or semaforo.get("niveles") != ["verde", "amarillo", "rojo"]:
+        raise UmbralesInvalidos("semaforo.niveles debe ser ['verde', 'amarillo', 'rojo']")
     bandas = datos["news2"].get("bandas", {})
     for variable in NEWS2_VARIABLES:
         if variable not in bandas:
@@ -60,6 +67,15 @@ def validar(datos: dict) -> dict:
         ):
             raise UmbralesInvalidos("o2_pct requiere rojo_bajo < amarillo_bajo < amarillo_alto < rojo_alto")
     pisos = datos["linea_base"].get("piso_desviacion", {})
+    linea_base = datos["linea_base"]
+    if linea_base.get("metodo") != "media_desviacion_muestral":
+        raise UmbralesInvalidos("linea_base.metodo no reconocido")
+    if not isinstance(linea_base.get("dias"), (int, float)) or linea_base["dias"] <= 0:
+        raise UmbralesInvalidos("linea_base.dias debe ser > 0")
+    if not isinstance(linea_base.get("min_muestras"), int) or linea_base["min_muestras"] < 2:
+        raise UmbralesInvalidos("linea_base.min_muestras debe ser un entero >= 2")
+    if not isinstance(linea_base.get("desviaciones"), (int, float)) or linea_base["desviaciones"] <= 0:
+        raise UmbralesInvalidos("linea_base.desviaciones debe ser > 0")
     if any(not isinstance(v, (int, float)) or v <= 0 for v in pisos.values()):
         raise UmbralesInvalidos("linea_base.piso_desviacion: todos los valores deben ser números > 0")
     _validar_combinadas(datos)

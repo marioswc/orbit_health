@@ -23,6 +23,11 @@ MODO_PARAMETRO_EXTREMO = os.getenv("ORBIT_MODO_PARAMETRO_EXTREMO") or _N2["modo_
 MIN_MUESTRAS_BASE = _LB["min_muestras"]
 K_DESVIACIONES = _LB["desviaciones"]
 _ORDEN = {"verde": 0, "amarillo": 1, "rojo": 2}
+_ESTADO_SEMAFORO = {
+    "verde": "sin_alerta",
+    "amarillo": "seguimiento",
+    "rojo": "urgente",
+}
 
 
 @dataclass
@@ -32,6 +37,15 @@ class ResultadoNews2:
     desglose: dict[str, int] = field(default_factory=dict)
     extremos: list[str] = field(default_factory=list)
     faltantes: list[str] = field(default_factory=list)
+
+
+def estado_semaforo(nivel: str, observacion: bool = False) -> str:
+    """Explica el semáforo operativo sin convertirlo en un diagnóstico."""
+    if nivel not in _ESTADO_SEMAFORO:
+        raise ValueError(f"nivel desconocido: {nivel}")
+    if nivel == "verde" and observacion:
+        return "observacion"
+    return _ESTADO_SEMAFORO[nivel]
 
 
 def _puntos_por_bandas(bandas: list[dict], valor: float) -> int:
@@ -152,7 +166,13 @@ def desviacion_linea_base(valor: float, historial: Sequence[float], solo_baja: b
     una diferencia insignificante en un aviso."""
     n = len(historial)
     if n < MIN_MUESTRAS_BASE:
-        return {"aplica": False, "n": n, "aviso": False}
+        return {
+            "aplica": False,
+            "estado": "insuficiente",
+            "razon": f"se requieren al menos {MIN_MUESTRAS_BASE} muestras",
+            "n": n,
+            "aviso": False,
+        }
     mu = statistics.fmean(historial)
     sigma = statistics.stdev(historial)
     efectiva = max(sigma, piso)
@@ -166,4 +186,17 @@ def desviacion_linea_base(valor: float, historial: Sequence[float], solo_baja: b
         aviso = False
     if solo_alta and valor <= mu:               # menos tiempo despierto que lo habitual no es un problema
         aviso = False
-    return {"aplica": True, "n": n, "media": mu, "desviacion": sigma, "desviacion_efectiva": efectiva, "z": z, "aviso": aviso}
+    direccion = "baja" if solo_baja else "alta" if solo_alta else "dos_lados"
+    return {
+        "aplica": True,
+        "estado": "aviso" if aviso else "normal",
+        "razon": "fuera del límite configurado" if aviso else "dentro del límite configurado",
+        "direccion": direccion,
+        "n": n,
+        "media": mu,
+        "desviacion": sigma,
+        "desviacion_efectiva": efectiva,
+        "z": z,
+        "limite_z": K_DESVIACIONES,
+        "aviso": aviso,
+    }

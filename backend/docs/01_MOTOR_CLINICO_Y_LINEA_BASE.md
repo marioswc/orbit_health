@@ -15,6 +15,12 @@ Al principio (`commit fdabb9f`), los rangos de qué era normal o peligroso (frec
 - Se creó la ruta pública `GET /api/umbrales` para que la interfaz muestre qué versión de reglas se está usando y recuerde siempre que los valores marcados como *supuestos* están pendientes de validación médica.
 - También se definió ahí cada cuántos minutos debe volver a medirse un tripulante según su gravedad (`captura_recomendada_min`): **60 minutos** en verde, **15 minutos** en amarillo y **5 minutos** en rojo.
 
+El endpoint `GET /api/umbrales` también expone el perfil poblacional, el estado de validación y la semántica del
+semáforo. El perfil actual es experimental para adultos astronautas y no pretende reemplazar ajustes individualizados.
+Un resultado verde significa únicamente que no se activó una alerta con los datos disponibles; no es un diagnóstico de
+normalidad. La línea base informa explícitamente cuando todavía hay muestras insuficientes, cuando el valor está dentro
+del límite configurado y cuando se activa un aviso.
+
 ---
 
 ## 2. Evaluación NEWS2 y otros indicadores individuales
