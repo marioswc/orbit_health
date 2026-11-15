@@ -21,6 +21,9 @@ Como a bordo **no hay médico**, cada astronauta tiene su propio asistente de ap
 ### Voz sin internet (oír y hablar)
 `scripts/instalar_voz_local.sh` instala **faster-whisper** (oír) y **Piper** con una voz en español de México (hablar) y deja los modelos en `backend/models/` (fuera de git; ~0.5 GB en total). Se necesita internet una sola vez. Medido en la laptop de desarrollo (CPU, sin GPU): hablar una frase tarda unos 2 s, oír unos 4 s, y el ciclo completo audio → asistente → audio unos 11 s. La transcripción de una frase de prueba fue correcta. Las voces de Piper son sintéticas pero claras; **no se probó con un micrófono real ni con otras personas hablando**. La voz del navegador (Web Speech) no se usa a propósito: en Chrome envía el audio a Google y no funciona sin internet.
 
+### Español e inglés
+La voz y el chat funcionan en **español e inglés**. Por voz, faster-whisper **detecta el idioma** (entre los dos) y el asistente responde en el mismo, con la voz de Piper correspondiente (`ORBIT_VOZ_PIPER_MODELO` para español y `ORBIT_VOZ_PIPER_MODELO_EN` para inglés; sin la segunda, usa la española). Por texto, el idioma se detecta con una heurística simple (o se indica con `idioma`: `es` o `en`); ante la duda, español. La guardia vigila también el inglés (fármacos, colores de alerta, enlaces). Una crisis en inglés se atiende con un **protocolo en inglés** que es traducción fiel de los mismos pasos del español (`PROTOCOLO_CRISIS_EN`), pendiente de la misma validación por un especialista. Medido en la laptop de desarrollo con dos frases sintetizadas por Piper: ambas se entendieron y se contestaron en su idioma (la de español salió con errores menores de transcripción). Los textos escritos de respaldo en inglés son breves. **No se probó con acentos ni con personas reales.**
+
 ### Calidad de la conversación (medición, misma laptop)
 | Modelo | Tiempo | Resultado de la prueba de acompañamiento |
 |---|---|---|
