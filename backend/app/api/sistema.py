@@ -6,10 +6,16 @@ from ..dominio.entornos import DATOS as ENTORNOS
 from ..dominio.explicaciones import DATOS as EXPLICACIONES
 from ..dominio.umbrales import UMBRALES
 from ..repositorios import tripulantes
-from ..servicios import recuperacion
-from .dependencias import conexion
+from ..servicios import diagnostico, recuperacion
+from .dependencias import conexion, requiere
 
 router = APIRouter(prefix="/api", tags=["sistema"])
+
+
+@router.get("/sistema/diagnostico")
+def diagnostico_del_sistema(_: dict = Depends(requiere("auditoria:leer"))) -> dict:
+    """Configuración efectiva (con su origen), estado de la voz y la IA, y advertencias de despliegue. Solo el comandante con login activo; sin secretos"""
+    return diagnostico.reunir()
 
 
 @router.get("/health")

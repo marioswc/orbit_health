@@ -19,6 +19,7 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 | GET | `/api/indicadores` | pública | Catálogo de indicadores con su unidad y rango de captura |
 | GET | `/api/peligros` | pública | Marco de peligros y riesgos del HRP, con la cobertura real de ORBIT Health por cada riesgo |
 | GET | `/api/salud` | pública | Estado de la base y de los respaldos. Pensado para que un tripulante no técnico sepa si todo está bien |
+| GET | `/api/sistema/diagnostico` | requerida | Configuración efectiva (con su origen), estado de la voz y la IA, y advertencias de despliegue. Solo el comandante con login activo; sin secretos |
 | GET | `/api/tripulantes` | pública | Lista de tripulantes (id, nombre y rol) para el selector de acceso |
 | GET | `/api/umbrales` | pública | Perfil, versión y estado de validación clínica de los umbrales en uso |
 
@@ -120,5 +121,6 @@ Qué rol puede usar cada una está en [SEGURIDAD_A_BORDO.md](SEGURIDAD_A_BORDO.m
 | Método | Ruta | Sesión | Qué hace |
 |---|---|---|---|
 | POST | `/api/voz/chat/{tid}` | requerida | Transcribe audio localmente, responde con el LLM local y devuelve audio opcional |
+| GET | `/api/voz/estado` | requerida | Si la voz puede usarse ya y, si no, qué le falta (la pantalla lo usa para explicarlo en vez de mostrar un error) |
 
-Total: 64 operaciones, 13 públicas.
+Total: 66 operaciones, 13 públicas.
