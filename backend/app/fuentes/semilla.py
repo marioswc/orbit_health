@@ -1,11 +1,21 @@
 """Datos de demostración ficticios (no son personas reales)."""
-from ..repositorios import bienestar, tripulantes
+import sys
+
+from ..repositorios import bienestar, seguridad as repo_seg, tripulantes
+from ..servicios import auth
 
 TRIPULANTES = [
     ("T1", "Tripulante Uno", "Comandante", "1985-03-12"),
     ("T2", "Tripulante Dos", "Médico de a bordo", "1988-07-21"),
     ("T3", "Tripulante Tres", "Ingeniero", "1990-11-02"),
     ("T4", "Tripulante Cuatro", "Piloto", "1987-05-30"),
+]
+
+CREDENCIALES_DEMO = [
+    ("T1", "comandante", "111111"),
+    ("T2", "medico", "222222"),
+    ("T3", "tripulante", "333333"),
+    ("T4", "tripulante", "444444"),
 ]
 
 # Supuesto: contenido genérico de bienestar y contención en crisis; revisar con un profesional de salud mental.
@@ -25,8 +35,17 @@ CAPSULAS = [
 ]
 
 
+def sembrar_credenciales_demo(conn) -> None:
+    for tid, rol, pin in CREDENCIALES_DEMO:
+        if repo_seg.obtener_credencial(conn, tid) is None:
+            auth.inscribir(conn, tid, rol, pin=pin)
+
+
 def sembrar(conn) -> None:
     if tripulantes.contar(conn) == 0:
         tripulantes.insertar_varios(conn, TRIPULANTES)
     bienestar.insertar_capsulas(conn, CAPSULAS)
     conn.commit()
+    if "pytest" not in sys.modules:
+        sembrar_credenciales_demo(conn)
+
