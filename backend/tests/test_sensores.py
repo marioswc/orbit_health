@@ -99,3 +99,47 @@ def test_con_autenticacion_los_sensores_exigen_sesion_y_la_demo_un_rol(cliente_a
     assert c.post("/api/sensores/lectura", json=cuerpo, headers=c.entrar("T3")).status_code == 200
     assert c.post("/api/demo/sensor/T1", headers=c.entrar("T3")).status_code == 403
     assert c.post("/api/demo/sensor/T1?ticks=3", headers=c.entrar("T2")).status_code == 200
+
+
+def test_perfiles_ampliados_cubren_reglas_combinadas_glucosa_o2_y_news2_completo(cliente):
+    # 1. Proceso infeccioso: fiebre + taquicardia activa posible_proceso_infeccioso
+    r_inf = cliente.post("/api/demo/sensor/T1?perfil=proceso_infeccioso&ticks=12&semilla=7").json()
+    assert r_inf["rondas"][-1]["nivel"] in ("amarillo", "rojo")
+    estado_t1 = cliente.get("/api/estado/T1").json()
+    assert "posible_proceso_infeccioso" in {rc["id"] for rc in estado_t1["reglas_combinadas"]}
+    assert estado_t1["news2"]["faltantes"] == []  # avpu se incluye en el simulador
+
+    # 2. Intolerancia ortostática: taquicardia + hipotensión sistólica y diastólica (<60 mmHg)
+    r_ort = cliente.post("/api/demo/sensor/T2?perfil=intolerancia_ortostatica&ticks=12&semilla=7").json()
+    assert r_ort["rondas"][-1][" valores" if " valores" in r_ort["rondas"][-1] else "valores"]["presion_diastolica"] < 60
+    estado_t2 = cliente.get("/api/estado/T2").json()
+    assert "posible_intolerancia_ortostatica" in {rc["id"] for rc in estado_t2["reglas_combinadas"]}
+
+    # 3. Hipoglucemia: glucosa cae de rango normal (<100) a amarillo (<70) y rojo (<54)
+    r_glu = cliente.post("/api/demo/sensor/T3?perfil=hipoglucemia&ticks=12&semilla=7").json()
+    glucosas = [ronda["valores"]["glucosa"] for ronda in r_glu["rondas"]]
+    assert glucosas[0] >= 70 and glucosas[-1] < 54
+    assert r_glu["rondas"][-1]["nivel"] == "rojo"
+
+    # 4. Hipoxia ambiental por caída de O2 en cabina (<19.0 % es rojo)
+    r_o2 = cliente.post("/api/demo/sensor/T4?perfil=hipoxia_ambiental_o2&ticks=12&semilla=7").json()
+    o2_vals = [ronda["valores"]["o2_cabina"] for ronda in r_o2["rondas"]]
+    assert o2_vals[0] > 19.5 and o2_vals[-1] < 19.0
+    assert r_o2["rondas"][-1]["nivel"] == "rojo"
+
+
+def test_realismo_fisiologico_acoplamiento_y_filtro_de_mediana_ante_artefactos(cliente):
+    from app.repositorios.conexion import get_conn
+    serie_con_artefacto = d.generar("estable", 7, semilla=7, artefactos=True)
+    assert serie_con_artefacto[3]["frecuencia_cardiaca"] == 124.0
+    assert serie_con_artefacto[3]["frecuencia_respiratoria"] == 23.0
+
+    conn = get_conn()
+    try:
+        res = d.simular_ventana_con_artefacto(conn, tid="T1", muestras=7, semilla=7)
+    finally:
+        conn.close()
+    assert res["pico_artefacto_fc"] == 124.0
+    assert res["promedio_sin_filtro"] > 75.0      # el promedio simple se contamina por el golpe de muñeca
+    assert res["mediana_registrada"] <= 72.0      # la mediana filtra el artefacto y conserva el valor real
+    assert res["nivel_registrado"] == "verde"

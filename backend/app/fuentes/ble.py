@@ -6,11 +6,17 @@ cubren aquí.
 """
 from __future__ import annotations
 
+import math
+from typing import Sequence
+
 from .. import config  # noqa: F401  (mantiene el paquete coherente con el resto de fuentes)
 from ..dominio.catalogos import validar
 
 SERVICIO_FC = "0000180d-0000-1000-8000-00805f9b34fb"
 CARACTERISTICA_FC = "00002a37-0000-1000-8000-00805f9b34fb"
+RR_MIN_MS = 240.0       # ~250 lpm
+RR_MAX_MS = 3000.0      # ~20 lpm
+SALTO_RR_MAX = 0.35     # descarta saltos >35% entre latidos consecutivos (artefacto de movimiento o ectopia)
 
 
 def parsear_medicion_fc(datos: bytes) -> dict:
@@ -51,6 +57,62 @@ def muestra_valida(medicion: dict) -> float | None:
     if medicion["contacto"] is False:
         return None
     return float(medicion["fc"]) if validar("frecuencia_cardiaca", medicion["fc"]) is None else None
+
+
+def rr_validos(rr_ms: Sequence[float]) -> list[float]:
+    """Filtra intervalos RR dentro del rango fisiológico humano (240 a 3000 ms)."""
+    return [float(r) for r in rr_ms if RR_MIN_MS <= r <= RR_MAX_MS]
+
+
+def calcular_rmssd(rr_ms: Sequence[float]) -> float | None:
+    """Calcula la variabilidad cardíaca RMSSD (ms) a partir de intervalos RR consecutivos válidos.
+
+    Ignora pares consecutivos con saltos > 35 % (artefactos de movimiento) y valida contra el catálogo.
+    """
+    limpios = rr_validos(rr_ms)
+    if len(limpios) < 2:
+        return None
+    difs_cuad = [
+        (b - a) ** 2
+        for a, b in zip(limpios, limpios[1:])
+        if abs(b - a) / max(a, b) <= SALTO_RR_MAX
+    ]
+    if not difs_cuad:
+        return None
+    rmssd = round(math.sqrt(sum(difs_cuad) / len(difs_cuad)), 1)
+    return rmssd if validar("variabilidad_cardiaca", rmssd) is None else None
+
+
+def extraer_muestras(medicion: dict, ventana_rr: list[float] | None = None,
+                     min_rr: int = 2, max_rr: int = 30) -> list[dict]:
+    """Convierte una notificación BLE en muestras listas para `/api/sensores/flujo/lote` (FC y RMSSD).
+
+    Si se pasa `ventana_rr`, acumula los intervalos RR entre notificaciones sucesivas (hasta `max_rr`)
+    y limpia la ventana si se pierde el contacto con la piel.
+    """
+    if medicion.get("contacto") is False:
+        if ventana_rr is not None:
+            ventana_rr.clear()
+        return []
+    fc = muestra_valida(medicion)
+    if fc is None:
+        return []
+    muestras = [{"indicador": "frecuencia_cardiaca", "valor": fc}]
+    nuevos = rr_validos(medicion.get("rr_ms", []))
+    if not nuevos:
+        return muestras
+    if ventana_rr is not None:
+        ventana_rr.extend(nuevos)
+        if len(ventana_rr) > max_rr:
+            del ventana_rr[:-max_rr]
+        serie = ventana_rr
+    else:
+        serie = nuevos
+    if len(serie) >= max(2, min_rr):
+        rmssd = calcular_rmssd(serie)
+        if rmssd is not None:
+            muestras.append({"indicador": "variabilidad_cardiaca", "valor": rmssd})
+    return muestras
 
 
 def describir_gatt(servicios) -> dict:

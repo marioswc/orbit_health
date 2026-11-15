@@ -182,8 +182,13 @@ function SimuladorDemo() {
             <h2>{t("demo.sensor.title")}</h2>
             <p className="suave">{t("demo.sensor.desc")}</p>
           </div>
-          <div className="fila">
+          <div className="fila" style={{ flexWrap: "wrap" }}>
             <button type="button" onClick={() => correrSensor("deterioro_respiratorio")}>{t("demo.sensor.worsen")}</button>
+            <button type="button" className="ghost" onClick={() => correrSensor("proceso_infeccioso")}>{t("demo.sensor.infection")}</button>
+            <button type="button" className="ghost" onClick={() => correrSensor("intolerancia_ortostatica")}>{t("demo.sensor.orthostatic")}</button>
+            <button type="button" className="ghost" onClick={() => correrSensor("exposicion_radiacion")}>{t("demo.sensor.radiation")}</button>
+            <button type="button" className="ghost" onClick={() => correrSensor("hipoglucemia")}>{t("demo.sensor.hypoglycemia")}</button>
+            <button type="button" className="ghost" onClick={() => correrSensor("hipoxia_ambiental_o2")}>{t("demo.sensor.o2")}</button>
             <button type="button" className="ghost" onClick={() => correrSensor("estable")}>{t("demo.sensor.stable")}</button>
           </div>
         </div>

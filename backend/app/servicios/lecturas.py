@@ -16,7 +16,7 @@ _ORDEN = {"verde": 0, "amarillo": 1, "rojo": 2}
 AVPU = "AVPU"
 ETIQUETAS = {k: v[0] for k, v in INDICADORES.items()}
 # Indicadores donde tener MÁS de lo habitual no es un problema: solo avisa la desviación hacia abajo.
-SOLO_BAJA = {"sueno_horas", "ejercicio_min", "sueno_eficiencia_pct"}
+SOLO_BAJA = {"sueno_horas", "ejercicio_min", "sueno_eficiencia_pct", "variabilidad_cardiaca"}
 SOLO_ALTA = {"sueno_despertares_min"}      # más de lo habitual es lo que preocupa
 
 
@@ -53,7 +53,7 @@ def _clasificar(conn, tid: str, indicador: str, valor: float, ventana: str) -> d
         nivel, obs = reglas.evaluar_glucosa(valor)
     elif indicador == "sueno_horas":
         nivel, obs = reglas.evaluar_sueno(valor)
-    elif indicador in ("ejercicio_min", "sueno_eficiencia_pct", "sueno_despertares_min"):
+    elif indicador in ("ejercicio_min", "sueno_eficiencia_pct", "sueno_despertares_min", "variabilidad_cardiaca"):
         nivel, obs = "verde", False        # sin umbral absoluto: solo cuenta la comparación con la propia base
     else:  # presion_diastolica
         nivel, obs = reglas.evaluar_diastolica(valor)

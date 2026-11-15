@@ -272,6 +272,18 @@
       ],
       "medidas_nasa": [],
       "habitos_generales_origen": "Consejo general de sentido común, no es una recomendación de la NASA. Pendiente de validación clínica."
+    },
+    "variabilidad_cardiaca": {
+      "que_es": "La variación en milisegundos (RMSSD) del tiempo entre un latido y el siguiente.",
+      "por_que_se_mide": "Refleja el equilibrio del sistema nervioso autónomo: cuando baja respecto a tu rango habitual puede señalar fatiga, estrés o menor recuperación.",
+      "como_medirlo": "Se calcula automáticamente desde una banda cardíaca que reporte intervalos RR en reposo.",
+      "en_el_espacio": "La adaptación a otros niveles de gravedad, el aislamiento y la carga de trabajo pueden modificar la regulación autonómica del corazón.",
+      "cuando_avisar": "No tiene un umbral fijo universal: se marca un aviso cuando cae claramente por debajo de tu línea base personal. Un valor mayor no es un problema.",
+      "fuentes": [
+        "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/",
+        "https://www.nasa.gov/hrp/hazard-isolation-and-confinement/"
+      ],
+      "medidas_nasa": []
     }
   },
   "nota_medidas": "`medidas_nasa` y `senales_a_vigilar` vienen de las páginas oficiales de la NASA, con su cita textual y su enlace. `habitos_generales` son consejos de sentido común nuestros y no se atribuyen a la NASA."
