@@ -32,3 +32,10 @@ El PIN debe tener de 6 a 10 dígitos. Un PIN equivocado repetido bloquea la cuen
 | T4 | Andrés Leal | Piloto | Sociable y competitivo; el encierro le pesa. Fútbol, música, retos | Cálido, breve |
 
 Cada persona puede cambiar su perfil y su trato desde la pantalla **Asistente**; lo sembrado solo se aplica a quien aún no tiene el suyo, y en bases anteriores solo reemplaza los nombres genéricos ("Tripulante Uno"…). Los rasgos y los intereses solo se usan con el modelo **local**, nunca con DeepSeek.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

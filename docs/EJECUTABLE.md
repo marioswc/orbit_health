@@ -42,3 +42,10 @@ scripts/probar_ejecutable.sh         # prueba de humo del que acabas de construi
 - **Comprobado en GitHub (ejecución del 15-nov-2026):** los tres sistemas (Linux, Windows y macOS) construyeron el ejecutable y **pasaron la prueba de humo** corriéndolo allí mismo. Linux es el más probado: además se descargó el artefacto de GitHub, se verificó su suma, conserva el permiso de ejecución y pasó la prueba de humo en una computadora real.
 - Hecho en Linux por mí: arranca en unos 2 s con una carpeta de datos nueva; creó la base y los respaldos en la carpeta del usuario; ignoró un `.env` ajeno; leyó el `.env` propio; detectó una instancia ya abierta.
 - **No hecho:** abrir el ejecutable de **Windows o Mac con doble clic en una computadora real** (la prueba de humo en GitHub lo arranca por línea de comandos y sin navegador); ver cómo se ve la interfaz en esos sistemas; Macs con procesador Intel (el construido es Apple Silicon); firma de código y notarización de Apple (cuestan dinero y cuentas de desarrollador); instaladores (`.msi`, `.dmg`, `.deb`). Los avisos de seguridad de la primera ejecución en Windows y Mac son esperables.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

@@ -80,3 +80,10 @@ Bajo el enfoque de *Standard Measures* de la NASA (aplicado en la ISS y *Artemis
 * \[ \] **Validación inmediata en formularios:** Bloquear envíos con valores fuera de rango humano plausible antes de hacer `fetch` a `http://localhost:8000/lecturas`.
 
 * \[ \] **Badge de Privacidad Permanente:** En la pestaña de `DiarioTripulante.tsx`, mantener visible el candado e indicador de almacenamiento 100% local sin cola de salida.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

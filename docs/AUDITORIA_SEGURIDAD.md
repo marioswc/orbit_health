@@ -53,3 +53,10 @@ La bitácora (`GET /api/auditoria`, solo el comandante; `/api/auditoria/verifica
 - Con `ORBIT_AUTH=0` cualquiera con acceso al equipo ve todo: aceptable solo en demo local. Con `ORBIT_DEMO_API=1` hay endpoints de demostración.
 - El saneado y la detección de inyección son heurísticos: no garantizan que ningún texto malicioso pase. Por eso la salida también se valida.
 - Una auditoría hecha por quien escribió el código no sustituye una revisión independiente.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

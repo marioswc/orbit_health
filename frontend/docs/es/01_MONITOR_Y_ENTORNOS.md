@@ -16,3 +16,10 @@ Un tablero médico tradicional muestra muchos números sueltos que cuesta leer r
   - Se muestra cuándo toca la siguiente medición según el estado del tripulante y cuántos días seguidos lleva monitoreándose (sin castigos ni alertas agresivas si el día aún está en curso).
 - **Mejor rendimiento al cargar (commit `3ab9737`):**
   - Se redujeron peticiones repetidas al arrancar y se evitaron recálculos innecesarios de diseño en pantalla.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

@@ -12,3 +12,10 @@ En una misión espacial un astronauta puede tener las manos ocupadas o necesitar
   - Se corrigieron errores de doble montaje en React (`StrictMode`) para que la burbuja nunca se quede trabada en *"Procesando"*, y se eliminó un botón flotante duplicado en `App.tsx` para dejar una sola burbuja limpia.
 - **Nota honesta de operación:**
   - La transcripción y síntesis de voz en el servidor solo se activan cuando el equipo tiene configuradas las variables de voz y los modelos locales descargados (`ORBIT_VOZ_ACTIVA=1`); si están apagados, la interfaz informa con claridad que el servicio de voz local no está activo sin afectar el resto de la aplicación.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

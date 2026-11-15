@@ -75,3 +75,10 @@ Es un recurso para el desarrollo y la demostración con internet. Para el plante
 
 ## Dónde está
 `backend/app/dominio/guardia_ia.py` (lógica pura), `servicios/explicador_local.py`, `servicios/voz_local.py`. Pruebas: `backend/tests/test_guardia_ia.py`.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

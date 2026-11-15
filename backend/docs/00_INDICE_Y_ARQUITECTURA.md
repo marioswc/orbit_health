@@ -9,21 +9,25 @@ En lugar de concentrar todo en un solo archivo gigante, la documentación está 
 ## Índice de documentos
 
 1. **[01 — Motor Clínico, Reglas Combinadas y Línea Base Personal](01_MOTOR_CLINICO_Y_LINEA_BASE.md)**
-   Cómo el sistema evalúa signos vitales (NEWS2, glucosa, sueño, ejercicio, aire de cabina), cómo cruza señales para detectar problemas grupales de CO₂ y cómo se corrigieron las falsas alarmas de la línea base personal.
+   Cómo el sistema evalúa signos vitales (NEWS2, glucosa, sueño, actigrafía, variabilidad cardíaca, ejercicio, aire de cabina), el perfil y semántica del semáforo, cómo cruza señales para detectar problemas grupales y cómo se corrigieron las falsas alarmas de la línea base personal.
 2. **[02 — Bienestar, Salud Mental, Crisis y Hábitos](02_BIENESTAR_SALUD_MENTAL_Y_HABITOS.md)**
-   Cómo se protege la privacidad del diario y del ánimo, cómo funciona el protocolo de crisis psicológica cruzado con el oxígeno de cabina, los avisos con consentimiento al médico, el asistente adaptable y la racha de mediciones.
+   Cómo se protege la privacidad del diario y del ánimo, cómo funciona el protocolo de crisis psicológica cruzado con el oxígeno de cabina, los avisos con consentimiento al comandante, el asistente adaptable y la racha de mediciones.
 3. **[03 — Enlace con Tierra, Cola con Prioridad e Informes](03_ENLACE_COLA_E_INFORMES_TIERRA.md)**
-   Cómo funciona el Modo Eclipse, el envío ordenado por urgencia al recuperar señal, la simulación de distancia (Luna y Marte), la vista del centro de control en Tierra y los informes exportables con sello de integridad.
+   Cómo funciona el Modo Eclipse, el envío ordenado por urgencia al recuperar señal, la compactación automática de eventos de rutina tras un apagón largo, la simulación de distancia (Luna y Marte), la vista del centro de control en Tierra y los informes exportables con sello de integridad.
 4. **[04 — Sensores, Flujo Continuo, Bluetooth (BLE) y Origen de Datos](04_SENSORES_FLUJO_Y_BLUETOOTH.md)**
-   Cómo se reciben datos continuos sin saturar la base de datos (ventanas de 1 minuto con paso inmediato para emergencias), el puente para bandas Bluetooth y cómo se distingue un sensor real de una simulación.
+   Cómo se reciben datos continuos sin saturar la base de datos (ventanas de 1 minuto con paso inmediato para emergencias), el puente e inspector para bandas Bluetooth con cálculo de variabilidad cardíaca (RMSSD) y selección segura entre dispositivos, y cómo se distingue un sensor real de una simulación.
 5. **[05 — Conocimiento Espacial: Riesgos NASA, Explicaciones y Entornos](05_CONOCIMIENTO_ESPACIAL_NASA.md)**
-   Cómo se integraron los peligros oficiales de la NASA, las citas textuales con enlaces reales y el cálculo de gravedad y pérdida ósea según el entorno (nave, estación, Luna o Marte).
-6. **[06 — Seguridad a Bordo, Simulación en Vivo y Pruebas de Calidad](06_SEGURIDAD_SIMULACION_Y_CALIDAD.md)**
-   Cómo funciona el acceso con PIN sin internet, los permisos ante emergencias, la misión simulada en vivo que corre sola para demostraciones y las pruebas automáticas que vigilan la seguridad y la documentación.
-7. **[07 — IA Local Explicativa y Asistente de Voz Offline](07_IA_LOCAL_Y_VOZ.md)**
-   Cómo funciona el explicador opcional con IA local (`GET /api/estado/{tid}/explicacion`) y el chat de voz offline (`POST /api/voz/chat/{tid}`), garantizando que la IA solo explique resultados ya calculados sin alterar jamás el nivel clínico ni saturar la computadora a bordo.
+   Cómo se integraron los peligros oficiales de la NASA, las citas textuales con enlaces reales (incluyendo actigrafía ARCHeR y adaptación cardiovascular) y el cálculo de gravedad y pérdida ósea según el entorno (nave, estación, Luna o Marte).
+6. **[06 — Seguridad a Bordo, Auditoría, Simulación en Vivo y Pruebas de Calidad](06_SEGURIDAD_SIMULACION_Y_CALIDAD.md)**
+   Cómo funciona el acceso con PIN sin internet (roles `tripulante` y `comandante`, 4 astronautas con perfil propio), cabeceras HTTP de seguridad, script de auditoría (`auditoria_seguridad.py`), asistente de inicio, PWA/Docker, la misión simulada en vivo y las **64 operaciones de la API** vigiladas por pruebas automáticas.
+7. **[07 — IA Local Explicativa, Asistente "Nova", Voz Offline y Guardia de IA](07_IA_LOCAL_Y_VOZ.md)**
+   Cómo funcionan el explicador (`GET /api/estado/{tid}/explicacion`), **Nova** con saludo y atajos (`GET /api/asistente/saludo/{tid}`), respiración guiada, perfil privado de intereses y rasgos (`GET` y `PUT /api/perfil-ia/{tid}`), chat con memoria efímera (`POST /api/asistente/chat/{tid}`), voz bilingüe (`POST /api/voz/chat/{tid}`), saneado de prompt, antifiltración y límites de uso (`limites.py`).
+8. **[08 — Guion de Speech para Jueces (3 Minutos — 5 Diapositivas)](../../docs/GUION_SPEECH_3_MINUTOS.md)**
+   Guion directo y libre de tecnicismos para presentar el proyecto en 3 minutos sincronizado con las 5 diapositivas.
+9. **[09 — Documento Maestro y Presentación en Inglés (5 Diapositivas)](../../docs/PRESENTACION_PROYECTO.md)**
+   Resumen completo del proyecto (problemática y solución) y estructura lista en inglés para las 5 diapositivas con notas de orador.
 
-> Para ver el plan inicial del proyecto puedes consultar [PLAN_DE_DESARROLLO.md](PLAN_DE_DESARROLLO.md), y para el listado completo de rutas disponibles consulta [API_REFERENCIA.md](../../docs/API_REFERENCIA.md).
+> Para ver el plan inicial del proyecto puedes consultar [PLAN_DE_DESARROLLO.md](../../docs/PLAN_DE_DESARROLLO.md), y para el listado completo de rutas disponibles consulta [API_REFERENCIA.md](../../docs/API_REFERENCIA.md).
 
 ---
 
@@ -64,3 +68,10 @@ Además, se unificó el registro de lecturas y su encolado a Tierra en **una sol
   4. Si ningún respaldo sirve, arranca con una base limpia para que el sistema **nunca quede fuera de servicio** en plena misión.
 - **Respaldos automáticos (`backend/app/repositorios/respaldo.py`):** al arrancar y cada cierto tiempo (`ORBIT_RESPALDO_CADA_MIN`, por defecto 30 minutos), el sistema saca una copia consistente de la base y borra las más antiguas para no llenar el disco (`ORBIT_RESPALDOS_CONSERVAR`).
 - **Consulta sencilla del estado (`GET /api/salud`):** devuelve en lenguaje claro si la base está sana, cuántos respaldos existen y si hubo que restaurar algo al arrancar.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Antigravity (Google DeepMind)** sobre base técnica documentada con **Claude (Anthropic / Claude Code)**.
+> - **Justificación de uso:** Se utilizó para estructurar y explicar en lenguaje claro y sin tecnicismos la arquitectura y los módulos del backend a partir del código fuente y el historial de commits, bajo la definición conceptual y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

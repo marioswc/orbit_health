@@ -52,3 +52,10 @@ Con `ORBIT_AUTH=0` (por defecto, demo en una estación) el comportamiento es el 
 - **PIN de 6 dígitos:** resiste intentos por la API gracias al bloqueo, pero no un ataque contra el archivo robado.
 - **Reloj del equipo:** expiración de sesiones y bloqueos dependen de la hora local; sin sincronización externa, un reloj desfasado los altera.
 - Los roles y permisos son decisiones de diseño pendientes de revisión del equipo y de un profesional.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

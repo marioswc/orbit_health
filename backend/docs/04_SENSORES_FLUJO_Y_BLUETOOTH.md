@@ -39,13 +39,20 @@ En `backend/app/dominio/flujo.py` y `backend/app/servicios/flujo.py` (`POST /api
 ### Qué problema había
 Las bandas de frecuencia cardíaca comerciales hablan por Bluetooth Low Energy (BLE) enviando paquetes de bytes en el formato estándar GATT (`0x180D` / `0x2A37`), donde los datos vienen compactados en bits (indicando si el pulso viene en 1 o 2 bytes y si el sensor está tocando la piel).
 
-### Cómo se solucionó (`commits 926a62b`, `0478bd9`)
+### Cómo se solucionó (`commits 926a62b`, `0478bd9`, `9bb497a`, `acafdae`, `f8a3cec`)
 - **Decodificador puro (`backend/app/fuentes/ble.py`):** traduce los bytes del estándar Bluetooth y extrae la frecuencia cardíaca, la energía gastada y los intervalos entre latidos (`RR-intervals`).
+- **Cálculo de Variabilidad Cardíaca (RMSSD) desde intervalos RR (`calcular_rmssd` y `extraer_muestras`, `commit f8a3cec`):**
+  - Aprovecha los intervalos entre latidos (`rr_ms`) que reporta la banda Bluetooth para calcular automáticamente el indicador `variabilidad_cardiaca` (RMSSD en milisegundos).
+  - Filtra intervalos fuera del rango humano (240 a 3000 ms) y **descarta saltos mayores al 35 % entre latidos consecutivos** (causados por golpes o artefactos de movimiento) para no contaminar el cálculo.
+  - Acumula una ventana de intervalos entre notificaciones sucesivas y la limpia de inmediato si la banda pierde contacto con la piel.
 - **Filtro contra lecturas falsas:** si los bits de la banda indican que **se perdió el contacto con la piel**, o si el pulso viene en `0` o fuera del rango humano válido, el paquete se descarta automáticamente para no generar una falsa alarma roja cuando el tripulante se quita la banda.
-- **Script puente (`scripts/puente_ble.py`):** se conecta por Bluetooth desde la computadora, lee los paquetes en vivo y los envía a `POST /api/sensores/flujo`. Si el servidor local no responde temporalmente, el puente guarda las muestras en una cola local y reintenta sin perderlas.
-- **Inspector de bandas comerciales (`describir_gatt`, `--inspeccionar` y `--escuchar`, `commit 0478bd9`):**
-  - *Problema:* muchas bandas de consumo (como Aolon y similares) no usan el servicio estándar de frecuencia cardíaca, sino un protocolo privado de la app de su fabricante (como GloryFit o Da Fit), o no aparecen al escanear porque siguen conectadas al celular.
-  - *Solución:* se añadió `describir_gatt` en `ble.py` y las opciones `--inspeccionar` y `--escuchar <segundos>` en `scripts/puente_ble.py`. Permite conectarse únicamente al dispositivo que el usuario nombra, listar todos sus servicios Bluetooth y confirmar en segundos si **trae el servicio estándar de frecuencia cardíaca** (compatible con el puente) o si **habla un protocolo propio del fabricante**, además de poder ver en crudo qué bytes emite. *(Ver detalles en [BANDA_BLE.md](../../docs/BANDA_BLE.md)).*
+- **Script puente (`scripts/puente_ble.py`):** se conecta por Bluetooth desde la computadora, lee los paquetes en vivo y los envía al flujo continuo. Si el servidor local no responde temporalmente, el puente guarda las muestras en una cola local y reintenta sin perderlas.
+- **Selección segura entre bandas con el mismo nombre y escaneo filtrado (`elegir_coincidencia`, `--filtrar` y `--mas-cercana`, `commit 9bb497a`):**
+  - *Problema:* si en la habitación hay varias bandas del mismo modelo (por ejemplo, dos `Aolon Curve`), buscar solo por nombre podía conectarse por error a la banda de otra persona. Además, escanear sin filtro mostraba dispositivos Bluetooth ajenos.
+  - *Solución:* `--escanear --filtrar <nombre>` muestra únicamente los dispositivos que coinciden con ese texto. Y si al conectar hay varios con el mismo nombre, el puente **no adivina**: lista las coincidencias ordenadas por potencia de señal (`dBm`) y pide indicar `--direccion` o usar `--mas-cercana` (que elige explícitamente la de señal más fuerte, normalmente la que llevas puesta).
+- **Inspector de bandas comerciales (`describir_gatt`, `--inspeccionar` y `--escuchar`, `commits 0478bd9`, `acafdae`):**
+  - *Problema:* muchas bandas de consumo (como Aolon o Veryfit) no usan el servicio estándar de frecuencia cardíaca (`0x180D`), sino un protocolo privado de la app de su fabricante.
+  - *Solución:* se añadió `describir_gatt` en `ble.py` y las opciones `--inspeccionar` y `--escuchar <segundos>` en `scripts/puente_ble.py` para listar los servicios de tu banda y saber en segundos si habla el estándar o un protocolo propio. Con esto se probó una banda física real (**IDW26 / Veryfit**), comprobando y documentando en [BANDA_BLE.md](../../docs/BANDA_BLE.md) que anuncia el servicio propietario `0xAF0` y requiere el *handshake* cerrado de su app.
 
 ---
 
@@ -62,3 +69,10 @@ Durante las pruebas (`commit 23d9b13`), se detectó que tanto la misión simulad
   4. `calibracion`: series históricas precargadas (PhysioNet BIDMC) para dar contexto de 14 días, que nunca se envían a Tierra.
 - Las rutas de sensores (`/api/sensores/lectura`, `/api/sensores/lote`, `/api/sensores/flujo` y `/api/sensores/flujo/lote`) ahora aceptan explícitamente `"origen": "sensor"` (por defecto) o `"origen": "simulado"`, rechazando cualquier intento de inyectar datos como `manual` o `calibracion`.
 - El campo `origen` viaja dentro del paquete hacia Tierra y aparece en el historial y en `/api/informe`, garantizando trazabilidad total.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Antigravity (Google DeepMind)** sobre base técnica documentada con **Claude (Anthropic / Claude Code)**.
+> - **Justificación de uso:** Se utilizó para estructurar y explicar en lenguaje claro y sin tecnicismos la arquitectura y los módulos del backend a partir del código fuente y el historial de commits, bajo la definición conceptual y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

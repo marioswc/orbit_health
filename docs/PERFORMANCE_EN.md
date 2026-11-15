@@ -17,3 +17,10 @@ Machine: Linux x86_64, 8 CPUs, Python 3.12.3 (a development laptop, **not flight
 - It shows that the on-board decision is local and takes milliseconds: nothing waits for a network or for Earth.
 - It does **not** measure concurrent users, a slower flight computer, the browser rendering time, or a large database. Those numbers should not be inferred from this table.
 - The simulated link delay (seconds to minutes) is a separate, configurable model and is not part of these figures.
+
+
+---
+
+> **AI Signature & Justification (SI Disclosure):**
+> - **Tool used:** **Claude (Anthropic)** via **Claude Code**.
+> - **Justification:** Used as a technical assistant during the hackathon to draft and structure technical documentation, record architectural decisions, and maintain traceability with the source code and public NASA references, under the human team's conceptual definition, review, and validation (in compliance with *NASA Space Apps Challenge* rules).

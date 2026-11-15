@@ -81,3 +81,10 @@ Meta: que corra en equipos muy modestos. Tres niveles (`shared/rendimiento.ts`),
 - No hacer commit ni push sin indicación explícita del responsable.
 - Lo marcado como **Supuesto** requiere revisión del equipo.
 - Documentación relacionada: [ARQUITECTURA.md](./ARQUITECTURA.md), [DISENO.md](./DISENO.md), [FIGURA_HUMANA.md](./FIGURA_HUMANA.md), [API.md](./API.md).
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

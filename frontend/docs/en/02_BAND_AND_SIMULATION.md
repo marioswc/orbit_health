@@ -11,3 +11,10 @@ Initially the interface relied on a prominent **"Manual capture"** floating butt
   - Removed the floating `+ Manual capture` button and its side drawer so the workflow centers on automatic readings from the wearable (via Bluetooth bridge) or live mission simulation.
 - **Honest `simulado` origin labeling ([SimuladorDemo.tsx](../../src/features/enlace/components/SimuladorDemo.tsx), commit `a0e80ab`):**
   - Updated simulator labels so demonstration readings are explicitly identified as **simulated** rather than physical sensor readings.
+
+
+---
+
+> **AI Signature & Justification (SI Disclosure):**
+> - **Tool used:** **Claude (Anthropic)** via **Claude Code**.
+> - **Justification:** Used as a technical assistant during the hackathon to draft and structure the frontend documentation, UI architecture, and component guides, under the human team's visual design, UX decisions, and validation (in compliance with *NASA Space Apps Challenge* rules).

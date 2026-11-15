@@ -106,3 +106,10 @@ frontend/src/
 ## 6. AI Usage Justification & Transparency
 
 In accordance with **NASA Space Apps Challenge** guidelines, AI tools were used strictly as **technical assistance** (component/hook implementation, CSS styling, unit tests, and documentation drafting) under the team's architecture, product decisions, and human verification. See full disclosure in [USO_IA_Y_DOCUMENTACION_FRONTEND.md](./USO_IA_Y_DOCUMENTACION_FRONTEND.md) and [docs/SI_DISCLOSURE.md](../../docs/SI_DISCLOSURE.md).
+
+
+---
+
+> **AI Signature & Justification (SI Disclosure):**
+> - **Tool used:** **Claude (Anthropic)** via **Claude Code**.
+> - **Justification:** Used as a technical assistant during the hackathon to draft and structure the frontend documentation, UI architecture, and component guides, under the human team's visual design, UX decisions, and validation (in compliance with *NASA Space Apps Challenge* rules).

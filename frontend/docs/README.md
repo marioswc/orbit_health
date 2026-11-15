@@ -106,3 +106,10 @@ frontend/src/
 ## 6. Justificación y transparencia del uso de IA
 
 De acuerdo con las reglas del **NASA Space Apps Challenge**, las herramientas de IA se utilizaron únicamente como **apoyo técnico** (implementación de componentes/hooks, estilos CSS, pruebas unitarias y redacción documental), bajo diseño, decisiones de producto y validación humana del equipo. Ver detalle completo en [USO_IA_Y_DOCUMENTACION_FRONTEND.md](./USO_IA_Y_DOCUMENTACION_FRONTEND.md) y [docs/SI_DISCLOSURE.md](../../docs/SI_DISCLOSURE.md).
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

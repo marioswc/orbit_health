@@ -13,3 +13,10 @@ En misiones a la Luna o Marte la señal tarda en llegar o se corta por completo 
   - Muestra los mensajes clínicos que ya llegaron a Tierra y ofrece enlaces directos para descargar el informe de tripulación.
 - **Historial en tabla plegable y paginada ([HistorialPage.tsx](../../src/features/historial/routes/HistorialPage.tsx), commits `25b68ba`, `8e99522`, `8573833`):**
   - Reemplazó listas largas difíciles de leer por una tabla ordenada con filas desplegables, gráficas detalladas por indicador y paginación para revisar mediciones pasadas con fluidez.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

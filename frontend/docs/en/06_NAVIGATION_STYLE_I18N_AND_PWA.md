@@ -15,3 +15,10 @@ As the app grew across eight views (*Monitor, Band, History, Wellbeing, Assistan
   - Near-achromatic light/dark palette, *liquid glass* surfaces, clinical traffic-light colors always paired with text, and automatic reduced-effects mode for lower-power devices.
 - **Minimal offline PWA ([manifest.webmanifest](../../public/manifest.webmanifest), [sw.js](../../public/sw.js), commit `fc7de22`):**
   - Added app manifest, icon, and a service worker that caches static UI assets **while never caching `/api`**, ensuring clinical data is always fresh from the local server.
+
+
+---
+
+> **AI Signature & Justification (SI Disclosure):**
+> - **Tool used:** **Claude (Anthropic)** via **Claude Code**.
+> - **Justification:** Used as a technical assistant during the hackathon to draft and structure the frontend documentation, UI architecture, and component guides, under the human team's visual design, UX decisions, and validation (in compliance with *NASA Space Apps Challenge* rules).

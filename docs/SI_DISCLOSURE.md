@@ -29,3 +29,10 @@ The product can use a **local language model** (no internet) to rephrase an aler
 
 ## Data
 - Calibration series come from the BIDMC PPG and Respiration Dataset (PhysioNet, Open Data Commons Attribution License v1.0). Attribution is in `data/physionet/ATRIBUCION.md`.
+
+
+---
+
+> **AI Signature & Justification (SI Disclosure):**
+> - **Tool used:** **Claude (Anthropic)** via **Claude Code**.
+> - **Justification:** Used as a technical assistant during the hackathon to draft and structure technical documentation, record architectural decisions, and maintain traceability with the source code and public NASA references, under the human team's conceptual definition, review, and validation (in compliance with *NASA Space Apps Challenge* rules).

@@ -5,7 +5,7 @@ Apoyo a la decisión clínica para tripulaciones con comunicación degradada. Fu
 
 Estado y pendientes del equipo: [docs/PENDIENTES.md](docs/PENDIENTES.md).
 
-Plan completo: [PLAN_DE_DESARROLLO.md](backend/docs/PLAN_DE_DESARROLLO.md).
+Plan completo: [PLAN_DE_DESARROLLO.md](docs/PLAN_DE_DESARROLLO.md).
 
 ## Producción local (un solo servidor, sin internet)
 
@@ -154,3 +154,10 @@ scripts/          arranque, E2E, calibración, generador de casos
 ```
 
 Dependencias entre capas: `api → servicios → repositorios`, y `servicios → dominio`. `dominio` no depende de nada.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación técnica, registrar las decisiones de arquitectura y mantener la trazabilidad con el código fuente y las fuentes públicas de la NASA, bajo la definición conceptual, revisión y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).

@@ -11,3 +11,10 @@ Originalmente la aplicación dependía de un botón flotante de **"Captura manua
   - Se quitó el botón flotante de `+ Captura manual` y su cajón lateral para que toda la experiencia gire en torno a lecturas automáticas provenientes de la banda (vía Bluetooth/puente) o de la simulación en vivo.
 - **Transparencia de origen `simulado` ([SimuladorDemo.tsx](../../src/features/enlace/components/SimuladorDemo.tsx), commit `a0e80ab`):**
   - Los textos e indicadores del simulador aclaran explícitamente que las lecturas generadas para demostración tienen origen **simulado**, diferenciándolas de lecturas de un sensor físico.
+
+
+---
+
+> **Firma de IA y Justificación (SI Disclosure):**
+> - **Herramienta utilizada:** **Claude (Anthropic)** mediante **Claude Code**.
+> - **Justificación de uso:** Se utilizó como asistente técnico durante el hackathon para redactar y estructurar la documentación de frontend, arquitectura de interfaz y componentes, bajo el diseño visual, criterio de experiencia de usuario y validación del equipo humano (conforme a las reglas del *NASA Space Apps Challenge*).
