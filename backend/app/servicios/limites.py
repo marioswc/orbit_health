@@ -49,3 +49,22 @@ def lugar_en_el_modelo():
 def reiniciar() -> None:
     with _cerrojo:
         _recientes.clear()
+
+
+def auditar_respuesta_ia(actor_id: str | None, tid: str, ruta: str, respuesta: dict) -> dict:
+    """Anota en la auditoría los hechos relevantes de una respuesta de IA, SIN el texto de nadie, y quita la bandera interna.
+    - ia_salida_nube: la consulta salió de la estación (DeepSeek).
+    - intento_inyeccion: sin identificar a la persona (la heurística puede equivocarse).
+    A propósito NO se anota nada de crisis, respiración ni contenido emocional: el comandante lee esta auditoría."""
+    from . import auditoria
+    if respuesta.pop("sospecha_inyeccion", False):
+        auditoria.anotar("sistema", "intento_inyeccion", None, {"ruta": ruta})
+    if respuesta.get("fuente") == "deepseek":
+        via = "respaldo" if config.IA_PROVEEDOR in {"automatico", "auto"} else "directa"
+        auditoria.anotar(actor_id, "ia_salida_nube", tid, {"ruta": ruta, "via": via})
+    return respuesta
+
+
+def auditar_limite(actor_id: str | None, tid: str, ruta: str) -> None:
+    from . import auditoria
+    auditoria.anotar(actor_id, "limite_ia", tid, {"ruta": ruta})

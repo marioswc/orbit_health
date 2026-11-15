@@ -25,6 +25,7 @@ def chat_voz(tid: str, audio: bytes = Body(...), idioma: str = "auto", content_t
     try:
         limites.contar_peticion(f"voz:{tid}")
     except limites.LimiteExcedido as e:
+        limites.auditar_limite(a.get("tripulante_id"), tid, "voz")
         raise HTTPException(429, e.motivo, headers={"Retry-After": str(e.espera_s)}) from e
     extension = ".wav" if not content_type else {
         "audio/wav": ".wav", "audio/webm": ".webm", "audio/ogg": ".ogg",
@@ -40,6 +41,7 @@ def chat_voz(tid: str, audio: bytes = Body(...), idioma: str = "auto", content_t
         ctx = servicio_perfil.contexto(conn, tid)
         respuesta = voz_local.responder(texto, estado, preferencias, perfil=ctx["intereses"], rasgos=ctx["rasgos"], nombre=(ctx["nombre"].split() or [""])[0], idioma=idioma_real)
         respuesta["transcripcion"] = texto
+        limites.auditar_respuesta_ia(a.get("tripulante_id"), tid, "voz", respuesta)
         respuesta["nivel_general"] = estado["nivel_general"]
         if config.VOZ_PIPER_MODELO:
             respuesta["audio_base64"] = voz_local.sintetizar(respuesta["texto"], idioma_real)

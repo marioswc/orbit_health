@@ -269,7 +269,8 @@ def responder(texto: str, estado: dict, preferencias: dict, perfil: str = "", no
     nombre = guardia_ia.sanear_para_prompt(nombre, 40)
     perfil = guardia_ia.sanear_para_prompt(perfil, 160)
     rasgos = guardia_ia.sanear_para_prompt(rasgos, 160)
-    if guardia_ia.parece_inyeccion(texto):
+    sospecha = guardia_ia.parece_inyeccion(texto)
+    if sospecha:
         explicador_local.log.warning("Posible intento de inyección de prompt en la conversación (texto no registrado)")
     contexto = _contexto_voz(estado)
     nivel_actual = contexto.get("nivel_general") or "verde"
@@ -308,6 +309,8 @@ def responder(texto: str, estado: dict, preferencias: dict, perfil: str = "", no
         else (f"{toque} " if toque else "") + f"Recibí: «{texto}». {explicador_local._fallback(estado)} "
                   "Para conversar con libertad hace falta el modelo de conversación local.",
     }
+    if sospecha:
+        fallback["sospecha_inyeccion"] = True
     if respuesta is None:
         return fallback
     respuesta = respuesta.replace("**", "").replace("__", "")[:config.VOZ_MAX_RESPUESTA_CARACTERES].strip()
@@ -319,7 +322,10 @@ def responder(texto: str, estado: dict, preferencias: dict, perfil: str = "", no
     fuente = explicador_local._ULTIMA_FUENTE.get()
     if not fuente:
         fuente = "deepseek" if explicador_local._usar_deepseek() else "modelo_local"
-    return {"fuente": fuente, "generado_por_ia": True, "idioma": idioma, "aviso": explicador_local.aviso_para(fuente), "texto": respuesta}
+    salida = {"fuente": fuente, "generado_por_ia": True, "idioma": idioma, "aviso": explicador_local.aviso_para(fuente), "texto": respuesta}
+    if sospecha:
+        salida["sospecha_inyeccion"] = True
+    return salida
 
 
 def sintetizar(texto: str, idioma: str = "es") -> str:

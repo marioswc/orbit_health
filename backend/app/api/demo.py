@@ -1,9 +1,12 @@
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from .. import config
 from ..dominio import acciones, comparativa, reglas
 from ..dominio import enlace as modelo_enlace
 from ..fuentes import dispositivo_simulado, escenarios
+from ..servicios import auditoria
 from ..servicios import estado as servicio_estado
 from ..servicios.simulacion_viva import GUIONES, SIMULACION
 from ..servicios import lecturas as servicio_lecturas
@@ -73,14 +76,17 @@ def dispositivo_simulado_en_marcha(tid: str, perfil: str = "deterioro_respirator
 
 @router.post("/simulacion/iniciar")
 async def iniciar_simulacion(guion: str = "mision_en_vivo", ritmo: int = 15, tick_s: float = 1.0, semilla: int = 7,
-                             _: dict = Depends(requiere("demo:ejecutar"))) -> dict:
+                             a: dict = Depends(requiere("demo:ejecutar"))) -> dict:
     """Pone en marcha una misión simulada en vivo: las bandas envían solas, el enlace se corta y vuelve. Escribe datos de demo"""
     if not 1 <= ritmo <= 3600:
         raise HTTPException(422, "ritmo debe estar entre 1 y 3600 segundos de misión por tick")
     if not 0.01 <= tick_s <= 10:
         raise HTTPException(422, "tick_s debe estar entre 0.01 y 10 segundos")
     try:
-        return await SIMULACION.iniciar(ritmo, tick_s, semilla, guion)
+        r = await SIMULACION.iniciar(ritmo, tick_s, semilla, guion)
+        await asyncio.to_thread(auditoria.anotar, a.get("tripulante_id"), "simulacion_iniciada", None,
+                                {"guion": guion, "ritmo": ritmo, "tick_s": tick_s})
+        return r
     except ValueError as e:
         raise HTTPException(422, str(e))
     except RuntimeError as e:
@@ -88,9 +94,11 @@ async def iniciar_simulacion(guion: str = "mision_en_vivo", ritmo: int = 15, tic
 
 
 @router.post("/simulacion/detener")
-async def detener_simulacion(_: dict = Depends(requiere("demo:ejecutar"))) -> dict:
+async def detener_simulacion(a: dict = Depends(requiere("demo:ejecutar"))) -> dict:
     """Detiene la misión simulada, cierra las ventanas abiertas y devuelve el enlace a la normalidad"""
-    return await SIMULACION.detener()
+    r = await SIMULACION.detener()
+    await asyncio.to_thread(auditoria.anotar, a.get("tripulante_id"), "simulacion_detenida", None, {})
+    return r
 
 
 @router.get("/simulacion/estado")

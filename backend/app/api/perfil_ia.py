@@ -57,15 +57,16 @@ def chat_texto(tid: str, datos: ChatIn, conn=Depends(conexion), a: dict = Depend
     if guardia_ia.detectar_crisis(datos.texto):          # la crisis nunca se frena: es texto escrito, no gasta el modelo
         r = _responder(datos, estado, conn, tid, ctx)
         r["nivel_general"] = estado["nivel_general"]
-        return r
+        return limites.auditar_respuesta_ia(a.get("tripulante_id"), tid, "chat", r)
     try:
         limites.contar_peticion(f"chat:{tid}")
         with limites.lugar_en_el_modelo():
             r = _responder(datos, estado, conn, tid, ctx)
     except limites.LimiteExcedido as e:
+        limites.auditar_limite(a.get("tripulante_id"), tid, "chat")
         raise HTTPException(429, e.motivo, headers={"Retry-After": str(e.espera_s)}) from e
     r["nivel_general"] = estado["nivel_general"]
-    return r
+    return limites.auditar_respuesta_ia(a.get("tripulante_id"), tid, "chat", r)
 
 
 def _responder(datos, estado, conn, tid, ctx) -> dict:
