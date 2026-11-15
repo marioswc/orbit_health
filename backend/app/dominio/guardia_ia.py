@@ -127,7 +127,7 @@ def parece_inyeccion(texto: str) -> bool:
     return bool(_INTENTOS.search(unicodedata.normalize("NFKC", texto or "")))
 
 
-def _filtra_instrucciones(salida_normalizada: str, secretos: tuple[str, ...], ventana: int = 6) -> bool:
+def _filtra_instrucciones(salida_normalizada: str, secretos: tuple[str, ...], ventana: int = 8) -> bool:
     """True si la salida contiene `ventana` palabras seguidas de alguno de los textos secretos (las instrucciones)."""
     pal_salida = salida_normalizada.split()
     if len(pal_salida) < ventana:

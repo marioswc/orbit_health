@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 
 from app import config
 from app.servicios import explicador_local, perfil_ia, voz_local
@@ -147,10 +148,10 @@ def test_la_voz_en_ingles_usa_el_modelo_de_piper_en_ingles(monkeypatch):
     monkeypatch.setattr(config, "VOZ_PIPER_MODELO", "es.onnx")
     monkeypatch.setattr(config, "VOZ_PIPER_MODELO_EN", "en.onnx")
     voz_local.sintetizar("hola", "es"); voz_local.sintetizar("hello", "en")
-    assert usados == ["es.onnx", "en.onnx"]
+    assert [Path(u).name for u in usados] == ["es.onnx", "en.onnx"]
     monkeypatch.setattr(config, "VOZ_PIPER_MODELO_EN", "")
     voz_local.sintetizar("hello", "en")
-    assert usados[-1] == "es.onnx"                                    # sin voz en inglés, usa la que hay
+    assert Path(usados[-1]).name == "es.onnx"                         # sin voz en inglés, usa la que hay
 
 
 # ---------- perfiles ficticios sembrados ----------
@@ -274,15 +275,21 @@ def test_con_la_nube_directa_tampoco_viaja_lo_personal(monkeypatch, local_listo)
 
 
 # ---------- IA incrustada (llama.cpp dentro del programa) ----------
+def _flujo(texto: str):
+    """Como el motor real con stream=True: una secuencia de trozos con un fragmento de texto cada uno."""
+    for palabra in texto.split(" "):
+        yield {"choices": [{"delta": {"content": palabra + " "}}]}
+
+
 class _LlamaFalso:
     llamadas: list = []
 
     def __init__(self, **kw):
         _LlamaFalso.llamadas.append(("init", kw))
 
-    def create_chat_completion(self, messages, max_tokens, temperature):
+    def create_chat_completion(self, messages, max_tokens, temperature, stream=False):
         _LlamaFalso.llamadas.append(("chat", messages, max_tokens))
-        return {"choices": [{"message": {"content": "  Te escucho. ¿Qué extrañas hoy?  "}}]}
+        return _flujo("  Te escucho. ¿Qué extrañas hoy?  ")
 
 
 @pytest.fixture
@@ -346,7 +353,7 @@ def test_sin_archivo_o_sin_libreria_no_esta_disponible(monkeypatch, tmp_path):
     assert ia_embebida.disponible() is False
 
 
-def test_si_el_modelo_falla_se_usa_el_texto_de_respaldo_y_no_se_reintenta_en_bucle(embebido, monkeypatch):
+def test_un_fallo_puntual_no_apaga_la_ia_pero_tres_seguidos_si(embebido, monkeypatch):
     class Roto(_LlamaFalso):
         def create_chat_completion(self, *a, **k):
             raise RuntimeError("sin memoria")
@@ -355,13 +362,95 @@ def test_si_el_modelo_falla_se_usa_el_texto_de_respaldo_y_no_se_reintenta_en_buc
     monkeypatch.setitem(sys.modules, "llama_cpp", types.SimpleNamespace(Llama=Roto))
     r = voz_local.responder("hola", ESTADO, {"tono": "directo"})
     assert r["fuente"] == "reglas_locales" and r["generado_por_ia"] is False
-    assert embebido.disponible() is False                                           # queda deshabilitado hasta reiniciar
+    assert embebido.disponible() is True                                            # un solo fallo: se sigue intentando
+    voz_local.responder("hola", ESTADO, {"tono": "directo"})
+    voz_local.responder("hola", ESTADO, {"tono": "directo"})
+    assert embebido.disponible() is False                                           # tres seguidos: se detiene hasta reiniciar
+
+
+def test_un_exito_borra_la_cuenta_de_fallos(embebido, monkeypatch):
+    import sys
+    import types
+    veces = {"n": 0}
+
+    class Intermitente(_LlamaFalso):
+        def create_chat_completion(self, *a, **k):
+            veces["n"] += 1
+            if veces["n"] % 3 != 0:
+                raise RuntimeError("falla")
+            return _flujo("Te escucho.")
+    monkeypatch.setitem(sys.modules, "llama_cpp", types.SimpleNamespace(Llama=Intermitente))
+    for _ in range(9):
+        voz_local.responder("hola", ESTADO, {"tono": "directo"})
+    assert embebido.disponible() is True                                            # nunca hubo tres fallos SEGUIDOS
+
+
+def test_un_modelo_que_no_carga_se_desactiva_de_inmediato(embebido, monkeypatch):
+    import sys
+    import types
+
+    class NoCarga:
+        def __init__(self, **kw):
+            raise OSError("archivo dañado")
+    monkeypatch.setitem(sys.modules, "llama_cpp", types.SimpleNamespace(Llama=NoCarga))
+    assert embebido.consultar("hola") is None and embebido.disponible() is False
+
+
+def test_un_tiempo_agotado_devuelve_none_sin_desactivar_la_ia(embebido, monkeypatch):
+    import sys
+    import time
+    import types
+
+    class Lento(_LlamaFalso):
+        def create_chat_completion(self, *a, **k):
+            for palabra in ("uno", "dos", "tres", "cuatro"):
+                time.sleep(0.05)
+                yield {"choices": [{"delta": {"content": palabra + " "}}]}
+    monkeypatch.setitem(sys.modules, "llama_cpp", types.SimpleNamespace(Llama=Lento))
+    monkeypatch.setattr(config, "IA_EMBEBIDA_TIMEOUT_S", 0.08)
+    t0 = time.monotonic()
+    assert embebido.consultar("hola") is None
+    assert time.monotonic() - t0 < 1 and embebido.disponible() is True              # corta a tiempo y sigue disponible
+
+
+def test_usa_los_nucleos_fisicos_por_defecto_y_respeta_la_configuracion(embebido, monkeypatch):
+    from app.servicios import recursos
+    monkeypatch.setattr(recursos, "nucleos_fisicos", lambda: 4)
+    monkeypatch.setattr(config, "IA_HILOS", 0)
+    assert embebido.hilos() == 4
+    voz_local.responder("hola", ESTADO, {"tono": "directo"})
+    init = [x for x in _LlamaFalso.llamadas if x[0] == "init"][0][1]
+    assert init["n_threads"] == 4 and init["n_threads_batch"] == 4
+    monkeypatch.setattr(config, "IA_HILOS", 2)
+    assert embebido.hilos() == 2
+
+
+def test_libera_la_memoria_del_modelo_tras_el_tiempo_sin_uso_y_lo_recarga_al_volver(embebido, monkeypatch):
+    import time
+    monkeypatch.setattr(config, "IA_DESCARGA_MIN", 1)
+    assert embebido.consultar("hola") is not None
+    assert embebido._modelo is not None
+    assert embebido.liberar_si_inactivo(time.monotonic()) is False                  # recién usado: se queda
+    assert embebido.liberar_si_inactivo(time.monotonic() + 61) is True              # un minuto sin uso: se libera
+    assert embebido._modelo is None
+    assert embebido.consultar("hola otra vez") is not None                          # y vuelve a cargarse solo
+    assert len([x for x in _LlamaFalso.llamadas if x[0] == "init"]) == 2
+
+
+def test_la_descarga_por_inactividad_se_puede_apagar_y_no_interrumpe_una_respuesta(embebido, monkeypatch):
+    import time
+    embebido.consultar("hola")
+    monkeypatch.setattr(config, "IA_DESCARGA_MIN", 0)
+    assert embebido.liberar_si_inactivo(time.monotonic() + 10_000) is False         # 0 = nunca
+    monkeypatch.setattr(config, "IA_DESCARGA_MIN", 1)
+    with embebido._cerrojo:                                                         # hay una respuesta en curso
+        assert embebido.liberar_si_inactivo(time.monotonic() + 10_000) is False
 
 
 def test_la_guardia_tambien_vigila_al_modelo_incrustado(embebido, monkeypatch):
     class Receta(_LlamaFalso):
         def create_chat_completion(self, *a, **k):
-            return {"choices": [{"message": {"content": "Toma ibuprofeno y descansa."}}]}
+            return _flujo("Toma ibuprofeno y descansa.")
     import sys
     import types
     monkeypatch.setitem(sys.modules, "llama_cpp", types.SimpleNamespace(Llama=Receta))

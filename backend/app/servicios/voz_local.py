@@ -60,9 +60,7 @@ def liberar_trabajo() -> None:
 def _modelo_stt():
     if not config.VOZ_STT_MODELO:
         raise VozNoDisponible("Configura ORBIT_VOZ_STT_MODELO con una ruta local")
-    ruta_modelo = Path(config.VOZ_STT_MODELO).expanduser()
-    if not ruta_modelo.is_dir() and (config.RAIZ / "backend" / ruta_modelo).is_dir():
-        ruta_modelo = config.RAIZ / "backend" / ruta_modelo
+    ruta_modelo = config.resolver_ruta(config.VOZ_STT_MODELO)
     if config.VOZ_STT_LOCAL_ONLY and not ruta_modelo.is_dir():
         raise VozNoDisponible("El modelo Whisper local no existe; no se permite descargarlo")
     try:
@@ -333,15 +331,15 @@ def responder(texto: str, estado: dict, preferencias: dict, perfil: str = "", no
 
 
 def _ruta_en_backend(ruta: str) -> str:
-    p = Path(ruta).expanduser()
-    if not p.exists() and (config.RAIZ / "backend" / p).exists():
-        return str(config.RAIZ / "backend" / p)
-    return str(p) if ruta.startswith("~") else ruta
+    """Compatibilidad: la búsqueda de rutas relativas vive ahora en config.resolver_ruta (junto a la base de datos, directorio de
+    trabajo, junto al ejecutable y backend/)."""
+    return str(config.resolver_ruta(ruta))
 
 
 def _resolver_piper_bin(ruta: str) -> str:
-    """Resuelve el binario de Piper: si la ruta del .env (p. ej. ./.venv/bin/piper) no existe en Docker, usa el del PATH."""
-    resuelta = _ruta_en_backend(ruta)
+    """Resuelve el binario de Piper: una ruta (p. ej. ./.venv/bin/piper) se busca con config.resolver_ruta; si no existe (típico en Docker,
+    donde piper está en el PATH del sistema), se usa el `piper` del PATH. Un nombre suelto lo busca el PATH."""
+    resuelta = str(config.resolver_ruta(ruta)) if ("/" in ruta or "\\" in ruta) else ruta
     if Path(resuelta).is_file() or shutil.which(resuelta):
         return resuelta
     return shutil.which("piper") or resuelta
@@ -352,8 +350,8 @@ def sintetizar(texto: str, idioma: str = "es") -> str:
     modelo = config.VOZ_PIPER_MODELO_EN if idioma == "en" and config.VOZ_PIPER_MODELO_EN else config.VOZ_PIPER_MODELO
     if not modelo:
         raise VozNoDisponible("Configura ORBIT_VOZ_PIPER_MODELO")
-    modelo = _ruta_en_backend(modelo)
-    piper_bin = _resolver_piper_bin(config.VOZ_PIPER_BIN)
+    modelo = str(config.resolver_ruta(modelo))
+    piper_bin = _binario_piper()
     with tempfile.TemporaryDirectory() as directorio:
         salida = os.path.join(directorio, "respuesta.wav")
         try:
@@ -378,3 +376,39 @@ def precalentar_stt() -> bool:
         return True
     except Exception:                                   # noqa: BLE001  (sin librería o sin modelo: ya se avisará al usarla)
         return False
+
+
+def _binario_piper() -> str:
+    return _resolver_piper_bin(config.VOZ_PIPER_BIN)
+
+
+def estado_voz() -> dict:
+    """Qué le falta a la voz para funcionar, en un formato que la pantalla y el diagnóstico pueden mostrar. Nunca carga modelos."""
+    import importlib.util
+    import shutil
+
+    def hay(modulo: str) -> bool:
+        try:
+            return importlib.util.find_spec(modulo) is not None
+        except (ImportError, ValueError):
+            return False
+    stt_ruta = config.resolver_ruta(config.VOZ_STT_MODELO) if config.VOZ_STT_MODELO else None
+    b = _binario_piper()
+    piper_ok = bool(shutil.which(b) or Path(b).is_file())
+    voces = {"es": bool(config.VOZ_PIPER_MODELO and config.resolver_ruta(config.VOZ_PIPER_MODELO).is_file()),
+             "en": bool(config.VOZ_PIPER_MODELO_EN and config.resolver_ruta(config.VOZ_PIPER_MODELO_EN).is_file())}
+    entrada = {"modelo_configurado": bool(config.VOZ_STT_MODELO), "modelo_existe": bool(stt_ruta and stt_ruta.is_dir()),
+               "ruta": str(stt_ruta) if stt_ruta else None, "librerias": hay("faster_whisper") and hay("av")}
+    salida = {"binario": piper_ok, "voces": voces, "libreria": hay("piper") or piper_ok}
+    if not config.VOZ_ACTIVA:
+        motivo, detalle = "desactivada", "La voz está desactivada (ORBIT_VOZ_ACTIVA=0). Nova funciona por texto."
+    elif not entrada["librerias"]:
+        motivo, detalle = "faltan_librerias", "Faltan las librerías de voz (faster-whisper y av): instala backend/requirements-voice.txt."
+    elif not entrada["modelo_configurado"]:
+        motivo, detalle = "sin_modelo", "No hay modelo de reconocimiento de voz configurado (ORBIT_VOZ_STT_MODELO)."
+    elif not entrada["modelo_existe"]:
+        motivo, detalle = "modelo_no_existe", f"El modelo de reconocimiento de voz no está en {entrada['ruta']}."
+    else:
+        motivo, detalle = "lista", "La voz está lista." + ("" if (salida["binario"] and any(voces.values())) else " Nova responderá con texto, sin voz hablada.")
+    return {"activa": config.VOZ_ACTIVA, "lista": motivo == "lista", "motivo": motivo, "detalle": detalle,
+            "entrada": entrada, "salida": salida, "habla": motivo == "lista" and salida["binario"] and any(voces.values())}

@@ -11,6 +11,12 @@ from .dependencias import actor, conexion, exigir_propietario, requerir_tripulan
 router = APIRouter(prefix="/api/voz", tags=["voz"])
 
 
+@router.get("/estado")
+def estado_de_la_voz(_: dict = Depends(requiere("clinico:leer"))) -> dict:
+    """Si la voz puede usarse ya y, si no, qué le falta (la pantalla lo usa para explicarlo en vez de mostrar un error)"""
+    return voz_local.estado_voz()
+
+
 @router.post("/chat/{tid}")
 def chat_voz(tid: str, audio: bytes = Body(...), idioma: str = "auto", content_type: str | None = Header(default=None),
              content_length: int | None = Header(default=None),
