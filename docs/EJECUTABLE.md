@@ -17,6 +17,22 @@ Un solo archivo (≈ 24 MB en Linux) que lleva dentro el servidor, la interfaz y
 | **Mac** | Gatekeeper lo bloquea por no estar firmado: clic derecho → *Abrir* → *Abrir* |
 | **Linux** | Primero hay que darle permiso: `chmod +x orbit-health` (o clic derecho → Propiedades → Permisos → *Permitir ejecutar*) y luego doble clic o `./orbit-health` |
 
+## Icono en el menú de aplicaciones y en el escritorio
+Un archivo ejecutable suelto **no se registra solo** en el sistema: no aparece en el menú de aplicaciones ni en el escritorio. Para eso, una sola vez, desde la carpeta donde dejaste el programa (déjalo en un lugar fijo):
+
+```bash
+./orbit-health --instalar-acceso         # crea el icono; en Windows: orbit-health.exe --instalar-acceso
+./orbit-health --quitar-acceso           # lo borra
+```
+
+| Sistema | Qué crea | Dónde |
+|---|---|---|
+| **Linux** | Un acceso `.desktop` (estándar freedesktop) con el icono de ORBIT | Menú de aplicaciones (`~/.local/share/applications`) y Escritorio. La ventana se agrupa con ese icono en la barra de tareas |
+| **Windows** | Dos accesos `.lnk` con el icono que ya lleva el `.exe` | Menú Inicio y Escritorio (respeta un Escritorio redirigido a OneDrive) |
+| **Mac** | Una app `ORBIT Health.app` | `~/Applications` (Launchpad, Dock). Al abrirla **no sale Terminal** |
+
+Solo escribe en la carpeta de tu usuario, no pide permisos de administrador y repetirlo no duplica nada. En Linux el icono se guarda en la carpeta propia de ORBIT (no en `~/.local/share/icons`, que en algunos equipos es de root y no se puede escribir; en el equipo de desarrollo lo era). Si el acceso no aparece al instante en el menú, cierra y abre sesión. En algunos escritorios de Linux hay que marcar el lanzador del escritorio como "de confianza" (clic derecho → *Permitir lanzar*).
+
 ## Paquete completo: la IA va dentro (sin Ollama, sin servidor aparte)
 El ejecutable de **Linux y Windows** lleva **el motor de IA incrustado** (llama.cpp, dentro del mismo proceso). **El de macOS no lo lleva**: en GitHub la rueda precompilada del motor para Mac llegó dañada (error de CRC) tras varios reintentos y con la versión anterior, así que ese ejecutable sale sin el motor y Nova usa textos escritos (o Ollama, si lo tienes). Para tener la IA incrustada en Mac hay que construirlo en un Mac compilando el motor desde el código fuente, algo que no se probó. Falta el modelo, que pesa ~1.1 GB (Qwen2.5 1.5B Instruct, licencia Apache-2.0). Hay dos formas de tenerlo:
 
@@ -60,6 +76,7 @@ scripts/probar_ejecutable.sh         # prueba de humo del que acabas de construi
 - **Comprobado en GitHub (ejecución del 15-nov-2026):** los tres sistemas (Linux, Windows y macOS) construyeron el ejecutable y **pasaron la prueba de humo** corriéndolo allí mismo. Linux es el más probado: además se descargó el artefacto de GitHub, se verificó su suma, conserva el permiso de ejecución y pasó la prueba de humo en una computadora real.
 - Hecho en Linux por mí: arranca en unos 2 s con una carpeta de datos nueva; creó la base y los respaldos en la carpeta del usuario; ignoró un `.env` ajeno; leyó el `.env` propio; detectó una instancia ya abierta.
 - **IA incrustada (comprobado en Linux):** se construyó el ejecutable con el motor, se armó el paquete completo, se descomprimió en una carpeta limpia y Nova respondió con el modelo de dentro y Ollama desactivado. En **Windows** el ejecutable se construyó con el motor en GitHub, pero **no se probó con el modelo** ni con doble clic. En **Mac no hay motor** (ver arriba).
+- **Accesos con icono:** en Linux se instaló de verdad en el equipo de desarrollo (menú y escritorio) y cumple el estándar freedesktop sin advertencias; la prueba `scripts/probar_acceso.sh` corre en GitHub en Linux, Windows y Mac (lo instala, lo comprueba y lo quita). **No se vio el icono en un Windows ni en un Mac reales.**
 - **Ventana de aplicación (comprobado en Linux con Edge):** se abre su propia ventana, y al cerrarla el servidor pasa de responder a apagado por sí solo.
 - **No hecho:** la ventana de aplicación en **Windows y Mac** (la lógica está probada con pruebas automáticas, pero ahí solo corrió la prueba de humo del servidor, sin ventana); abrir el ejecutable de **Windows o Mac con doble clic en una computadora real** (la prueba de humo en GitHub lo arranca por línea de comandos y sin navegador); ver cómo se ve la interfaz en esos sistemas; Macs con procesador Intel (el construido es Apple Silicon); firma de código y notarización de Apple (cuestan dinero y cuentas de desarrollador); instaladores (`.msi`, `.dmg`, `.deb`). Los avisos de seguridad de la primera ejecución en Windows y Mac son esperables.
 
