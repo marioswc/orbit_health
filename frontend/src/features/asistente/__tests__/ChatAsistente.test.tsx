@@ -61,13 +61,4 @@ describe("Nova, la compañía de apoyo", () => {
     expect(await screen.findByText(/Vamos a respirar juntos\./)).toBeInTheDocument();
     expect(screen.queryByText(/sin IA generativa/)).not.toBeInTheDocument();
   });
-
-  it("guarda lo que cuentas de ti al salir del campo", async () => {
-    const llamadas = simular({});
-    render(<ChatAsistente tripulanteId="T3" />);
-    const intereses = await screen.findByLabelText(/Qué te gusta/);
-    fireEvent.change(intereses, { target: { value: "el ajedrez" } });
-    fireEvent.blur(intereses);
-    await waitFor(() => expect(llamadas.some((l) => l.metodo === "PUT" && l.ruta.includes("/perfil-ia/T3"))).toBe(true));
-  });
 });

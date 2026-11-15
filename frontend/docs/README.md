@@ -1,6 +1,8 @@
 # ORBIT Health — Documentación de Frontend
 
-Interfaz local de apoyo a la decisión clínica para tripulaciones en misiones de espacio profundo con comunicación degradada.
+[English version](./README.en.md)
+
+Interfaz web local de apoyo a la decisión clínica para tripulaciones en misiones de espacio profundo con comunicación degradada. Opera 100 % sin conexión a internet y está disponible en **español (`ES`)** e **inglés (`EN`)**.
 
 ---
 
@@ -8,10 +10,12 @@ Interfaz local de apoyo a la decisión clínica para tripulaciones en misiones d
 
 - **Framework:** React 18 + TypeScript 5
 - **Empaquetador y servidor de desarrollo:** Vite 5 (`@vitejs/plugin-react`)
-- **Estilos:** CSS nativo con variables en `src/styles.css` (tema oscuro de cabina, sin frameworks CSS externos)
+- **Pruebas:** Vitest + Testing Library (`@testing-library/react`, `jsdom`)
+- **Estilos:** CSS nativo consolidado en [`src/shared/styles/styles.css`](../src/shared/styles/styles.css) con soporte de tema **claro / oscuro**, adaptación por nivel de rendimiento (`data-rendimiento`), barra superior tipo hielo esmerilado, menú lateral transparente y tarjetas liquid glass.
+- **Internacionalización (`i18n`):** Diccionarios locales en `src/i18n/locales/{ES,EN}/` con cambio en caliente desde la barra superior (`CambioIdioma`).
 - **Regla de oro (100 % offline):**
   - El build de producción (`frontend/dist/`) se sirve directamente desde FastAPI sin conexión a internet.
-  - **Prohibido** incluir fuentes remotas (p. ej. Google Fonts), iconos por CDN, scripts externos o peticiones fuera de `/api`.
+  - Todas las fuentes (`Inter`, `Geist Mono`), iconos SVG, imágenes `.webp` y el Service Worker (`public/sw.js`) son locales. Prohibido usar CDNs o peticiones fuera de `/api`.
 
 ---
 
@@ -20,21 +24,24 @@ Interfaz local de apoyo a la decisión clínica para tripulaciones en misiones d
 Desde la carpeta `frontend/`:
 
 ```bash
-# Instalar dependencias (solo una vez con red)
-npm install
+# Instalar dependencias
+pnpm install   # o npm install
 
 # Servidor de desarrollo en http://localhost:3000
-# Redirige automáticamente /api/* -> http://localhost:8000 (ver vite.config.ts)
+# Redirige /api/* -> http://localhost:8000 (ver vite.config.ts)
 npm run dev
 
 # Verificar tipos TypeScript y generar build estático en frontend/dist/
 npm run build
 
-# Previsualizar el build estático en el puerto 3000
-npm run preview
+# Medir presupuesto de tamaño del bundle (JS, CSS e imágenes)
+npm run perf
+
+# Correr todas las pruebas unitarias (31 archivos, 139 tests)
+npx vitest run
 ```
 
-> **Nota:** Para usar `npm run dev`, el backend debe estar corriendo en otra terminal en el puerto `8000`:
+> **Nota:** Para usar `npm run dev`, el backend debe correr en el puerto `8000`:
 > ```bash
 > cd backend && uvicorn app.main:app --reload --port 8000
 > ```
@@ -43,171 +50,59 @@ npm run preview
 
 ## 3. Estructura de archivos (`frontend/src/`)
 
+Arquitectura por features (*Screaming Architecture*):
+
 ```text
-frontend/
-├── docs/
-│   └── README.md                  # Esta documentación
-├── index.html                     # Punto de entrada HTML
-├── package.json                   # Scripts y dependencias
-├── tsconfig.json                  # Configuración de TypeScript
-├── vite.config.ts                 # Puerto 3000 y proxy /api -> localhost:8000
-└── src/
-    ├── main.tsx                   # Montaje de React en #root
-    ├── App.tsx                    # Layout principal, selector de tripulante y navegación por vistas
-    ├── styles.css                 # Variables CSS, layout, badges y animaciones del mapa anatómico
-    ├── api/
-    │   ├── client.ts              # Wrapper fetch() hacia /api con manejo de errores HTTP
-    │   └── tipos.ts               # Interfaces TypeScript compartidas con la API
-    └── components/
-        ├── FiguraHumana.tsx       # Mapa anatómico SVG por zonas corporales
-        ├── PanelMedicion.tsx      # Captura manual de signos vitales y variables ambientales
-        ├── DiarioTripulante.tsx   # Notas personales privadas (100 % locales, fuera de cola)
-        ├── Tamizaje.tsx           # Cuestionario PHQ-2 confidencial y cápsulas de apoyo
-        └── ConsolaEnlace.tsx      # Simulación Luna/Marte, Modo Eclipse, cola por prioridad y verificación SHA-256
+frontend/src/
+├── app/                          # Shell principal: App.tsx, BarraLateral, AsistenteFlotante, rutas
+├── features/
+│   ├── asistente/                # Chat privado con Nova (saludo, atajos, historial corto, perfil IA)
+│   ├── banda/                    # Reloj 3D interactivo (RelojBanda), misión simulada y racha
+│   ├── bienestar/                # Ánimo diario, diario privado, tamizaje PHQ-2, protocolo de crisis y preferencias
+│   ├── bienvenida/               # Guía de bienvenida paso a paso para nuevos tripulantes
+│   ├── cabina/                   # Lecturas ambientales de cabina (CO₂ y dosis de radiación)
+│   ├── enlace/                   # Consola de enlace Luna/Marte, Modo Eclipse, cola SHA-256, Tierra e informes CSV
+│   ├── historial/                # Tabla filtrable y exportable de mediciones históricas
+│   ├── mediciones/               # Panel de captura manual de signos vitales
+│   ├── monitor/                  # Vista clínica principal: figura humana (.webp), NEWS2, zonas y signos vitales
+│   ├── peligros/                 # Marco de riesgos NASA HRP (radiación, gravedad alterada, aislamiento)
+│   ├── seguridad/                # AccesoTripulante (Tierra 3D, login por PIN, recuperación) y PerfilMenu
+│   ├── sistema/                  # Estado de base de datos, respaldos, reinicio de PIN, avisos y auditoría
+│   ├── tripulantes/              # Selector de tripulante activo
+│   └── voz/                      # Burbuja de voz bilingüe ES/EN (Whisper/Piper local o Web Speech API)
+├── i18n/                         # Motor i18n y locales ES / EN por feature
+├── shared/                       # api/client.ts, componentes UI, hooks (useTema), rendimiento y styles/styles.css
+└── main.tsx                      # Arranque de rendimiento, tema, i18n, Service Worker y React
 ```
 
 ---
 
-## 4. Vistas y componentes
+## 4. Vistas y funcionalidades principales
 
-### 4.1 `App.tsx` (Contenedor principal)
-- Carga la lista de tripulantes (`GET /api/tripulantes`) y el estado de validación de los umbrales (`GET /api/umbrales`).
-- Muestra un banner de advertencia si los umbrales no están marcados como `validado`.
-- Gestiona 3 vistas mediante pestañas:
-  1. **Monitor (`vista === "monitor"`)**: Renderiza `FiguraHumana`, `PanelMedicion` y el panel de **Resumen** (puntaje NEWS2 en ventana vigente, variables faltantes y lista de últimos indicadores con su nivel).
-  2. **Bienestar (`vista === "bienestar"`)**: Renderiza `DiarioTripulante` y `Tamizaje`.
-  3. **Enlace (`vista === "enlace"`)**: Renderiza `ConsolaEnlace`.
-
-### 4.2 `FiguraHumana.tsx` (Mapa anatómico SVG)
-Agrupa las lecturas vigentes del tripulante en 5 zonas anatómicas y colorea cada región SVG con el peor nivel registrado (`verde`, `amarillo`, `rojo` o `sin_datos`):
-
-| ID Zona | Etiqueta | Indicadores asociados |
-|---|---|---|
-| `snc` | Cabeza / SNC | `avpu` |
-| `cardio` | Cardiovascular | `presion_sistolica`, `presion_diastolica`, `frecuencia_cardiaca` |
-| `resp` | Respiratorio | `spo2`, `frecuencia_respiratoria` |
-| `metab` | Tronco / Metabólico | `glucosa`, `temperatura` |
-| `extr` | Extremidades | *(sin indicador asignado en el prototipo)* |
-
-### 4.3 `PanelMedicion.tsx` (Captura manual)
-- Obtiene el catálogo de indicadores y sus rangos fisiológicos válidos desde `GET /api/indicadores`.
-- Valida en cliente que el valor numérico esté dentro de `[min, max]` antes de enviarlo (para `avpu` presenta un selector `0: A`, `1: V`, `2: P`, `3: U`).
-- Envía `POST /api/lecturas` y muestra el resultado inmediato: nivel asignado, puntos NEWS2, prioridad en cola (`1`–`3`), si es observación o si activó aviso por desviación de línea base (>2 DE en ventana de 14 días).
-- Dispara el callback `alGuardar()` para refrescar el estado en `App.tsx`.
-
-### 4.4 `DiarioTripulante.tsx` (Diario privado)
-- Permite consultar (`GET /api/diario/{tid}`) y guardar (`POST /api/diario`) notas de texto libre con título opcional.
-- Incluye la etiqueta visible de privacidad: *"Almacenamiento local seguro: desconectado de la telemetría externa"*.
-- Nunca genera eventos en `cola_salida`.
-
-### 4.5 `Tamizaje.tsx` (Tamizaje PHQ-2)
-- Cuestionario de 2 preguntas con escala `0` (*Nunca*) a `3` (*Casi todos los días*).
-- Envía `POST /api/tamizajes` y recibe `{ total, positivo, capsulas }`.
-- Si `total >= 3`, el tamizaje es positivo; muestra las cápsulas de autorregulación correspondientes. No encola eventos hacia Tierra.
-
-### 4.6 `ConsolaEnlace.tsx` (Consola Store-and-Forward)
-- Hace polling cada `2000 ms` a `GET /api/cola`.
-- Permite alternar el entorno (`luna` con latencia de `1.3 s` vs. `marte` con `1200 s`) y el estado del enlace (`Enlace normal` vs. `Modo Eclipse`) vía `POST /api/enlace`.
-- Muestra los eventos agrupados en 3 columnas por prioridad (`Prioridad 1 · rojo`, `Prioridad 2 · amarillo`, `Prioridad 3 · verde`) con su estado (`retenido`, `en_transito`, `recibido`).
-- Incluye el botón **"Verificar cadena de hash"** (`GET /api/cola/verificar`) para comprobar la integridad criptográfica SHA-256 de la cola.
+1. **Acceso y perfil (`seguridad`)**: Pantalla de inicio de sesión sobre `Tierra3D`, autenticación por PIN, recuperación y cierre de sesión desde `PerfilMenu` en la barra superior.
+2. **Bienvenida (`bienvenida`)**: Guía inicial paso a paso para tripulantes que entran por primera vez.
+3. **Monitor (`monitor` + `cabina` + `mediciones`)**: Anillo NEWS2, figura humana interactiva con capas realistas `.webp` (traje, esqueleto, músculos, órganos), tarjetas de signos vitales, gráfica de series, acciones clínicas y captura manual.
+4. **Banda (`banda`)**: Reloj 3D manipulable (`RelojBanda`), simulación de misión en vivo con eventos y racha de mediciones.
+5. **Historial (`historial`)**: Registro histórico de lecturas por indicador y tripulante.
+6. **Bienestar (`bienestar` + `voz`)**: Registro de ánimo, diario 100 % local, tamizaje PHQ-2, protocolo de crisis con consentimiento y asistente de voz.
+7. **Asistente (`asistente`)**: Conversación privada con **Nova** (saludo contextual, atajos rápidos, memoria corta, perfil personal de intereses y rasgos). También accesible desde el botón flotante (`AsistenteFlotante`).
+8. **Riesgos (`peligros`)**: Resumen de los riesgos fisiológicos y psicológicos del vuelo espacial.
+9. **Enlace (`enlace`)**: Simulación Luna/Marte, Modo Eclipse, cola por prioridad con verificación de cadena de hashes, vista de mensajes recibidos en Tierra y descarga de informes CSV.
+10. **Sistema (`sistema`)**: Salud del servidor y respaldos, reinicio de PIN por comandante, avisos de salud mental compartidos y verificación de auditoría.
 
 ---
 
-## 5. Contrato con la API del Backend
+## 5. Documentos relacionados
 
-### 5.1 Endpoints consumidos actualmente
-
-| Método y Ruta | Usado en | Respuesta principal |
-|---|---|---|
-| `GET /api/tripulantes` | `App.tsx` | `Tripulante[]` (`id`, `nombre`, `rol`) |
-| `GET /api/umbrales` | `App.tsx` | `{ version, estado }` |
-| `GET /api/estado/{tid}` | `App.tsx` | `Estado` (`indicadores`, `news2`, `nivel_general`, `ventana_min`, ...) |
-| `GET /api/indicadores` | `PanelMedicion.tsx` | `IndicadorDef[]` (`clave`, `etiqueta`, `unidad`, `min`, `max`) |
-| `POST /api/lecturas` | `PanelMedicion.tsx` | `RespuestaLectura` (`lectura_id`, `nivel`, `puntos_news2`, `prioridad`, ...) |
-| `GET /api/diario/{tid}` | `DiarioTripulante.tsx` | `NotaDiario[]` |
-| `POST /api/diario` | `DiarioTripulante.tsx` | `{ id }` |
-| `POST /api/tamizajes` | `Tamizaje.tsx` | `RespuestaTamizaje` (`total`, `positivo`, `capsulas`) |
-| `GET /api/cola` | `ConsolaEnlace.tsx` | `Cola` (`enlace`, `resumen`, `items`) |
-| `POST /api/enlace` | `ConsolaEnlace.tsx` | `{ activo, entorno }` |
-| `GET /api/cola/verificar` | `ConsolaEnlace.tsx` | `{ valida, total, primer_invalido }` |
-
-### 5.2 Nuevas capacidades del Backend listas para integrar en el Frontend
-
-Tras las últimas actualizaciones en `main`, el backend expone datos adicionales que podemos conectar en la interfaz:
-
-1. **Frecuencia recomendada de captura (`proxima_captura_min`)**:
-   - Devuelto tanto en `GET /api/estado/{tid}` como en `POST /api/lecturas`.
-   - Valores: `60` min (verde), `15` min (amarillo), `5` min (rojo).
-   - *Dónde mostrarlo:* en el panel de Resumen de `App.tsx` y en el mensaje de confirmación de `PanelMedicion.tsx`.
-
-2. **Reglas combinadas individuales (`reglas_combinadas` y `nivel_fisiologico`)**:
-   - Devueltos en `GET /api/estado/{tid}` y `POST /api/lecturas`.
-   - Formato de cada regla activa: `{ id: string, nombre: string, nivel: Nivel }`.
-   - *Dónde mostrarlo:* como alertas destacadas en la vista `Monitor` cuando se activa una combinación clínica (por ejemplo, cruce de signos vitales).
-
-3. **Alerta colectiva de $\text{CO}_2$ en cabina (`GET /api/alertas/colectivas`)**:
-   - Nuevo endpoint que cruza el nivel de $\text{CO}_2$ ambiental con el número de tripulantes con síntomas/afectación fisiológica:
-     ```json
-     {
-       "activa": true,
-       "nivel": "rojo",
-       "co2_mmhg": 3.5,
-       "tripulantes_afectados": ["t1", "t2"],
-       "detalle": "CO2 elevado con varios tripulantes afectados"
-     }
-     ```
-   - *Dónde mostrarlo:* como alerta global en el encabezado o en la vista `Monitor`.
+- [English documentation](./README.en.md)
+- [API consumida por el frontend](./API.md)
+- [Arquitectura](./ARQUITECTURA.md)
+- [Estilo de la plataforma](./ESTILO_PLATAFORMA.md)
+- [Figura humana](./FIGURA_HUMANA.md)
+- [Uso de IA y documentación](./USO_IA_Y_DOCUMENTACION_FRONTEND.md)
 
 ---
 
-## 6. Guía de estilos (`src/styles.css`)
+## 6. Justificación y transparencia del uso de IA
 
-### Variables CSS (`:root`)
-- Fondos y bordes: `--bg` (`#0b1020`), `--panel` (`#151b30`), `--borde` (`#26304f`)
-- Texto: `--texto` (`#e6e9f5`), `--suave` (`#98a2c3`), `--acento` (`#6c8cff`)
-- Semáforo clínico:
-  - `--verde`: `#2fbf71`
-  - `--amarillo`: `#f2b84b`
-  - `--rojo`: `#ef5350`
-  - `--neutro`: `#3a4468` (sin datos)
-
-### Clases principales
-- `.grid`: rejilla responsiva (`repeat(auto-fit, minmax(300px, 1fr))`)
-- `.panel`: tarjeta contenedora con fondo `--panel` y borde redondeado
-- `.fila`: contenedor flex horizontal con `gap: 8px` y `flex-wrap: wrap`
-- `.badge.<nivel>`: pastilla de estado (`.verde`, `.amarillo`, `.rojo`, `.sin_datos`)
-- `.zona.<nivel>`: relleno de regiones SVG en `FiguraHumana` (incluye animación de parpadeo en `.amarillo` y `.rojo`)
-
----
-
-## 7. Flujo de trabajo en Git (`dev-frontend`)
-
-Rama de trabajo compartida para Frontend (Lourdes y Santi): `dev-frontend`.
-
-```bash
-# 1. Cambiar a la rama de frontend (si no estás en ella)
-git checkout dev-frontend
-
-# 2. Bajar los últimos cambios de tu compañero antes de empezar
-git pull origin dev-frontend
-
-# 3. Guardar y subir tus avances a dev-frontend
-git add .
-git commit -m "feat(front): descripción breve del cambio"
-git push origin dev-frontend
-
-# 4. Traer actualizaciones nuevas desde main hacia dev-frontend
-git fetch origin
-git merge origin/main
-git push origin dev-frontend
-```
-
-
-
----
-
-## Documentos adicionales de la rama frontend-santi
-
-- [ESTILO_PLATAFORMA.md](./ESTILO_PLATAFORMA.md): sistema de diseño vigente (tokens, modo oscuro, cristal, componentes, movimiento).
-- [AVANCE_FRONTEND_SANTI.md](./AVANCE_FRONTEND_SANTI.md): cambios, niveles de rendimiento (alto/medio/bajo), presupuesto de peso (`pnpm perf`) y pendientes.
-- [ARQUITECTURA.md](./ARQUITECTURA.md), [FIGURA_HUMANA.md](./FIGURA_HUMANA.md), [API.md](./API.md): arquitectura por features, SVG clicable y endpoints.
+De acuerdo con las reglas del **NASA Space Apps Challenge**, las herramientas de IA se utilizaron únicamente como **apoyo técnico** (implementación de componentes/hooks, estilos CSS, pruebas unitarias y redacción documental), bajo diseño, decisiones de producto y validación humana del equipo. Ver detalle completo en [USO_IA_Y_DOCUMENTACION_FRONTEND.md](./USO_IA_Y_DOCUMENTACION_FRONTEND.md) y [docs/SI_DISCLOSURE.md](../../docs/SI_DISCLOSURE.md).

@@ -16,3 +16,6 @@ backend/models/
 .DS_Store
 *.danada-*
 data/respaldos/
+.venv-build/
+build/
+dist-ejecutable/

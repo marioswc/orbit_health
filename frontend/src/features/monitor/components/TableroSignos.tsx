@@ -2,6 +2,8 @@ import { memo, useEffect, useState } from "react";
 import { useTranslation } from "../../../i18n";
 import type { LecturaEstado, PuntoHistorial } from "../types/estado";
 import { nombreIndicador } from "../utils/nombreIndicador";
+import type { ApexOptions } from "apexcharts";
+import Grafica, { colorNivel, usePaleta } from "../../../shared/components/Grafica";
 
 import { num } from "../../../shared/formato";
 export { num };
@@ -41,13 +43,20 @@ export const PulsoCardiaco = memo(function PulsoCardiaco({ lectura }: { lectura?
   );
 });
 
-/** Mini grafica de la serie real de un indicador. */
+/** Mini grafica (ApexCharts, modo sparkline) de la serie real de un indicador; el color es el del nivel. */
 export function Chispa({ puntos, nivel }: { puntos?: PuntoHistorial[]; nivel: string }) {
+  const p = usePaleta();
   if (!puntos || puntos.length < 2) return <span className="chispa-vacia" aria-hidden="true" />;
-  const v = puntos.map((p) => p.valor);
-  const min = Math.min(...v), max = Math.max(...v), rango = max - min || 1;
-  const d = puntos.map((p, i) => `${i ? "L" : "M"}${((i / (puntos.length - 1)) * 100).toFixed(1)} ${(22 - ((p.valor - min) / rango) * 20).toFixed(1)}`).join(" ");
-  return <svg className={`chispa ${nivel}`} viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><path d={d} pathLength={1} /></svg>;
+  const opciones: ApexOptions = {
+    chart: { sparkline: { enabled: true }, animations: { enabled: false } },
+    colors: [colorNivel(p, nivel)],
+    stroke: { curve: "monotoneCubic", width: 2, lineCap: "round" },
+    fill: { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.28, opacityTo: 0, stops: [0, 100] } },
+    markers: { size: 0 },
+    tooltip: { enabled: false },
+    grid: { padding: { left: 0, right: 0, top: 2, bottom: 2 } },
+  };
+  return <Grafica className={`chispa ${nivel}`} tipo="area" altura={26} decorativa series={[{ name: "", data: puntos.map((q) => q.valor) }]} opciones={opciones} etiqueta="" />;
 }
 
 /** Lista de signos: valor actual, tendencia real de 14 dias y estado; al tocar una fila se elige para la grafica grande. */

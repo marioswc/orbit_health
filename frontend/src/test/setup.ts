@@ -25,3 +25,9 @@ if (!window.matchMedia) {
 
 // jsdom no implementa scrollIntoView
 if (!Element.prototype.scrollIntoView) Element.prototype.scrollIntoView = () => {};
+
+// ApexCharts necesita SVG real (getBBox, ResizeObserver): en jsdom se sustituye por un marcador que conserva las opciones para poder inspeccionarlas
+vi.mock("react-apexcharts", async () => {
+  const React = await import("react");
+  return { default: (props: { type?: string; series?: unknown; options?: unknown }) => React.createElement("div", { "data-testid": "apexchart", "data-tipo": props.type, "data-series": JSON.stringify(props.series ?? []) }) };
+});

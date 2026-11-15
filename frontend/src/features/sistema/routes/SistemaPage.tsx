@@ -5,11 +5,13 @@ import Alerta from "../../../shared/components/Alerta";
 import EncabezadoPagina from "../../../shared/components/EncabezadoPagina";
 import Selector from "../../../shared/components/Selector";
 import AvisosMedico from "../components/AvisosMedico";
+import ListaAuditoria from "../components/ListaAuditoria";
+import Pestanas from "../../../shared/components/Pestanas";
+import { useSeccion } from "../../../shared/hooks/useSeccion";
 import type { EventoAuditoria, Salud, VerificacionAuditoria } from "../types/sistema";
 
-function objetivo(payload: string): string {
-  try { const o = JSON.parse(payload) as { objetivo?: string | null }; return o.objetivo ?? ""; } catch { return ""; }
-}
+const SECCIONES = ["estado", "avisos", "auditoria"] as const;
+type Seccion = (typeof SECCIONES)[number];
 
 /** Estado del sistema: salud de la base y respaldos, auditoria verificable y reinicio de PIN (medico o comandante). */
 export default function SistemaPage() {
@@ -17,6 +19,7 @@ export default function SistemaPage() {
   const hora = (ts: string) => new Date(ts).toLocaleString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit" });
   const accion = (a: string) => { const k = `audit.action.${a}`; const r = t(k); return r === k ? a.replace(/_/g, " ") : r; };
 
+  const [seccion, setSeccion] = useSeccion<Seccion>("sistema", SECCIONES, "estado");
   const [salud, setSalud] = useState<Salud | null>(null);
   const [errSalud, setErrSalud] = useState("");
   const [eventos, setEventos] = useState<EventoAuditoria[] | null>(null);
@@ -26,6 +29,7 @@ export default function SistemaPage() {
   const [objetivoPin, setObjetivoPin] = useState("");
   const [pin, setPin] = useState<{ ok: boolean; texto: string; secreto?: string } | null>(null);
 
+  const nombres = Object.fromEntries(tripulantes.map((x) => [x.id, { nombre: x.nombre, rol: x.rol }]));
   const cargarAuditoria = useCallback(() => {
     api<EventoAuditoria[]>("/auditoria").then((e) => { setEventos(e); setErrAud(""); }).catch((e) => { setEventos([]); setErrAud(e.message); });
   }, []);
@@ -52,10 +56,13 @@ export default function SistemaPage() {
 
   return (
     <div className="pagina">
-      <EncabezadoPagina etiqueta={t("page.kicker")} titulo={t("page.title")} descripcion={t("page.desc")}>
+      <EncabezadoPagina etiqueta={t(`tabs.${seccion}`)} titulo={t("page.title")} descripcion={t("page.desc")}>
         {salud && <span className={`chip-estado ${salud.base_ok ? "activo" : "eclipse"}`}><span className="latido" aria-hidden="true" />{salud.base_ok ? t("chip.ok") : t("chip.bad")}</span>}
       </EncabezadoPagina>
 
+      <Pestanas etiqueta={t("tabs.aria")} valor={seccion} alCambiar={(id) => setSeccion(id as Seccion)}
+        pestanas={[{ id: "estado", etiqueta: t("tabs.estado") }, { id: "avisos", etiqueta: t("tabs.avisos") }, { id: "auditoria", etiqueta: t("tabs.auditoria") }]}>
+      {seccion === "estado" && (
       <div className="rejilla-2">
         <section className="tarjeta pieza" aria-label={t("health.title")}>
           <h2>{t("health.title")}</h2>
@@ -85,10 +92,12 @@ export default function SistemaPage() {
           </div>
         </section>
       </div>
+      )}
 
-      <AvisosMedico />
+      {seccion === "avisos" && <AvisosMedico />}
 
-      <section className="tarjeta pieza" aria-label={t("audit.title")}>
+      {seccion === "auditoria" && (
+      <section className="tarjeta pieza aud-tabla" aria-label={t("audit.title")}>
         <div className="pieza-cab">
           <div><h2>{t("audit.title")}</h2><p className="suave">{t("audit.desc")}</p></div>
           <button type="button" onClick={verificar}>{t("audit.verify")}</button>
@@ -98,17 +107,11 @@ export default function SistemaPage() {
         {eventos === null && <span className="esqueleto" style={{ height: 120 }} aria-busy="true" />}
         {eventos && eventos.length === 0 && !errAud && <p className="vacio">{t("audit.empty")}</p>}
         {eventos && eventos.length > 0 && (
-          <ul className="auditoria">
-            {eventos.map((e) => (
-              <li key={e.id}>
-                <time dateTime={e.ts}>{hora(e.ts)}</time>
-                <span className="aud-accion">{accion(e.accion ?? "")}</span>
-                <span className="suave">{e.actor}{objetivo(e.payload) ? ` → ${objetivo(e.payload)}` : ""}</span>
-              </li>
-            ))}
-          </ul>
+          <ListaAuditoria eventos={eventos} accion={accion} hora={hora} nombres={nombres} />
         )}
       </section>
+      )}
+      </Pestanas>
     </div>
   );
 }
