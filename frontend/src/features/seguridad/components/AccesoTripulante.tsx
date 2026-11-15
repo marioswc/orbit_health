@@ -55,7 +55,6 @@ function AccesoTripulante({ tripulantes, alEntrar, alRecuperar }: Props) {
         <Logo />
         <span>ORBIT Health</span>
       </div>
-      <p className="etiqueta-pagina">{t("kicker")}</p>
       <h1>{t("title")}</h1>
       <p className="suave">{t("desc")}</p>
 
@@ -69,8 +68,8 @@ function AccesoTripulante({ tripulantes, alEntrar, alRecuperar }: Props) {
             <span>{t("pin")}</span>
             <input type="password" inputMode="numeric" pattern="[0-9]{6,10}" maxLength={10} value={pin} onChange={(e) => setPin(e.target.value)} placeholder={t("pin_ph")} autoComplete="current-password" />
           </label>
-          <div className="fila">
-            <button type="submit">{t("enter")}</button>
+          <div className="fila acceso-acciones">
+            <button type="submit" className="btn-primario acceso-enviar">{t("enter")}</button>
             <button type="button" className="ghost" onClick={() => { setModoRec(true); setMsg(null); }}>{t("recover")}</button>
           </div>
         </form>
@@ -88,8 +87,8 @@ function AccesoTripulante({ tripulantes, alEntrar, alRecuperar }: Props) {
             <span>{t("pin_new")}</span>
             <input type="password" inputMode="numeric" pattern="[0-9]{6,10}" maxLength={10} value={pinNuevo} onChange={(e) => setPinNuevo(e.target.value)} placeholder={t("pin_ph")} />
           </label>
-          <div className="fila">
-            <button type="submit">{t("change")}</button>
+          <div className="fila acceso-acciones">
+            <button type="submit" className="btn-primario acceso-enviar">{t("change")}</button>
             <button type="button" className="ghost" onClick={() => { setModoRec(false); setMsg(null); }}>{t("back")}</button>
           </div>
         </form>

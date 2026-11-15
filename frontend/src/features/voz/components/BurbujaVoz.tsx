@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { registrarEspanol, useTranslation } from "../../../i18n";
 import esVoz from "../../../i18n/locales/ES/features/voz/voz.json";
 import { getToken } from "../../../shared/api/client";
-import "./voz.css";
 
 registrarEspanol("voz", esVoz);
 
@@ -33,6 +32,7 @@ export default function BurbujaVoz({ tripulanteId }: Props) {
   const [fase, setFase] = useState<Fase>("reposo");
   const [abierta, setAbierta] = useState(false);
   const [respuesta, setRespuesta] = useState<Respuesta | null>(null);
+  const [previos, setPrevios] = useState<Respuesta[]>([]);
   const [aviso, setAviso] = useState("");
   const [hablando, setHablando] = useState(false);
   const grabador = useRef<MediaRecorder | null>(null);
@@ -86,7 +86,9 @@ export default function BurbujaVoz({ tripulanteId }: Props) {
   }
 
   async function empezar() {
-    setAviso(""); setRespuesta(null); setAbierta(true);
+    setAviso(""); setAbierta(true);
+    if (respuesta) setPrevios((p) => [...p, respuesta].slice(-3));
+    setRespuesta(null);
     callar();
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") { setAviso(t("error.sinMicrofono")); return; }
     try {
@@ -170,7 +172,7 @@ export default function BurbujaVoz({ tripulanteId }: Props) {
     window.speechSynthesis.speak(u);
   }
 
-  function cerrar() { callar(); setAbierta(false); setRespuesta(null); setAviso(""); }
+  function cerrar() { callar(); setAbierta(false); setRespuesta(null); setPrevios([]); setAviso(""); }
 
   const grabando = fase === "grabando";
   const procesando = fase === "procesando";
@@ -211,10 +213,20 @@ export default function BurbujaVoz({ tripulanteId }: Props) {
               </div>
             </div>
           )}
+          {previos.length > 0 && (
+            <div className="voz-hilo">
+              {previos.map((r, i) => (
+                <div key={i} className="voz-turno">
+                  {r.transcripcion && <p className="voz-tu">{r.transcripcion}</p>}
+                  <p className="voz-resp previa">{r.texto}</p>
+                </div>
+              ))}
+            </div>
+          )}
           {aviso && <p className="voz-aviso" role="alert">{aviso}</p>}
           {respuesta && (
             <>
-              {respuesta.transcripcion && <p className="voz-tu"><span>{t("tu")}</span>{respuesta.transcripcion}</p>}
+              {respuesta.transcripcion && <p className="voz-tu">{respuesta.transcripcion}</p>}
               <div className={`voz-resp-caja${hablando ? " hablando" : ""}`}>
                 <p className="voz-resp">{respuesta.texto}</p>
                 {hablando && (
