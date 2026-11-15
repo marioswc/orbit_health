@@ -21,7 +21,7 @@ from ..dominio import guardia_ia
 from ..dominio.acciones import DETALLES, ESTILO_POR_DEFECTO, TONOS
 
 log = logging.getLogger("orbit.ia")
-_LOOPBACKS = {"localhost", "127.0.0.1", "::1"}
+_LOOPBACKS = {"localhost", "127.0.0.1", "::1", "host.docker.internal"}
 _ULTIMA_FUENTE: ContextVar[str | None] = ContextVar("orbit_ultima_fuente", default=None)
 AVISO_IA = "Texto generado por un modelo local. No es un diagnóstico y no modifica la alerta."
 AVISO_IA_EXTERNA = ("Texto generado por IA en un servicio externo por internet (DeepSeek): tu consulta y tu estado salieron de la estación. "

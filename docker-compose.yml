@@ -1,18 +1,24 @@
 # docker compose up --build      ->  http://127.0.0.1:3000   (solo accesible desde este equipo)
+# En MacBook (o con ./run.sh --docker): usa el Ollama nativo del anfitrión (Metal) y monta backend/models para voz local.
 services:
   orbit:
     build: .
     image: orbit-health:latest
     ports:
       - "127.0.0.1:3000:3000"          # a propósito solo loopback: los datos de salud no se exponen en la red
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       ORBIT_AUTH: "0"                    # 1 = pedir PIN (ver docs/CUENTAS_DEMO.md)
       ORBIT_SEED_DEMO: "1"               # tripulación ficticia; en una instalación real, 0
+      ORBIT_IA_LOCAL_URL: "http://host.docker.internal:11434/api/generate"  # conecta con el Ollama del anfitrión
+      ORBIT_VOZ_PIPER_BIN: "piper"       # dentro del contenedor piper está en el PATH del sistema, no en .venv
     env_file:
       - path: .env                       # opcional: si no existe, se ignora
         required: false
     volumes:
       - orbit-data:/app/data
+      - ./backend/models:/app/backend/models:ro
     restart: unless-stopped
 volumes:
   orbit-data:

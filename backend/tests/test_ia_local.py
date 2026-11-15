@@ -24,6 +24,12 @@ def test_no_consulta_hosts_externos(monkeypatch):
     assert resultado["fuente"] == "reglas_locales"
 
 
+def test_acepta_host_docker_internal_como_loopback_del_anfitrion():
+    assert explicador_local._url_local("http://host.docker.internal:11434/api/generate") is True
+    assert explicador_local._url_local("http://127.0.0.1:11434/api/generate") is True
+    assert explicador_local._url_local("https://example.com/api/generate") is False
+
+
 def test_endpoint_explica_estado_sin_recalcularlo(cliente):
     cliente.post("/api/lecturas", json={"tripulante_id": "T1", "indicador": "spo2", "valor": 88})
     respuesta = cliente.get("/api/estado/T1/explicacion")

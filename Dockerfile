@@ -1,7 +1,6 @@
 # ORBIT Health en un contenedor: interfaz compilada + API en un solo proceso, sin dependencias en la máquina anfitriona.
 # Construir:  docker build -t orbit-health .      Correr:  docker run -p 127.0.0.1:3000:3000 -v orbit-data:/app/data orbit-health
-# NOTA: la IA generativa local (Ollama) no se conecta desde el contenedor (el proyecto solo acepta un modelo en loopback);
-# dentro del contenedor Nova responde con textos escritos. Para IA local usa la instalación normal (scripts/asistente_inicio.sh).
+# Con docker compose (o ./run.sh --docker): conecta con el Ollama del anfitrión (host.docker.internal) y monta backend/models para voz local.
 
 FROM node:22-slim AS interfaz
 WORKDIR /w
@@ -13,14 +12,15 @@ RUN npm run build
 FROM python:3.12-slim
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 ORBIT_PRECALENTAR=0
 WORKDIR /app
-COPY backend/requirements.txt backend/requirements.txt
-RUN pip install --no-cache-dir -r backend/requirements.txt
+COPY backend/requirements.txt backend/requirements-voice.txt backend/
+RUN pip install --no-cache-dir -r backend/requirements.txt && \
+    (pip install --no-cache-dir -r backend/requirements-voice.txt || echo "Aviso: librerías opcionales de voz no instaladas")
 COPY backend/app backend/app
 COPY scripts scripts
 COPY docs docs
 COPY README.md README.es.md .env.example ./
 COPY --from=interfaz /w/dist frontend/dist
-RUN useradd --create-home --uid 10001 orbit && mkdir -p /app/data && chown -R orbit:orbit /app/data
+RUN useradd --create-home --uid 10001 orbit && mkdir -p /app/data /app/backend/models && chown -R orbit:orbit /app/data /app/backend/models
 USER orbit
 WORKDIR /app/backend
 EXPOSE 3000

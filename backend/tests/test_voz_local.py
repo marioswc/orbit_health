@@ -97,3 +97,8 @@ def test_audio_invalido_se_expone_como_error_de_validacion(tmp_path):
         assert str(error) == "Audio inválido o formato no compatible"
     else:
         raise AssertionError("El audio inválido debe producir ValueError")
+
+
+def test_resolver_piper_bin_usa_el_del_sistema_cuando_no_existe_venv_en_docker(monkeypatch):
+    monkeypatch.setattr(voz_local.shutil, "which", lambda cmd: "/usr/local/bin/piper" if cmd == "piper" else None)
+    assert voz_local._resolver_piper_bin("./ruta/inexistente/piper") == "/usr/local/bin/piper"

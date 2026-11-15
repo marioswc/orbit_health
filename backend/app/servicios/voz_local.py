@@ -11,6 +11,7 @@ import base64
 import json
 import re
 import os
+import shutil
 import subprocess
 import tempfile
 import threading
@@ -331,16 +332,33 @@ def responder(texto: str, estado: dict, preferencias: dict, perfil: str = "", no
     return salida
 
 
+def _ruta_en_backend(ruta: str) -> str:
+    p = Path(ruta).expanduser()
+    if not p.exists() and (config.RAIZ / "backend" / p).exists():
+        return str(config.RAIZ / "backend" / p)
+    return str(p) if ruta.startswith("~") else ruta
+
+
+def _resolver_piper_bin(ruta: str) -> str:
+    """Resuelve el binario de Piper: si la ruta del .env (p. ej. ./.venv/bin/piper) no existe en Docker, usa el del PATH."""
+    resuelta = _ruta_en_backend(ruta)
+    if Path(resuelta).is_file() or shutil.which(resuelta):
+        return resuelta
+    return shutil.which("piper") or resuelta
+
+
 def sintetizar(texto: str, idioma: str = "es") -> str:
     """Devuelve audio WAV codificado, sin guardar el resultado permanentemente."""
     modelo = config.VOZ_PIPER_MODELO_EN if idioma == "en" and config.VOZ_PIPER_MODELO_EN else config.VOZ_PIPER_MODELO
     if not modelo:
         raise VozNoDisponible("Configura ORBIT_VOZ_PIPER_MODELO")
+    modelo = _ruta_en_backend(modelo)
+    piper_bin = _resolver_piper_bin(config.VOZ_PIPER_BIN)
     with tempfile.TemporaryDirectory() as directorio:
         salida = os.path.join(directorio, "respuesta.wav")
         try:
             subprocess.run(
-                [config.VOZ_PIPER_BIN, "--model", modelo, "--output_file", salida],
+                [piper_bin, "--model", modelo, "--output_file", salida],
                 input=texto, text=True, capture_output=True, check=True, timeout=30,
             )
         except (OSError, subprocess.SubprocessError) as error:
