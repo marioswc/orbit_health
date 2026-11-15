@@ -1,0 +1,22 @@
+/* Guía de bienvenida: este CSS viaja con el componente */
+.bienvenida-fondo {
+  position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: var(--spacing-16);
+  background: rgba(0, 0, 0, .55); backdrop-filter: blur(4px);
+}
+.bienvenida {
+  width: min(520px, 100%); padding: var(--spacing-24); border-radius: 20px; border: 1px solid var(--glass-edge);
+  background: var(--color-ink); color: var(--color-eggshell); box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+}
+.bienvenida h2 { margin: 0 0 var(--spacing-12); font-size: var(--text-body-lg); }
+.bienvenida p { margin: 0 0 var(--spacing-16); line-height: 1.55; font-size: var(--text-body-sm); }
+.bienvenida-paso { font-size: var(--text-caption); opacity: .65; margin-bottom: var(--spacing-8); }
+.bienvenida-puntos { display: flex; gap: 6px; margin-bottom: var(--spacing-16); }
+.bienvenida-puntos i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: .25; }
+.bienvenida-puntos i.activo { opacity: 1; background: var(--estado-verde); }
+.bienvenida-acciones { display: flex; gap: var(--spacing-8); justify-content: space-between; flex-wrap: wrap; }
+.bienvenida-acciones > div { display: flex; gap: var(--spacing-8); }
+.bienvenida-ayuda {
+  position: fixed; left: 16px; bottom: 16px; z-index: 40; width: 36px; height: 36px; min-height: 36px; padding: 0;
+  border-radius: 50%; border: 1px solid var(--glass-edge); background: var(--color-ink); color: var(--color-eggshell);
+  cursor: pointer; font-weight: 600;
+}
