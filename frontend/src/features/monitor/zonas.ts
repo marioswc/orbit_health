@@ -33,7 +33,7 @@ export const FUENTE_EFECTOS = "NASA HRP · Hazards of Human Spaceflight";
 
 export const ZONAS: Zona[] = [
   {
-    id: "snc", etiqueta: "Cabeza / SNC", indicadores: ["avpu"], x: 239, y: 76, zoom: 2.2, capaInicial: "organos",
+    id: "snc", etiqueta: "Cabeza / SNC", indicadores: ["avpu", "sueno_horas", "sueno_eficiencia_pct", "sueno_despertares_min"], x: 239, y: 76, zoom: 2.2, capaInicial: "organos",
     peligro: "Radiación, aislamiento y sueño",
     efectos: [
       "Radiación espacial: daño al sistema nervioso central, con alteraciones cognitivas, menor función motora y cambios de comportamiento.",
@@ -56,7 +56,7 @@ export const ZONAS: Zona[] = [
     anatomia: { organos: "El aire de la nave se recicla y su calidad se monitorea sin pausa; la hipoxia es uno de los riesgos del catálogo HRP." },
   },
   {
-    id: "cardio", etiqueta: "Cardiovascular", indicadores: ["presion_sistolica", "presion_diastolica", "frecuencia_cardiaca"], x: 237, y: 194, zoom: 2.3, capaInicial: "organos",
+    id: "cardio", etiqueta: "Cardiovascular", indicadores: ["presion_sistolica", "presion_diastolica", "frecuencia_cardiaca", "variabilidad_cardiaca"], x: 237, y: 194, zoom: 2.3, capaInicial: "organos",
     peligro: "Radiación y gravedad alterada",
     efectos: [
       "Radiación espacial: mayor riesgo de enfermedades cardíacas y circulatorias.",
@@ -87,7 +87,7 @@ export const ZONAS: Zona[] = [
     },
   },
   {
-    id: "piernas", etiqueta: "Piernas", indicadores: [], x: 211, y: 323, zoom: 1.8, capaInicial: "musculo",
+    id: "piernas", etiqueta: "Piernas", indicadores: ["ejercicio_min"], x: 211, y: 323, zoom: 1.8, capaInicial: "musculo",
     peligro: "Pérdida ósea y locomoción",
     efectos: [
       "La densidad mineral ósea baja alrededor de 1 % por mes en microgravedad según el video de NASA HRP; la página de gravedad indica entre 1 % y 1.5 %.",

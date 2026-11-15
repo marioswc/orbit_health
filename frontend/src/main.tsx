@@ -18,6 +18,11 @@ import "./shared/styles/consola.css";
 import "./shared/styles/banda.css";
 import "./shared/styles/ligero.css";
 
+// PWA: solo en producción y en un contexto seguro (localhost o HTTPS); en la red de la cabina por HTTP simple no aplica.
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(() => undefined); });
+}
+
 iniciarRendimiento(); // antes del primer pintado: el CSS ligero ya aplica desde el inicio
 
 createRoot(document.getElementById("root")!).render(

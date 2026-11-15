@@ -7,6 +7,14 @@ const NOMBRES: Record<string, string> = {
   temperatura: "Temperatura",
   avpu: "Conciencia (AVPU)",
   o2_cabina: "O₂ de cabina",
+  glucosa: "Glucosa",
+  co2: "CO₂ de cabina",
+  dosis_pct: "Dosis de radiación",
+  sueno_horas: "Sueño",
+  sueno_eficiencia_pct: "Eficiencia de sueño",
+  sueno_despertares_min: "Despertares",
+  variabilidad_cardiaca: "Variabilidad (HRV)",
+  ejercicio_min: "Ejercicio diario",
 };
 
 /** Nombre legible de un indicador del backend (clave en snake_case). */
