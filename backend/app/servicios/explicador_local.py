@@ -20,6 +20,12 @@ from ..dominio import guardia_ia
 log = logging.getLogger("orbit.ia")
 _LOOPBACKS = {"localhost", "127.0.0.1", "::1"}
 AVISO_IA = "Texto generado por un modelo local. No es un diagnóstico y no modifica la alerta."
+AVISO_IA_EXTERNA = ("Texto generado por IA en un servicio externo por internet (DeepSeek): tu consulta y tu estado salieron de la estación. "
+                    "No es un diagnóstico y no modifica la alerta.")
+
+
+def aviso_para(fuente: str) -> str:
+    return AVISO_IA_EXTERNA if fuente == "deepseek" else AVISO_IA
 
 
 class _SinRedireccion(HTTPRedirectHandler):
@@ -129,7 +135,7 @@ def explicar(estado: dict) -> dict:
         log.warning("Respuesta del modelo descartada: %s", motivo)
         return {"fuente": "reglas_locales", "modelo": None, "generado_por_ia": False, "descartado_por": motivo,
                 "explicacion": _fallback(estado), "nivel_general": nivel}
-    return {"fuente": fuente, "modelo": modelo, "generado_por_ia": True, "aviso": AVISO_IA,
+    return {"fuente": fuente, "modelo": modelo, "generado_por_ia": True, "aviso": aviso_para(fuente),
             "explicacion": texto, "nivel_general": nivel}
 
 

@@ -123,3 +123,27 @@ def test_no_sigue_redirecciones(monkeypatch):
         assert llamadas == []
     finally:
         origen.shutdown(); destino.shutdown()
+
+
+# ---------- proveedor externo (DeepSeek): se declara en el aviso y la crisis tampoco llega ahí ----------
+def test_con_deepseek_el_aviso_dice_que_los_datos_salieron(monkeypatch):
+    monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "clave-de-prueba")
+    monkeypatch.setattr(config, "IA_PROVEEDOR", "")
+    monkeypatch.setattr(explicador_local, "consultar_modelo", lambda p: "Nivel amarillo por la respiración en 22.")
+    r = explicador_local.explicar(ESTADO)
+    assert r["fuente"] == "deepseek" and "externo" in r["aviso"] and "salieron" in r["aviso"]
+    v = voz_local.responder("¿cómo voy?", ESTADO, {"tono": "directo"})
+    assert v["fuente"] == "deepseek" and "externo" in v["aviso"]
+
+
+def test_una_crisis_no_llega_a_deepseek(monkeypatch):
+    monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "clave-de-prueba")
+    monkeypatch.setattr(config, "IA_PROVEEDOR", "")
+    monkeypatch.setattr(explicador_local, "consultar_modelo", lambda p: (_ for _ in ()).throw(AssertionError("salió a internet")))
+    assert voz_local.responder("quiero morir", ESTADO, {"tono": "directo"})["fuente"] == "protocolo_crisis"
+
+
+def test_con_proveedor_local_forzado_no_se_usa_deepseek(monkeypatch):
+    monkeypatch.setattr(config, "DEEPSEEK_API_KEY", "clave-de-prueba")
+    monkeypatch.setattr(config, "IA_PROVEEDOR", "local")
+    assert explicador_local._usar_deepseek() is False

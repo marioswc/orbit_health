@@ -154,7 +154,7 @@ def responder(texto: str, estado: dict, preferencias: dict) -> dict:
         explicador_local.log.warning("Respuesta de voz descartada: %s", motivo)
         return {**fallback, "descartado_por": motivo}
     fuente = "deepseek" if explicador_local._usar_deepseek() else "modelo_local"
-    return {"fuente": fuente, "generado_por_ia": True, "aviso": explicador_local.AVISO_IA, "texto": respuesta}
+    return {"fuente": fuente, "generado_por_ia": True, "aviso": explicador_local.aviso_para(fuente), "texto": respuesta}
 
 
 def sintetizar(texto: str) -> str:
