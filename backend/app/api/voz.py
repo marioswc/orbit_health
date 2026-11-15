@@ -33,7 +33,7 @@ def chat_voz(tid: str, audio: bytes = Body(...), idioma: str = "auto", content_t
         estado = servicio_estado.estado_tripulante(conn, tid)
         preferencias = servicio_preferencias.obtener(conn, tid)
         ctx = servicio_perfil.contexto(conn, tid)
-        respuesta = voz_local.responder(texto, estado, preferencias, perfil=ctx["intereses"], rasgos=ctx["rasgos"], nombre=ctx["nombre"], idioma=idioma_real)
+        respuesta = voz_local.responder(texto, estado, preferencias, perfil=ctx["intereses"], rasgos=ctx["rasgos"], nombre=(ctx["nombre"].split() or [""])[0], idioma=idioma_real)
         respuesta["transcripcion"] = texto
         respuesta["nivel_general"] = estado["nivel_general"]
         if config.VOZ_PIPER_MODELO:
