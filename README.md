@@ -72,7 +72,7 @@ La lista completa y siempre actual está en [docs/API_REFERENCIA.md](docs/API_RE
 | `GET /api/demo/comparativa?entorno=&respuesta_tierra_min=` | Línea de tiempo con y sin ORBIT |
 | `GET /api/recordatorios` y `/{id}` | Quién tiene la medición vencida, según su nivel y su frecuencia elegida |
 | `POST /api/sensores/lectura` y `/lote` | Entrada de dispositivos (origen `sensor`); el lote es todo o nada |
-| `POST /api/demo/sensor/{id}?perfil=` | Un dispositivo portátil simulado (estable o deterioro respiratorio) |
+| `POST /api/demo/sensor/{id}?perfil=` | Un dispositivo portátil simulado (estable, deterioro respiratorio o exposición a radiación acumulada) |
 | `GET /api/entornos` y `/{clave}` | Entornos con su gravedad y si la estimación de pérdida ósea aplica (solo en microgravedad) |
 | `GET /api/racha/{id}` | Racha de días con los 5 signos vitales, sin presión |
 | `GET /api/explicaciones/{clave}` | Ahora trae `medidas_nasa` y `senales_a_vigilar` con cita textual y enlace |
@@ -86,7 +86,11 @@ Para que la demo no sea manual: `POST /api/demo/simulacion/iniciar` pone a una t
 
 ## Banda o pulsómetro por Bluetooth
 
-La frecuencia cardíaca puede llegar sola desde un dispositivo BLE que anuncie el servicio estándar; ver [docs/BANDA_BLE.md](docs/BANDA_BLE.md). El puente está probado con una banda simulada, **no con una real**.
+La frecuencia cardíaca puede llegar sola desde un dispositivo BLE que anuncie el servicio estándar; ver [docs/BANDA_BLE.md](docs/BANDA_BLE.md). El puente está probado con una banda simulada. Con una banda real de consumo (IDW26, app Veryfit) se conectó, pero habla un protocolo propio y **no está soportada**; solo funcionarían dispositivos con el servicio estándar.
+
+## IA local (opcional)
+
+Un modelo local sin internet puede explicar una alerta o responder por voz, pero nunca decide el nivel: una crisis la atiende siempre el protocolo escrito y todo texto del modelo se valida y se marca como IA. Ver [docs/IA_LOCAL.md](docs/IA_LOCAL.md).
 
 ## Escenarios de demo
 
@@ -94,6 +98,7 @@ La frecuencia cardíaca puede llegar sola desde un dispositivo BLE que anuncie e
 curl -X POST localhost:3000/api/demo/escenarios/hipoxia_eclipse                 # deja el enlace en eclipse
 curl -X POST "localhost:3000/api/demo/escenarios/hipoxia_eclipse?reconectar=true"  # y reconecta en el mismo paso
 curl -X POST localhost:3000/api/demo/escenarios/co2_colectivo
+curl -X POST "localhost:3000/api/demo/sensor/T1?perfil=exposicion_radiacion&ticks=12"  # dosis acumulada: amarillo y luego rojo
 curl localhost:3000/api/demo/escenarios                                         # lista de guiones
 ```
 

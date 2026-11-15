@@ -35,7 +35,7 @@ Runs fully offline from a single local server. Optional local authentication (sw
 - The live mission shown in the demo is a script: its values are invented, although they travel through the same sensor channel a real band would use. They are stored, shown in the history and sent to Earth tagged as `simulated`, never as real sensor data.
 - This is a **prototype** that supports decisions. It does not replace the flight surgeon.
 - **All thresholds are design assumptions pending clinical validation.** The interface says so on screen.
-- Vital signs are entered by hand, through a simulated device or, for heart rate only, through a Bluetooth bridge. The bridge is tested with simulated packets and against the real server, **not yet with a real band**. Other vitals from consumer bands would need vendor-specific protocols.
+- Vital signs are entered by hand, through a simulated device or, for heart rate only, through a Bluetooth bridge. The bridge is tested with simulated packets and against the real server. A real consumer band (IDW26, Veryfit app) was tried: it connects but exposes no standard services (proprietary protocol), so it is **not supported**. Other vitals from consumer bands would need vendor-specific protocols.
 - The "with and without ORBIT" timeline is an illustration with explicit assumptions, not a measurement.
 - Only 8 of the 17 HRP risks have any indicator behind them, and only hypoxia is covered directly.
 - The adaptive assistant is preference-based personalisation, not a model that learns personalities. A local language model that rephrases the texts is future work.

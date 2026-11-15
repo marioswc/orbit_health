@@ -21,6 +21,21 @@ Con `ritmo=15` y `tick_s=1`, la misión dura unos 2 minutos y medio. Para una de
 
 Para empezar de cero, arranca con una base nueva: `ORBIT_DB_PATH=/tmp/demo.db ./run.sh`. La simulación **no borra nada**.
 
+## Exposición a radiación con el sensor simulado
+
+El dispositivo simulado incluye el perfil `exposicion_radiacion`. Genera una dosis acumulada
+monotónica desde 68 % hasta 95 % del límite de misión, por lo que atraviesa el umbral amarillo
+de 70 % y termina en rojo al alcanzar 90 %. Se procesa por el mismo servicio de lecturas,
+se guarda con `origen = simulado`, aparece en el historial y genera eventos en la cola.
+
+```bash
+curl -X POST "localhost:3000/api/demo/sensor/T1?perfil=exposicion_radiacion&ticks=12"
+curl "localhost:3000/api/historial/T1?indicador=dosis_pct"
+```
+
+Los valores son hipotéticos para demostración y no representan una medición física ni una
+calibración de radiación real.
+
 ## La historia (minutos de misión)
 
 | Min | Qué pasa | Qué se ve |
@@ -47,4 +62,4 @@ Todo lo que fabrica la simulación (la misión, las ráfagas de `/demo/sensor` y
 ## Qué NO es
 - No es una banda real: los valores salen de un guion. La conexión con una banda real está en [BANDA_BLE.md](BANDA_BLE.md).
 - No es una predicción: el guion es ilustrativo y los umbrales son supuestos pendientes de validación médica.
-- Un detalle de diseño que sale a la vista: **durante un apagón largo se acumulan muchos eventos de rutina**. Hoy salen todos al volver el enlace, ordenados por urgencia. Resumir lo rutinario antes de enviar sigue pendiente.
+- Un detalle de diseño que sale a la vista: **durante un apagón largo se acumulan muchos eventos de rutina**. Al volver el enlace, si hay `ORBIT_COMPACTAR_RUTINA_DESDE` (20 por defecto) o más, salen **resumidos en un evento por tripulante** (`resumen_rutina`) y lo urgente sale primero. Los eventos originales **no se borran**: siguen a bordo y en la cadena de integridad (`/api/cola/verificar`), solo dejan de enviarse uno por uno. Los amarillos y rojos nunca se resumen. `ORBIT_COMPACTAR_RUTINA_DESDE=0` lo desactiva.

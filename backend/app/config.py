@@ -34,6 +34,7 @@ RESPALDOS_CONSERVAR = int(os.getenv("ORBIT_RESPALDOS_CONSERVAR", "24"))
 
 # --- Flujo continuo de sensores (una banda envía una muestra por segundo): se agrupa en ventanas ---
 FLUJO_VENTANA_S = float(os.getenv("ORBIT_FLUJO_VENTANA_S", "60"))             # 0 = sin agrupar
+COMPACTAR_RUTINA_DESDE = int(os.getenv("ORBIT_COMPACTAR_RUTINA_DESDE", "20"))  # eventos de rutina retenidos que disparan el resumen; 0 = nunca
 FLUJO_ENFRIAMIENTO_S = float(os.getenv("ORBIT_FLUJO_ENFRIAMIENTO_S", "30"))   # mínimo entre extremos del mismo indicador
 
 # Explicador opcional: solo acepta un modelo servido en la propia estación.
