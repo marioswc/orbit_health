@@ -14,7 +14,7 @@
   "health.every": "cada {{min}} min",
   "health.disabled": "automáticos desactivados",
   "pin.title": "Reiniciar PIN",
-  "pin.desc": "Solo el médico o el comandante. Genera un PIN temporal y cierra las sesiones de esa persona. Queda en la auditoría.",
+  "pin.desc": "Solo el comandante. Genera un PIN temporal y cierra las sesiones de esa persona. Queda en la auditoría.",
   "pin.crew": "Tripulante",
   "pin.button": "Reiniciar PIN",
   "pin.done": "PIN reiniciado",
